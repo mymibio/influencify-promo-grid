@@ -11,7 +11,6 @@ import UserProfile from "./pages/UserProfile";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import DashboardLinks from "./pages/DashboardLinks";
 import DashboardProfile from "./pages/DashboardProfile";
 import DashboardSettings from "./pages/DashboardSettings";
 import DashboardAnalytics from "./pages/DashboardAnalytics";
@@ -33,7 +32,6 @@ function App() {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/dashboard/links" element={<DashboardLinks />} />
             <Route path="/dashboard/profile" element={<DashboardProfile />} />
             <Route path="/dashboard/settings" element={<DashboardSettings />} />
             <Route path="/dashboard/analytics" element={<DashboardAnalytics />} />

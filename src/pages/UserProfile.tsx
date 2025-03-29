@@ -15,7 +15,10 @@ const sampleUser: User = {
   socialLinks: {
     instagram: "fashionista",
     twitter: "fashionista",
-    youtube: "fashionistachannel"
+    youtube: "fashionistachannel",
+    facebook: "fashionista.page",
+    whatsapp: "12345678900",
+    email: "ashley@example.com"
   },
   createdAt: new Date().toISOString()
 };

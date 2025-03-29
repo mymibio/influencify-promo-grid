@@ -2,7 +2,7 @@
 import { User } from "@/types/user";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
-import { Instagram, Youtube, Twitter } from "lucide-react";
+import { Instagram, Youtube, Twitter, Facebook, Mail, MessageSquare } from "lucide-react";
 
 interface ProfileHeaderProps {
   user: User;
@@ -64,6 +64,36 @@ const ProfileHeader = ({ user }: ProfileHeaderProps) => {
               className="text-gray-600 hover:text-brand-purple transition-colors"
             >
               <Twitter size={20} />
+            </Link>
+          )}
+          {user.socialLinks.facebook && (
+            <Link 
+              to={`https://facebook.com/${user.socialLinks.facebook}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-600 hover:text-brand-purple transition-colors"
+            >
+              <Facebook size={20} />
+            </Link>
+          )}
+          {user.socialLinks.email && (
+            <Link 
+              to={`mailto:${user.socialLinks.email}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-600 hover:text-brand-purple transition-colors"
+            >
+              <Mail size={20} />
+            </Link>
+          )}
+          {user.socialLinks.whatsapp && (
+            <Link 
+              to={`https://wa.me/${user.socialLinks.whatsapp}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-600 hover:text-brand-purple transition-colors"
+            >
+              <MessageSquare size={20} />
             </Link>
           )}
         </div>
