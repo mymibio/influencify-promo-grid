@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Instagram, Twitter, Youtube, TikTok, Upload } from "lucide-react";
+import { Instagram, Twitter, Youtube, Video, Upload } from "lucide-react";
 import { toast } from "sonner";
 
 // Mock user data for demonstration
@@ -152,7 +152,7 @@ const DashboardProfile = () => {
                     
                     <div className="space-y-2">
                       <FormLabel className="flex items-center gap-2" htmlFor="tiktok">
-                        <TikTok size={18} />
+                        <Video size={18} />
                         TikTok
                       </FormLabel>
                       <Input
