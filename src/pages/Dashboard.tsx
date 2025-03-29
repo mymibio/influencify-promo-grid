@@ -16,7 +16,7 @@ const sampleUser: User = {
   email: "ashley@example.com",
   name: "Ashley Johnson",
   profilePicture: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&h=256&auto=format&fit=crop",
-  bio: "Fashion & lifestyle content creator. Sharing my favorite products and deals with you!",
+  bio: "Fashion & lifestyle content creator. Sharing my favorite coupons and deals with you!",
   socialLinks: {
     instagram: "fashionista",
     facebook: "fashionista.style",
@@ -107,11 +107,11 @@ const Dashboard = () => {
               <PromotionalCard key={item.id} item={item} />
             ))}
             
-            {/* Add Item Cards */}
-            <AddItemCard aspectRatio="1:1" onClick={() => handleAddItem("1:1")} />
-            <AddItemCard aspectRatio="1:1" onClick={() => handleAddItem("1:1")} />
-            <AddItemCard aspectRatio="9:16" onClick={() => handleAddItem("9:16")} />
-            <AddItemCard aspectRatio="9:16" onClick={() => handleAddItem("9:16")} />
+            {/* Add Coupon Cards */}
+            <AddItemCard aspectRatio="1:1" onClick={() => handleAddItem("1:1")} label="Add Coupon" />
+            <AddItemCard aspectRatio="1:1" onClick={() => handleAddItem("1:1")} label="Add Coupon" />
+            <AddItemCard aspectRatio="9:16" onClick={() => handleAddItem("9:16")} label="Add Coupon" />
+            <AddItemCard aspectRatio="9:16" onClick={() => handleAddItem("9:16")} label="Add Coupon" />
           </div>
         </div>
       </main>
