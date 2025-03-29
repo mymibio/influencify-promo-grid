@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { User, PromotionalItem } from "@/types/user";
 import { Button } from "@/components/ui/button";
-import { Instagram, Facebook, MessageCircle, Mail, Youtube, Twitter, Plus, Copy, Link, Pencil } from "lucide-react";
+import { Instagram, Facebook, MessageCircle, Mail, Youtube, Twitter, Plus, Copy, Link, Pencil, Menu, Settings, LayoutGrid, BarChart, Palette } from "lucide-react";
 import SimpleSidebar from "@/components/dashboard/simple-sidebar";
 import AddItemCard from "@/components/dashboard/add-item-card";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 const sampleUser: User = {
   id: "123",
@@ -73,6 +74,7 @@ const Dashboard = () => {
   const [selectedTheme, setSelectedTheme] = useState("default");
   const [currentSocialPlatform, setCurrentSocialPlatform] = useState<string>("");
   const [socialHandle, setSocialHandle] = useState<string>("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isMobile = useIsMobile();
   
   const getInitials = (name: string) => {
@@ -237,6 +239,21 @@ const Dashboard = () => {
       
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">
+          {/* Mobile Header with Menu Button */}
+          {isMobile && (
+            <div className="flex items-center justify-between mb-4">
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => setMobileMenuOpen(true)}
+              >
+                <Menu size={24} />
+              </Button>
+              <h1 className="text-xl font-bold">Dashboard</h1>
+              <div className="w-10"></div> {/* Empty div for balanced spacing */}
+            </div>
+          )}
+          
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {!isMobile && (
               <div className="hidden lg:block">
@@ -250,17 +267,115 @@ const Dashboard = () => {
             )}
             
             <div className="lg:col-span-2">
-              <ProfileHeader 
-                user={user} 
-                editable={true} 
-                onEditProfilePicture={handleEditProfilePicture}
-                onAddSocialLink={(platform) => {
-                  setCurrentSocialPlatform(platform);
-                  setIsSocialDialogOpen(true);
-                }}
-                onDeleteSocialLink={handleDeleteSocialLink}
-                onEditSocialLink={handleEditSocialLink}
-              />
+              <div className="bg-white rounded-lg shadow-sm border">
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-6 p-4 sm:p-6">
+                  <div className="relative">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden flex-shrink-0 border-2 border-white shadow-md">
+                      {user.profilePicture ? (
+                        <img 
+                          src={user.profilePicture} 
+                          alt={user.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                          <span className="text-xl font-semibold">{user.name.charAt(0)}</span>
+                        </div>
+                      )}
+                    </div>
+                    <Button 
+                      size="icon" 
+                      className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-1.5 cursor-pointer shadow-md hover:bg-primary/90 h-8 w-8"
+                      onClick={() => setIsProfileDialogOpen(true)}
+                    >
+                      <Pencil size={16} />
+                    </Button>
+                  </div>
+                  
+                  <div className="flex-1 flex flex-col text-center md:text-left">
+                    <h1 className="text-2xl sm:text-3xl font-bold">{user.name}</h1>
+                    
+                    <div className="text-muted-foreground text-sm mb-2">
+                      @{user.username}
+                    </div>
+                    
+                    {isEditingBio ? (
+                      <div className="flex flex-col gap-2">
+                        <Input
+                          value={editedBio}
+                          onChange={(e) => setEditedBio(e.target.value)}
+                          className="text-sm"
+                        />
+                        <div className="flex gap-2 justify-end">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => setIsEditingBio(false)}
+                          >
+                            Cancel
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            onClick={handleSaveBio}
+                          >
+                            Save
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="relative group">
+                        <p className="text-sm sm:text-base text-gray-600 max-w-lg">
+                          {user.bio}
+                        </p>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 h-6 w-6"
+                          onClick={handleEditBio}
+                        >
+                          <Pencil size={12} />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Centered social links */}
+                <div className="flex flex-wrap gap-2 justify-center pb-6">
+                  {user.socialLinks && Object.entries(user.socialLinks).map(([platform, handle]) => (
+                    <div 
+                      key={platform} 
+                      className="relative group"
+                    >
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-10 w-10 rounded-full"
+                        onClick={() => {
+                          setCurrentSocialPlatform(platform);
+                          setSocialHandle(handle);
+                          setIsSocialDialogOpen(true);
+                        }}
+                      >
+                        {getSocialIcon(platform)}
+                      </Button>
+                    </div>
+                  ))}
+                  
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-10 w-10 rounded-full"
+                    onClick={() => {
+                      setCurrentSocialPlatform("");
+                      setSocialHandle("");
+                      setIsSocialDialogOpen(true);
+                    }}
+                  >
+                    <Plus size={16} />
+                  </Button>
+                </div>
+              </div>
               
               <div className="mt-4 bg-white rounded-lg border p-3 shadow-sm">
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -334,6 +449,33 @@ const Dashboard = () => {
         editItem={editingItem}
       />
 
+      <Dialog open={isProfileDialogOpen} onOpenChange={setIsProfileDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Profile</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="flex justify-center mb-4">
+              <div className="relative">
+                
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input 
+                id="username" 
+                value={user.username} 
+                onChange={(e) => setUser(prev => ({ ...prev, username: e.target.value }))} 
+                placeholder="Enter your username"
+              />
+            </div>
+            <div className="pt-4 flex justify-end">
+              <Button onClick={() => setIsProfileDialogOpen(false)}>Save Changes</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
       <Dialog open={isSocialDialogOpen} onOpenChange={setIsSocialDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -380,6 +522,78 @@ const Dashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
+      
+      {/* Mobile Menu Sheet */}
+      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <SheetContent side="left" className="w-[250px] p-0">
+          <div className="flex flex-col h-full">
+            <div className="p-4 border-b">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full overflow-hidden">
+                  {user.profilePicture ? (
+                    <img src={user.profilePicture} alt={user.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                      <span className="text-sm font-semibold">{user.name.charAt(0)}</span>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <p className="font-medium">{user.name}</p>
+                  <p className="text-xs text-muted-foreground">@{user.username}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex-1 py-2">
+              <div className="px-2">
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start mb-1"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <LayoutGrid className="mr-2 h-4 w-4" />
+                  Dashboard
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start mb-1"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <BarChart className="mr-2 h-4 w-4" />
+                  Analytics
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start mb-1"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Palette className="mr-2 h-4 w-4" />
+                  Theme Settings
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start mb-1"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </Button>
+              </div>
+            </div>
+            
+            <div className="p-4 border-t">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Close Menu
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
