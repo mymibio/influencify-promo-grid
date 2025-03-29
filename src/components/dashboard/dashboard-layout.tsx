@@ -183,7 +183,7 @@ const DashboardLayout = ({ children, user: initialUser }: DashboardLayoutProps) 
                     const input = document.createElement('input');
                     input.type = 'file';
                     input.accept = 'image/*';
-                    input.onchange = (e) => handleProfilePictureUpload(e as React.ChangeEvent<HTMLInputElement>);
+                    input.onchange = (e) => handleProfilePictureUpload(e as any as React.ChangeEvent<HTMLInputElement>);
                     setFileInput(input);
                     input.click();
                   }}

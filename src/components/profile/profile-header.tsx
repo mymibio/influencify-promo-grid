@@ -1,7 +1,7 @@
 
 import { User } from "@/types/user";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Instagram, Youtube, Twitter, Facebook, Mail, MessageSquare, Plus, Pencil, X, ChevronLeft, Search, Linkedin, Pin, Snapchat, MessageCircle, FileText, ArrowRight } from "lucide-react";
+import { Instagram, Youtube, Twitter, Facebook, Mail, MessageSquare, Plus, Pencil, X, ChevronLeft, Search, Linkedin, Pin, MessageCircle, FileText, ArrowRight, Ghost } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -178,7 +178,7 @@ const ProfileHeader = ({
     { 
       name: "Snapchat", 
       key: "snapchat", 
-      icon: Snapchat,
+      icon: Ghost, // Changed from Snapchat to Ghost icon
       placeholder: "Enter Snapchat Username",
       example: "Example: @snapchatusername"
     },
