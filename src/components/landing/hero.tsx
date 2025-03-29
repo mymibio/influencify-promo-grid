@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -42,15 +41,14 @@ const Hero = () => {
       const { data, error } = await supabase
         .from('user_profiles')
         .select('username')
-        .eq('username', username)
-        .single();
+        .eq('username', username);
       
-      if (error && error.code !== 'PGRST116') { 
-        // PGRST116 means no rows found, which is what we want
+      if (error) {
         throw error;
       }
       
-      if (data) {
+      // If data exists and has length > 0, username is taken
+      if (data && data.length > 0) {
         toast.error("Username is already taken. Please choose another one.");
         setIsChecking(false);
         return;
