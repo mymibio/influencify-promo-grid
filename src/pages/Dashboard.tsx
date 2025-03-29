@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { User, PromotionalItem, SocialLinks } from "@/types/user";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { User, PromotionalItem } from "@/types/user";
 import { Button } from "@/components/ui/button";
-import { Instagram, Facebook, MessageCircle, Mail, Plus, Copy, Link, Edit, Save, Pencil, Youtube, Twitter } from "lucide-react";
+import { Instagram, Facebook, MessageCircle, Mail, Youtube, Twitter, Plus, Copy, Link, Pencil } from "lucide-react";
 import SimpleSidebar from "@/components/dashboard/simple-sidebar";
 import AddItemCard from "@/components/dashboard/add-item-card";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
@@ -201,6 +200,18 @@ const Dashboard = () => {
     }
   };
 
+  const handleEditSocialLink = (platform: string, handle: string) => {
+    if (user.socialLinks) {
+      setUser(prev => ({
+        ...prev,
+        socialLinks: {
+          ...prev.socialLinks,
+          [platform]: handle
+        }
+      }));
+    }
+  };
+
   const getSocialIcon = (platform: string) => {
     switch (platform.toLowerCase()) {
       case 'instagram':
@@ -248,6 +259,7 @@ const Dashboard = () => {
                   setIsSocialDialogOpen(true);
                 }}
                 onDeleteSocialLink={handleDeleteSocialLink}
+                onEditSocialLink={handleEditSocialLink}
               />
               
               <div className="mt-4 bg-white rounded-lg border p-3 shadow-sm">
@@ -322,7 +334,6 @@ const Dashboard = () => {
         editItem={editingItem}
       />
 
-      {/* Social Media Dialog */}
       <Dialog open={isSocialDialogOpen} onOpenChange={setIsSocialDialogOpen}>
         <DialogContent>
           <DialogHeader>

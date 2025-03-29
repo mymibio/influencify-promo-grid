@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   username: string;
@@ -12,12 +11,12 @@ export interface User {
 
 export interface SocialLinks {
   instagram?: string;
-  tiktok?: string;
   youtube?: string;
   twitter?: string;
   facebook?: string;
   whatsapp?: string;
   email?: string;
+  tiktok?: string;
 }
 
 export interface PromotionalItem {
