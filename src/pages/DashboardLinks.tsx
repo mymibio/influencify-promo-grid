@@ -6,13 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, Edit2, Trash2, ExternalLink, Smartphone } from "lucide-react";
+import { PlusCircle, Edit2, Trash2, ExternalLink, Smartphone, Link2, Copy } from "lucide-react";
 import { toast } from "sonner";
 import ProfilePreview from "@/components/dashboard/profile-preview";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { PromotionalCard } from "@/components/cards/promotional-card";
 import PromotionalGrid from "@/components/profile/promotional-grid";
 
 // Mock user data for demonstration
@@ -77,6 +76,7 @@ const DashboardLinks = () => {
   const [selectedTheme, setSelectedTheme] = useState("default");
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
   const isMobile = useIsMobile();
+  const [showCopiedToast, setShowCopiedToast] = useState(false);
   
   const filteredItems = items.filter(item => 
     item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -105,6 +105,18 @@ const DashboardLinks = () => {
   const handleReorderItems = (reorderedItems: PromotionalItem[]) => {
     setItems(reorderedItems);
     toast.success("Items reordered successfully");
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText("https://yourdomain.com/fashionista")
+      .then(() => {
+        setShowCopiedToast(true);
+        toast.success("Link copied to clipboard!");
+        setTimeout(() => setShowCopiedToast(false), 2000);
+      })
+      .catch(() => {
+        toast.error("Failed to copy link");
+      });
   };
   
   return (
@@ -172,8 +184,26 @@ const DashboardLinks = () => {
         <div className="xl:col-span-1">
           <div className="space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <h1 className="text-3xl font-bold">Promotional Links</h1>
-              <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-bold md:block hidden">Promotional Links</h1>
+              <div className="w-full md:w-auto flex flex-col md:flex-row gap-2 items-start md:items-center">
+                {/* Redesigned Link Copy UI */}
+                <div className="flex items-center w-full md:w-auto gap-1 bg-gradient-to-r from-blue-50 to-indigo-50 border border-indigo-100 p-1.5 rounded-full">
+                  <div className="flex items-center gap-2 pl-2">
+                    <Link2 size={16} className="text-indigo-500" />
+                    <span className="text-sm font-medium text-gray-700 hidden sm:block">yourdomain.com/fashionista</span>
+                    <span className="text-sm font-medium text-gray-700 sm:hidden">Copy URL</span>
+                  </div>
+                  <Button 
+                    size="sm"
+                    variant="secondary" 
+                    className="h-8 rounded-full bg-white hover:bg-gray-100 transition-colors"
+                    onClick={handleCopyLink}
+                  >
+                    <Copy size={14} className="mr-1" />
+                    <span className="text-xs hidden sm:inline">Copy</span>
+                  </Button>
+                </div>
+                
                 <div className="flex items-center bg-muted rounded-lg p-1">
                   <Button 
                     variant={viewMode === 'table' ? 'default' : 'ghost'} 
@@ -192,11 +222,19 @@ const DashboardLinks = () => {
                     Grid
                   </Button>
                 </div>
+              </div>
+            </div>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <div>
+                  <CardTitle>Manage Promotional Content</CardTitle>
+                </div>
                 <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                   <DialogTrigger asChild>
                     <Button>
                       <PlusCircle className="h-4 w-4 mr-2" />
-                      Add New Link
+                      Add New
                     </Button>
                   </DialogTrigger>
                   <AddItemDialog 
@@ -206,13 +244,6 @@ const DashboardLinks = () => {
                     aspectRatio="9:16"
                   />
                 </Dialog>
-              </div>
-            </div>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Manage Your Links</CardTitle>
-                <CardDescription>Add, edit or remove your promotional links and coupons</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center mb-6">
