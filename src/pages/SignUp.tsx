@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "@/components/ui/navbar";
 import { toast } from "sonner";
@@ -19,15 +19,15 @@ const SignUp = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    // Get username from URL query parameter if available
+  // Special handling for username from URL query parameter
+  useState(() => {
     const queryParams = new URLSearchParams(location.search);
     const usernameParam = queryParams.get('username');
     
     if (usernameParam) {
       setFormData(prev => ({ ...prev, username: usernameParam }));
     }
-  }, [location]);
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -45,14 +45,36 @@ const SignUp = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    // In a real app with Supabase, we would register the user
-    // For now, let's simulate a successful registration
-    
-    setTimeout(() => {
+    try {
+      // Register the user with Supabase
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            name: formData.name,
+            username: formData.username,
+          }
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      // Create a user profile in the public schema
+      if (data.user) {
+        // Store username in localStorage for dashboard to access
+        localStorage.setItem('username', formData.username);
+        
+        toast.success("Account created successfully! Redirecting to dashboard...");
+        navigate("/dashboard");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to create account");
+    } finally {
       setIsLoading(false);
-      toast.success("Account created successfully! Redirecting to dashboard...");
-      navigate("/dashboard");
-    }, 1500);
+    }
   };
 
   return (
