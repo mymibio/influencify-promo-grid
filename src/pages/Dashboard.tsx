@@ -1,16 +1,9 @@
 
-import React, { useState } from "react";
+import React from "react";
 import DashboardLayout from "@/components/dashboard/dashboard-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, PromotionalItem } from "@/types/user";
-import ProfilePreview from "@/components/dashboard/profile-preview";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PlusCircle } from "lucide-react";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import AddItemDialog from "@/components/dashboard/add-item-dialog";
-import { toast } from "sonner";
-import PromotionalGrid from "@/components/profile/promotional-grid";
 
 // Sample user data
 const sampleUser: User = {
@@ -79,117 +72,72 @@ const sampleItems: PromotionalItem[] = [
 ];
 
 const Dashboard = () => {
-  const [items, setItems] = useState<PromotionalItem[]>(sampleItems);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [selectedTheme, setSelectedTheme] = useState("default");
-
-  const handleAddItem = (newItem: PromotionalItem) => {
-    setItems([newItem, ...items]);
-    toast.success("Item added successfully");
-  };
-  
-  const handleEditItem = (id: string) => {
-    toast.info("Edit functionality would open here");
-  };
-  
-  const handleDeleteItem = (id: string) => {
-    setItems(items.filter(item => item.id !== id));
-    toast.success("Item deleted successfully");
-  };
-  
-  const handleDragItem = (id: string) => {
-    toast.info("Drag functionality would be implemented here");
-  };
-
   return (
     <DashboardLayout user={sampleUser}>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <div className="space-y-6">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <h1 className="text-3xl font-bold">Dashboard</h1>
-              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button>
-                    <PlusCircle className="h-4 w-4 mr-2" />
-                    Add New Link
-                  </Button>
-                </DialogTrigger>
-                <AddItemDialog 
-                  open={isAddDialogOpen}
-                  onClose={() => setIsAddDialogOpen(false)}
-                  onAdd={handleAddItem}
-                  aspectRatio="9:16"
-                />
-              </Dialog>
+      <div className="space-y-6 max-w-4xl mx-auto">
+        {/* Welcome Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-3xl">Welcome back, {sampleUser.name}!</CardTitle>
+            <CardDescription className="text-lg">
+              Here's an overview of your promotional links and analytics.
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent className="space-y-8">
+            {/* Your Link Section */}
+            <div>
+              <h3 className="text-xl font-bold mb-3">Your Link</h3>
+              <div className="bg-slate-50 p-4 rounded-lg">
+                <p className="text-lg">linkpromo.io/{sampleUser.username}</p>
+              </div>
             </div>
             
-            <Card>
-              <CardHeader>
-                <CardTitle>Welcome back, {sampleUser.name}!</CardTitle>
-                <CardDescription>
-                  Here's an overview of your promotional links and analytics.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-lg font-medium">Your Link</h3>
-                    <div className="flex items-center justify-between mt-2 p-3 bg-muted rounded-lg">
-                      <p className="text-sm">
-                        linkpromo.io/{sampleUser.username}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-lg font-medium mt-4">Recent Activity</h3>
-                    <div className="mt-2 p-4 bg-muted rounded-lg text-center">
-                      <p>Your link had 25 views in the last 7 days</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Your Promotional Links</CardTitle>
-                <CardDescription>
-                  Your promotional links and coupons
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <Input
-                    placeholder="Search links..."
-                    className="max-w-sm mb-4"
-                  />
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <PromotionalGrid 
-                      items={items.slice(0, 4)} 
-                      editable={true}
-                      onEdit={handleEditItem}
-                      onDelete={handleDeleteItem}
-                      onDrag={handleDragItem}
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+            {/* Recent Activity Section */}
+            <div>
+              <h3 className="text-xl font-bold mb-3">Recent Activity</h3>
+              <div className="bg-slate-50 p-6 rounded-lg text-center">
+                <p className="text-lg">Your link had 25 views in the last 7 days</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
         
-        {/* Live Preview section - only shown on desktop and tablet */}
-        <div className="hidden lg:block">
-          <ProfilePreview
-            user={sampleUser}
-            items={items}
-            selectedTheme={selectedTheme}
-            hideOnMobile={true}
-          />
-        </div>
+        {/* Promotional Links Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-3xl">Your Promotional Links</CardTitle>
+            <CardDescription className="text-lg">
+              Your promotional links and coupons
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent className="space-y-4">
+            <Input
+              placeholder="Search links..."
+              className="max-w-sm"
+            />
+            
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
+              {sampleItems.slice(0, 4).map((item) => (
+                <div key={item.id} className="rounded-lg overflow-hidden border border-gray-200">
+                  {item.image && (
+                    <div className="aspect-square w-full overflow-hidden">
+                      <img 
+                        src={item.image} 
+                        alt={item.title} 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="p-3">
+                    <h3 className="font-bold truncate">{item.title}</h3>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   );
