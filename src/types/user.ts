@@ -7,6 +7,7 @@ export interface User {
   profilePicture?: string;
   bio?: string;
   socialLinks?: SocialLinks;
+  categories?: string[];
   createdAt: string;
 }
 
@@ -38,6 +39,7 @@ export interface PromotionalItem {
   aspectRatio: '1:1' | '9:16';
   couponCode?: string;
   discount?: string;
+  category?: string;
   createdAt: string;
 }
 

@@ -3,6 +3,9 @@ import { User, PromotionalItem } from "@/types/user";
 import ProfileHeader from "@/components/profile/profile-header";
 import PromotionalGrid from "@/components/profile/promotional-grid";
 import { useParams } from "react-router-dom";
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Filters } from "lucide-react";
 
 // Mock user data for demonstration
 const sampleUser: User = {
@@ -20,6 +23,7 @@ const sampleUser: User = {
     whatsapp: "12345678900",
     email: "ashley@example.com"
   },
+  categories: ["Fashion", "Beauty", "Lifestyle", "Travel"],
   createdAt: new Date().toISOString()
 };
 
@@ -34,6 +38,7 @@ const sampleItems: PromotionalItem[] = [
     url: "https://example.com/product/1",
     type: "product",
     aspectRatio: "9:16",
+    category: "Fashion",
     createdAt: new Date().toISOString()
   },
   {
@@ -45,6 +50,7 @@ const sampleItems: PromotionalItem[] = [
     url: "https://example.com/product/2",
     type: "product",
     aspectRatio: "1:1",
+    category: "Beauty",
     createdAt: new Date().toISOString()
   },
   {
@@ -58,6 +64,7 @@ const sampleItems: PromotionalItem[] = [
     aspectRatio: "1:1",
     couponCode: "ASHLEY20",
     discount: "20% OFF",
+    category: "Fashion",
     createdAt: new Date().toISOString()
   },
   {
@@ -69,6 +76,7 @@ const sampleItems: PromotionalItem[] = [
     url: "https://example.com/product/4",
     type: "product",
     aspectRatio: "9:16",
+    category: "Fashion",
     createdAt: new Date().toISOString()
   },
   {
@@ -80,6 +88,7 @@ const sampleItems: PromotionalItem[] = [
     url: "https://example.com/product/5",
     type: "product",
     aspectRatio: "1:1",
+    category: "Accessories",
     createdAt: new Date().toISOString()
   },
   {
@@ -93,33 +102,77 @@ const sampleItems: PromotionalItem[] = [
     aspectRatio: "1:1",
     couponCode: "FREESHIP",
     discount: "Free Shipping",
+    category: "Lifestyle",
     createdAt: new Date().toISOString()
   }
 ];
 
+const availableCategories = [
+  "All", "Fashion", "Beauty", "Lifestyle", "Travel", "Technology", "Food", "Fitness", "Home", "Accessories"
+];
+
 const UserProfile = () => {
   const { username } = useParams<{ username: string }>();
+  const [selectedCategory, setSelectedCategory] = useState("All");
   
   // In a real app, we would fetch the user and items based on the username
   // For demo purposes, we're using our sample data
   
+  const filteredItems = selectedCategory === "All" 
+    ? sampleItems 
+    : sampleItems.filter(item => item.category === selectedCategory);
+    
   return (
-    <div className="min-h-screen max-w-4xl mx-auto px-4 py-6">
-      <div className="mb-6">
-        <ProfileHeader 
-          user={sampleUser} 
-          compact={true} 
-        />
+    <div className="min-h-screen py-4">
+      {/* Header Section - Bento Style */}
+      <div className="px-4 md:px-8 max-w-7xl mx-auto">
+        <div className="rounded-3xl overflow-hidden shadow-lg bg-white/70 backdrop-blur-sm border border-gray-100 transition-transform hover:shadow-xl mb-6">
+          <ProfileHeader 
+            user={sampleUser} 
+            compact={true} 
+          />
+        </div>
+        
+        {/* Category Selection Section */}
+        <div className="mb-6 rounded-2xl bg-white/80 shadow-md backdrop-blur-sm border border-gray-100 p-4 overflow-hidden">
+          <div className="flex items-center gap-2 mb-3">
+            <Filters size={16} className="text-gray-500" />
+            <h3 className="text-sm font-medium text-gray-700">Categories</h3>
+          </div>
+          
+          <div className="flex flex-wrap gap-2 pb-1">
+            {availableCategories.map((category) => (
+              <Badge
+                key={category}
+                variant={selectedCategory === category ? "default" : "outline"}
+                className={`rounded-full px-3 py-1 cursor-pointer hover:bg-accent transition-colors ${
+                  selectedCategory === category ? "bg-primary text-primary-foreground" : "hover:text-accent-foreground"
+                }`}
+                onClick={() => setSelectedCategory(category)}
+              >
+                {category}
+              </Badge>
+            ))}
+          </div>
+        </div>
+        
+        {/* Promotional Content */}
+        <div className="rounded-3xl overflow-hidden bg-white/80 shadow-lg backdrop-blur-sm border border-gray-100 transition-all hover:shadow-xl mb-6">
+          <div className="p-4 pb-0">
+            <h2 className="text-xl font-medium">Promotions & Products</h2>
+            <p className="text-sm text-muted-foreground">Check out my latest recommendations</p>
+          </div>
+          <PromotionalGrid items={filteredItems} />
+        </div>
       </div>
       
-      <div className="mt-4">
-        <PromotionalGrid items={sampleItems} />
-      </div>
-      
-      <footer className="py-4 text-center text-sm text-muted-foreground border-t mt-8">
-        <p>
-          Powered by <span className="font-medium text-brand-purple">Influencify</span>
-        </p>
+      {/* Footer */}
+      <footer className="py-4 text-center text-sm text-muted-foreground mt-8 px-4">
+        <div className="max-w-7xl mx-auto">
+          <p className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-md py-3 border border-gray-100">
+            Powered by <span className="font-medium text-brand-purple">Influencify</span>
+          </p>
+        </div>
       </footer>
     </div>
   );
