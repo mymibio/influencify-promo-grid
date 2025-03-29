@@ -8,6 +8,7 @@ import SimpleSidebar from "@/components/dashboard/simple-sidebar";
 import AddItemCard from "@/components/dashboard/add-item-card";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
 import { PromotionalCard } from "@/components/cards/promotional-card";
+import PromotionalGrid from "@/components/profile/promotional-grid";
 
 // Mock user data
 const sampleUser: User = {
@@ -61,7 +62,6 @@ const Dashboard = () => {
   const [user, setUser] = useState(sampleUser);
   const [items, setItems] = useState(sampleItems);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedAspectRatio, setSelectedAspectRatio] = useState<"1:1" | "9:16">("1:1");
   
   const getInitials = (name: string) => {
     return name
@@ -71,8 +71,7 @@ const Dashboard = () => {
       .toUpperCase();
   };
   
-  const handleAddItem = (aspectRatio: "1:1" | "9:16") => {
-    setSelectedAspectRatio(aspectRatio);
+  const handleAddItem = () => {
     setIsDialogOpen(true);
   };
   
@@ -137,16 +136,22 @@ const Dashboard = () => {
           </div>
 
           {/* Promotional Items Grid */}
-          <div className="grid grid-cols-2 gap-4 sm:gap-6">
-            {items.map((item) => (
-              <PromotionalCard key={item.id} item={item} />
-            ))}
-            
-            {/* Add Coupon Cards */}
-            <AddItemCard aspectRatio="1:1" onClick={() => handleAddItem("1:1")} label="Add Coupon" />
-            <AddItemCard aspectRatio="1:1" onClick={() => handleAddItem("1:1")} label="Add Coupon" />
-            <AddItemCard aspectRatio="9:16" onClick={() => handleAddItem("9:16")} label="Add Coupon" />
-            <AddItemCard aspectRatio="9:16" onClick={() => handleAddItem("9:16")} label="Add Coupon" />
+          <PromotionalGrid items={items} />
+          
+          {/* Add Coupon Card */}
+          <div className="mt-6">
+            <div className="grid grid-cols-2 gap-4">
+              <AddItemCard 
+                aspectRatio="9:16" 
+                onClick={handleAddItem} 
+                label="Add Coupon" 
+              />
+              <AddItemCard 
+                aspectRatio="9:16" 
+                onClick={handleAddItem} 
+                label="Add Coupon" 
+              />
+            </div>
           </div>
         </div>
       </main>
@@ -155,7 +160,7 @@ const Dashboard = () => {
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         onAdd={handleAddNewItem}
-        aspectRatio={selectedAspectRatio}
+        aspectRatio="9:16"
       />
     </div>
   );

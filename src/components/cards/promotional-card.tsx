@@ -21,20 +21,14 @@ export const PromotionalCard = ({ item }: PromotionalCardProps) => {
 
   return (
     <Card 
-      className={cn(
-        "group overflow-hidden h-full w-full flex flex-col rounded-3xl shadow-sm border-0",
-        item.aspectRatio === "1:1" ? "card-1-1" : "card-9-16"
-      )}
+      className="group overflow-hidden h-full w-full flex flex-col rounded-3xl shadow-sm border-0 card-9-16"
     >
       {item.image && (
         <div className="relative w-full overflow-hidden">
           <img 
             src={item.image} 
             alt={item.title} 
-            className={cn(
-              "w-full object-cover transition-transform group-hover:scale-105",
-              item.aspectRatio === "1:1" ? "h-36 sm:h-40" : "h-52 sm:h-64 md:h-72"
-            )}
+            className="w-full object-cover transition-transform group-hover:scale-105 h-52 sm:h-64 md:h-72"
           />
         </div>
       )}

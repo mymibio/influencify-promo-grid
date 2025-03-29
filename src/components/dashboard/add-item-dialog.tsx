@@ -13,10 +13,10 @@ interface AddItemDialogProps {
   open: boolean;
   onClose: () => void;
   onAdd: (item: PromotionalItem) => void;
-  aspectRatio: "1:1" | "9:16";
+  aspectRatio: "9:16";
 }
 
-const AddItemDialog = ({ open, onClose, onAdd, aspectRatio }: AddItemDialogProps) => {
+const AddItemDialog = ({ open, onClose, onAdd }: AddItemDialogProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [url, setUrl] = useState("");
@@ -53,7 +53,7 @@ const AddItemDialog = ({ open, onClose, onAdd, aspectRatio }: AddItemDialogProps
       image: imagePreview || undefined,
       url,
       type: "coupon", // Always set to coupon as per requirements
-      aspectRatio,
+      aspectRatio: "9:16",
       couponCode,
       discount,
       createdAt: new Date().toISOString(),
