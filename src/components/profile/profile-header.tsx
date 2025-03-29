@@ -2,25 +2,61 @@
 import { User } from "@/types/user";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
-import { Instagram, Youtube, Twitter, Facebook, Mail, MessageSquare, Plus, Pencil } from "lucide-react";
+import { Instagram, Youtube, Twitter, Facebook, Mail, MessageSquare, Plus, Pencil, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useRef } from "react";
+import { toast } from "sonner";
 
 interface ProfileHeaderProps {
   user: User;
   editable?: boolean;
-  onEditProfilePicture?: () => void;
+  onEditProfilePicture?: (file: File) => void;
   onAddSocialLink?: (platform: string) => void;
+  onDeleteSocialLink?: (platform: string) => void;
 }
 
-const ProfileHeader = ({ user, editable = false, onEditProfilePicture, onAddSocialLink }: ProfileHeaderProps) => {
+const ProfileHeader = ({ 
+  user, 
+  editable = false, 
+  onEditProfilePicture, 
+  onAddSocialLink,
+  onDeleteSocialLink
+}: ProfileHeaderProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const getInitials = (name: string) => {
     return name
       .split(" ")
       .map((n) => n[0])
       .join("")
       .toUpperCase();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && onEditProfilePicture) {
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        toast.error("Please select an image file");
+        return;
+      }
+      
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image size should be less than 5MB");
+        return;
+      }
+      
+      onEditProfilePicture(file);
+    }
+  };
+
+  const handleEditButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
   const availableSocialPlatforms = [
@@ -44,13 +80,22 @@ const ProfileHeader = ({ user, editable = false, onEditProfilePicture, onAddSoci
         </Avatar>
         
         {editable && onEditProfilePicture && (
-          <Button 
-            size="icon" 
-            className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-primary"
-            onClick={onEditProfilePicture}
-          >
-            <Pencil size={16} className="text-white" />
-          </Button>
+          <>
+            <input 
+              type="file" 
+              ref={fileInputRef}
+              className="hidden"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+            <Button 
+              size="icon" 
+              className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-primary"
+              onClick={handleEditButtonClick}
+            >
+              <Pencil size={16} className="text-white" />
+            </Button>
+          </>
         )}
       </div>
       
@@ -111,15 +156,27 @@ const ProfileHeader = ({ user, editable = false, onEditProfilePicture, onAddSoci
           }
           
           return (
-            <Link 
-              key={platform}
-              to={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm hover:shadow-md transition-all border border-gray-100"
-            >
-              <Icon className="h-5 w-5 text-gray-600" />
-            </Link>
+            <div key={platform} className="relative group">
+              <Link 
+                to={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm hover:shadow-md transition-all border border-gray-100"
+              >
+                <Icon className="h-5 w-5 text-gray-600" />
+              </Link>
+              
+              {editable && onDeleteSocialLink && (
+                <Button
+                  size="icon"
+                  variant="destructive"
+                  className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => onDeleteSocialLink(platform)}
+                >
+                  <X size={10} />
+                </Button>
+              )}
+            </div>
           );
         })}
         

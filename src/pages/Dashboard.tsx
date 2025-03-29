@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { User, PromotionalItem, SocialLinks } from "@/types/user";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -9,6 +8,7 @@ import AddItemCard from "@/components/dashboard/add-item-card";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
 import PromotionalGrid from "@/components/profile/promotional-grid";
 import ProfilePreview from "@/components/dashboard/profile-preview";
+import ProfileHeader from "@/components/profile/profile-header";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -74,8 +74,6 @@ const Dashboard = () => {
   const [selectedTheme, setSelectedTheme] = useState("default");
   const [currentSocialPlatform, setCurrentSocialPlatform] = useState<string>("");
   const [socialHandle, setSocialHandle] = useState<string>("");
-  const [newUsername, setNewUsername] = useState(user.username);
-  const [newProfilePicture, setNewProfilePicture] = useState<string | undefined>(user.profilePicture);
   const isMobile = useIsMobile();
   
   const getInitials = (name: string) => {
@@ -158,22 +156,17 @@ const Dashboard = () => {
     setIsDialogOpen(false);
   };
 
-  const handleEditProfile = () => {
-    setNewUsername(user.username);
-    setNewProfilePicture(user.profilePicture);
-    setIsProfileDialogOpen(true);
-  };
-  
-  const handleSaveProfile = () => {
+  const handleEditProfilePicture = (file: File) => {
+    const imageUrl = URL.createObjectURL(file);
+    
     setUser(prev => ({
       ...prev,
-      username: newUsername,
-      profilePicture: newProfilePicture
+      profilePicture: imageUrl
     }));
-    setIsProfileDialogOpen(false);
-    toast.success("Profile updated successfully!");
+    
+    toast.success("Profile picture updated successfully!");
   };
-
+  
   const handleAddSocialMedia = () => {
     setIsSocialDialogOpen(true);
   };
@@ -191,6 +184,20 @@ const Dashboard = () => {
       setSocialHandle("");
       setCurrentSocialPlatform("");
       toast.success(`${currentSocialPlatform} link added successfully!`);
+    }
+  };
+
+  const handleDeleteSocialLink = (platform: string) => {
+    if (user.socialLinks) {
+      const updatedSocialLinks = { ...user.socialLinks };
+      delete updatedSocialLinks[platform as keyof typeof user.socialLinks];
+      
+      setUser(prev => ({
+        ...prev,
+        socialLinks: updatedSocialLinks
+      }));
+      
+      toast.success(`${platform} link removed successfully!`);
     }
   };
 
@@ -232,90 +239,38 @@ const Dashboard = () => {
             )}
             
             <div className="lg:col-span-2">
-              <div className="flex flex-col items-center mb-10 md:flex-row md:justify-start md:gap-8">
-                <div className="relative">
-                  <Avatar className="h-24 w-24 mb-4 md:mb-0">
-                    {user.profilePicture ? (
-                      <AvatarImage src={user.profilePicture} alt={user.name} />
-                    ) : (
-                      <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
-                    )}
-                  </Avatar>
+              <ProfileHeader 
+                user={user} 
+                editable={true} 
+                onEditProfilePicture={handleEditProfilePicture}
+                onAddSocialLink={(platform) => {
+                  setCurrentSocialPlatform(platform);
+                  setIsSocialDialogOpen(true);
+                }}
+                onDeleteSocialLink={handleDeleteSocialLink}
+              />
+              
+              <div className="mt-4 bg-white rounded-lg border p-3 shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Link size={18} className="text-blue-500" />
+                    <span className="text-sm">
+                      Your LinkPromo is live: <span className="text-blue-500 font-medium">linkpromo.io/{user.username}</span>
+                    </span>
+                  </div>
                   <Button 
-                    size="icon" 
-                    className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-primary"
-                    onClick={handleEditProfile}
+                    variant="default" 
+                    size="sm" 
+                    className="bg-blue-500 hover:bg-blue-600 text-white"
+                    onClick={handleCopyLink}
                   >
-                    <Pencil size={16} className="text-white" />
+                    <Copy size={16} className="mr-1" />
+                    Copy URL
                   </Button>
-                </div>
-                
-                <div className="text-center md:text-left">
-                  <h1 className="text-3xl font-bold">@{user.username}</h1>
-                  
-                  <div className="mt-1 relative">
-                    {isEditingBio ? (
-                      <div className="flex items-center gap-2">
-                        <Input 
-                          value={editedBio} 
-                          onChange={(e) => setEditedBio(e.target.value)}
-                          className="pr-10"
-                          maxLength={160}
-                          placeholder="Add bio"
-                        />
-                        <Button size="sm" variant="ghost" onClick={handleSaveBio} className="absolute right-2">
-                          <Save size={16} />
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <p className="text-gray-600">{user.bio || "Add bio..."}</p>
-                        <Button size="sm" variant="ghost" onClick={handleEditBio} className="p-1 h-auto">
-                          <Edit size={16} className="text-gray-500" />
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex gap-2 mt-4 justify-center md:justify-start flex-wrap">
-                    {user.socialLinks && Object.entries(user.socialLinks).map(([platform, handle]) => (
-                      <Button key={platform} variant="outline" size="icon" className="rounded-full bg-white">
-                        {getSocialIcon(platform)}
-                      </Button>
-                    ))}
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      className="rounded-full bg-gray-100 border-dashed"
-                      onClick={handleAddSocialMedia}
-                    >
-                      <Plus size={20} />
-                    </Button>
-                  </div>
-                  
-                  <div className="mt-4 bg-white rounded-lg border p-3 shadow-sm">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <Link size={18} className="text-blue-500" />
-                        <span className="text-sm">
-                          Your LinkPromo is live: <span className="text-blue-500 font-medium">linkpromo.io/{user.username}</span>
-                        </span>
-                      </div>
-                      <Button 
-                        variant="default" 
-                        size="sm" 
-                        className="bg-blue-500 hover:bg-blue-600 text-white"
-                        onClick={handleCopyLink}
-                      >
-                        <Copy size={16} className="mr-1" />
-                        Copy URL
-                      </Button>
-                    </div>
-                  </div>
                 </div>
               </div>
               
-              <div className="mb-6">
+              <div className="mb-6 mt-8">
                 <h2 className="text-xl font-bold">Your Coupons</h2>
                 <p className="text-muted-foreground">
                   This is how your coupons will appear to visitors. Add more coupons or edit existing ones.
@@ -366,41 +321,6 @@ const Dashboard = () => {
         aspectRatio="9:16"
         editItem={editingItem}
       />
-
-      {/* Profile Edit Dialog */}
-      <Dialog open={isProfileDialogOpen} onOpenChange={setIsProfileDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Profile</DialogTitle>
-            <DialogDescription>
-              Change your profile picture and username
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input 
-                id="username" 
-                value={newUsername} 
-                onChange={(e) => setNewUsername(e.target.value)} 
-                placeholder="Enter your username"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="profilePicture">Profile Picture URL</Label>
-              <Input 
-                id="profilePicture" 
-                value={newProfilePicture || ''} 
-                onChange={(e) => setNewProfilePicture(e.target.value)} 
-                placeholder="Enter profile picture URL"
-              />
-            </div>
-            <div className="pt-4 flex justify-end">
-              <Button onClick={handleSaveProfile}>Save Changes</Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Social Media Dialog */}
       <Dialog open={isSocialDialogOpen} onOpenChange={setIsSocialDialogOpen}>
