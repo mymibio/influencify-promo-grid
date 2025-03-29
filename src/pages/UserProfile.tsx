@@ -1,11 +1,10 @@
-
 import { User, PromotionalItem } from "@/types/user";
 import ProfileHeader from "@/components/profile/profile-header";
 import PromotionalGrid from "@/components/profile/promotional-grid";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Filters } from "lucide-react";
+import { Filter } from "lucide-react";
 
 // Mock user data for demonstration
 const sampleUser: User = {
@@ -115,9 +114,6 @@ const UserProfile = () => {
   const { username } = useParams<{ username: string }>();
   const [selectedCategory, setSelectedCategory] = useState("All");
   
-  // In a real app, we would fetch the user and items based on the username
-  // For demo purposes, we're using our sample data
-  
   const filteredItems = selectedCategory === "All" 
     ? sampleItems 
     : sampleItems.filter(item => item.category === selectedCategory);
@@ -136,7 +132,7 @@ const UserProfile = () => {
         {/* Category Selection Section */}
         <div className="mb-6 rounded-2xl bg-white/80 shadow-md backdrop-blur-sm border border-gray-100 p-4 overflow-hidden">
           <div className="flex items-center gap-2 mb-3">
-            <Filters size={16} className="text-gray-500" />
+            <Filter size={16} className="text-gray-500" />
             <h3 className="text-sm font-medium text-gray-700">Categories</h3>
           </div>
           
