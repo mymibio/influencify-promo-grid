@@ -2,10 +2,11 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "@/components/ui/navbar";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -16,19 +17,35 @@ const SignUp = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Get username from URL query parameter if available
+    const queryParams = new URLSearchParams(location.search);
+    const usernameParam = queryParams.get('username');
+    
+    if (usernameParam) {
+      setFormData(prev => ({ ...prev, username: usernameParam }));
+    }
+  }, [location]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    
+    // Special handling for username to enforce valid format
+    if (name === 'username') {
+      const sanitizedValue = value.toLowerCase().replace(/[^a-z0-9_]/g, "");
+      setFormData({ ...formData, [name]: sanitizedValue });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // In a real app, we would send this data to an API
+    // In a real app with Supabase, we would register the user
     // For now, let's simulate a successful registration
     
     setTimeout(() => {
@@ -79,14 +96,20 @@ const SignUp = () => {
               
               <div>
                 <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  name="username"
-                  placeholder="Choose a username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  required
-                />
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+                    influencify.com/
+                  </span>
+                  <Input
+                    id="username"
+                    name="username"
+                    placeholder="yourname"
+                    value={formData.username}
+                    onChange={handleChange}
+                    className="pl-32"
+                    required
+                  />
+                </div>
               </div>
               
               <div>
