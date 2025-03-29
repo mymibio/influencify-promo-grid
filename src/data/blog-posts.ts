@@ -313,7 +313,18 @@ const generateAdditionalPosts = () => {
   // Generate 90 more posts to have a total of 100
   for (let i = 11; i <= 100; i++) {
     const randomTopicIndex = Math.floor(Math.random() * topics.length);
+    // Check if we still have topics available
+    if (randomTopicIndex >= topics.length || !topics[randomTopicIndex]) {
+      console.warn(`No more topics available at index ${randomTopicIndex}. Skipping post ${i}.`);
+      continue;
+    }
+    
     const title = topics[randomTopicIndex];
+    if (!title) {
+      console.warn(`Title is undefined for index ${randomTopicIndex}. Skipping post ${i}.`);
+      continue;
+    }
+    
     // Remove the used topic to avoid duplicates
     topics.splice(randomTopicIndex, 1);
     
@@ -325,7 +336,7 @@ const generateAdditionalPosts = () => {
     const pastDate = new Date(today.setDate(today.getDate() - Math.floor(Math.random() * 365)));
     const date = pastDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     
-    // Generate slug from title
+    // Generate slug from title - Adding a null/undefined check
     const slug = title
       .toLowerCase()
       .replace(/[^\w\s-]/g, '')
