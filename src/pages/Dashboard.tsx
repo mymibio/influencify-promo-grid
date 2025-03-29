@@ -41,6 +41,7 @@ const sampleItems: PromotionalItem[] = [
     type: "coupon",
     aspectRatio: "9:16",
     couponCode: "SUMMER20",
+    discount: "20% OFF",
     createdAt: new Date().toISOString()
   },
   {
@@ -53,6 +54,7 @@ const sampleItems: PromotionalItem[] = [
     type: "coupon",
     aspectRatio: "9:16",
     couponCode: "BEAUTY15",
+    discount: "15% OFF",
     createdAt: new Date().toISOString()
   }
 ];
@@ -102,6 +104,22 @@ const Dashboard = () => {
     }));
     setIsEditingBio(false);
     toast.success("Bio updated successfully!");
+  };
+  
+  // New handlers for card actions
+  const handleEditCard = (id: string) => {
+    toast.info(`Editing card ${id}`);
+    // Here you would typically open the edit dialog
+  };
+
+  const handleDeleteCard = (id: string) => {
+    setItems(prevItems => prevItems.filter(item => item.id !== id));
+    toast.success("Card deleted successfully!");
+  };
+
+  const handleDragCard = (id: string) => {
+    toast.info(`Ready to drag card ${id}`);
+    // Here you would implement the drag functionality
   };
   
   return (
@@ -203,8 +221,14 @@ const Dashboard = () => {
             </p>
           </div>
 
-          {/* Promotional Items Grid */}
-          <PromotionalGrid items={items} />
+          {/* Promotional Items Grid with edit capabilities */}
+          <PromotionalGrid 
+            items={items} 
+            onEdit={handleEditCard}
+            onDelete={handleDeleteCard}
+            onDrag={handleDragCard}
+            editable={true}
+          />
           
           {/* Add Coupon Card */}
           <div className="mt-6">

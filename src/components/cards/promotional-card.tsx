@@ -82,7 +82,7 @@ export const PromotionalCard = ({
       {/* Main Card */}
       <Card 
         className={cn(
-          "group overflow-hidden h-full w-full flex flex-col rounded-3xl shadow-sm border-0 card-9-16 transition-all duration-200",
+          "group overflow-hidden h-full w-full flex flex-col rounded-3xl shadow-sm border-0 transition-all duration-200",
           isSelected && editable ? "ring-2 ring-primary ring-offset-2" : "",
           editable ? "cursor-pointer" : ""
         )}
