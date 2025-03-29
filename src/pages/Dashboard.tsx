@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { User, PromotionalItem } from "@/types/user";
+import { User, PromotionalItem, SocialLinks } from "@/types/user";
 import { Button } from "@/components/ui/button";
 import { Instagram, Facebook, MessageCircle, Mail, Youtube, Twitter, Plus, Copy, Link, Pencil, LayoutGrid, BarChart, Palette, Settings } from "lucide-react";
 import SimpleSidebar from "@/components/dashboard/simple-sidebar";
@@ -49,6 +49,11 @@ const Dashboard = () => {
         if (error) throw error;
         
         if (data) {
+          // Convert social_links from JSON to SocialLinks type
+          const socialLinks: SocialLinks = data.social_links ? 
+            (data.social_links as Record<string, string>) : 
+            {};
+          
           setUserProfile({
             id: data.id,
             username: data.username,
@@ -56,7 +61,7 @@ const Dashboard = () => {
             name: data.name,
             profilePicture: data.profile_picture,
             bio: data.bio || "",
-            socialLinks: data.social_links || {},
+            socialLinks: socialLinks,
             categories: data.categories || [],
             createdAt: data.created_at
           });
@@ -73,20 +78,24 @@ const Dashboard = () => {
         if (itemsError) throw itemsError;
         
         if (itemsData) {
-          setItems(itemsData.map(item => ({
+          const typedItems: PromotionalItem[] = itemsData.map(item => ({
             id: item.id,
             userId: item.user_id,
             title: item.title,
             description: item.description,
             image: item.image,
             url: item.url,
-            type: item.type,
-            aspectRatio: item.aspect_ratio,
+            // Ensure type is always one of the allowed values
+            type: (item.type === 'product' || item.type === 'coupon') ? item.type : 'product',
+            // Ensure aspectRatio is always one of the allowed values
+            aspectRatio: (item.aspect_ratio === '1:1' || item.aspect_ratio === '9:16') ? item.aspect_ratio : '9:16',
             couponCode: item.coupon_code,
             discount: item.discount,
             category: item.category,
             createdAt: item.created_at
-          })));
+          }));
+          
+          setItems(typedItems);
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -262,8 +271,10 @@ const Dashboard = () => {
             description: data.description,
             image: data.image,
             url: data.url,
-            type: data.type,
-            aspectRatio: data.aspect_ratio,
+            // Ensure type is always one of the allowed values
+            type: (data.type === 'product' || data.type === 'coupon') ? data.type : 'product',
+            // Ensure aspectRatio is always one of the allowed values
+            aspectRatio: (data.aspect_ratio === '1:1' || data.aspect_ratio === '9:16') ? data.aspect_ratio : '9:16',
             couponCode: data.coupon_code,
             discount: data.discount,
             category: data.category,
