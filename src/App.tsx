@@ -1,5 +1,5 @@
 
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import Navbar from "@/components/ui/navbar";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "@/pages/Index";
@@ -16,15 +16,18 @@ import Contact from "@/pages/Contact";
 import Demo from "@/pages/Demo";
 import Blogs from "@/pages/Blogs";
 import BlogPost from "@/pages/BlogPost";
+import { useAuth } from "@/context/AuthContext";
 
 function App() {
+  const { user } = useAuth();
+  
   return (
     <>
       <Navbar />
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
+        <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
+        <Route path="/signup" element={user ? <Navigate to="/dashboard" /> : <SignUp />} />
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <Dashboard />

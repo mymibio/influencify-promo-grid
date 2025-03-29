@@ -128,11 +128,6 @@ const Navbar = () => {
               </Link>
             </SheetClose>
             <SheetClose asChild>
-              <Link to="/demo" className="flex items-center px-4 py-2 hover:bg-accent rounded-md">
-                Demo
-              </Link>
-            </SheetClose>
-            <SheetClose asChild>
               <Link to="/blogs" className="flex items-center px-4 py-2 hover:bg-accent rounded-md">
                 Blogs
               </Link>

@@ -3,49 +3,80 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 const SignUp = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    username: "",
-    password: "",
-  });
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-
-  // Special handling for username from URL query parameter
-  useState(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const usernameParam = queryParams.get('username');
-    
-    if (usernameParam) {
-      setFormData(prev => ({ ...prev, username: usernameParam }));
-    }
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    name: "",
+    username: ""
+  });
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+    name: "",
+    username: ""
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
-    // Special handling for username to enforce valid format
-    if (name === 'username') {
-      const sanitizedValue = value.toLowerCase().replace(/[^a-z0-9_]/g, "");
-      setFormData({ ...formData, [name]: sanitizedValue });
-    } else {
-      setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear error when user starts typing
+    if (errors[name as keyof typeof errors]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
+  };
+
+  const validateForm = () => {
+    let valid = true;
+    const newErrors = { ...errors };
+
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+      valid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Email is invalid";
+      valid = false;
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+      valid = false;
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+      valid = false;
+    }
+
+    if (!formData.name) {
+      newErrors.name = "Name is required";
+      valid = false;
+    }
+
+    if (!formData.username) {
+      newErrors.username = "Username is required";
+      valid = false;
+    } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+      newErrors.username = "Username can only contain letters, numbers and underscores";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    
+    if (!validateForm()) return;
     
     try {
-      // Register the user with Supabase
+      setIsLoading(true);
+
       const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -58,19 +89,18 @@ const SignUp = () => {
       });
 
       if (error) {
-        throw error;
+        toast.error(error.message);
+        return;
       }
 
-      // Create a user profile in the public schema
       if (data.user) {
-        // Store username in localStorage for dashboard to access
-        localStorage.setItem('username', formData.username);
-        
-        toast.success("Account created successfully! Redirecting to dashboard...");
-        navigate("/dashboard");
+        toast.success("Account created successfully!");
+        // Redirect to dashboard immediately after signup
+        navigate('/dashboard');
       }
-    } catch (error: any) {
-      toast.error(error.message || "Failed to create account");
+    } catch (error) {
+      toast.error("An unexpected error occurred");
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -81,85 +111,85 @@ const SignUp = () => {
       <main className="flex-1 flex items-center justify-center py-12">
         <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-sm border">
           <div className="text-center">
-            <h1 className="text-2xl font-bold">Create Your Account</h1>
-            <p className="text-muted-foreground mt-2">
-              Start sharing your favorite products today
-            </p>
-          </div>
-          
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  placeholder="Your name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="username">Username</Label>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
-                    influencify.com/
-                  </span>
-                  <Input
-                    id="username"
-                    name="username"
-                    placeholder="yourname"
-                    value={formData.username}
-                    onChange={handleChange}
-                    className="pl-32"
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="Create a password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full bg-brand-purple hover:bg-brand-dark-purple" 
-              disabled={isLoading}
-            >
-              {isLoading ? "Creating Account..." : "Create Account"}
-            </Button>
-            
-            <p className="text-center text-sm text-muted-foreground">
+            <h2 className="text-3xl font-bold">Sign Up</h2>
+            <p className="mt-2 text-sm text-gray-600">
               Already have an account?{" "}
-              <Link to="/login" className="text-brand-purple hover:underline">
-                Log in
+              <Link to="/login" className="text-primary hover:underline">
+                Sign In
               </Link>
             </p>
+          </div>
+
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Enter your name"
+                className={errors.name ? "border-red-500" : ""}
+              />
+              {errors.name && (
+                <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                name="username"
+                type="text"
+                value={formData.username}
+                onChange={handleChange}
+                placeholder="Choose a username"
+                className={errors.username ? "border-red-500" : ""}
+              />
+              {errors.username && (
+                <p className="text-red-500 text-xs mt-1">{errors.username}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Enter your email"
+                className={errors.email ? "border-red-500" : ""}
+                autoComplete="email"
+              />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Create a password"
+                className={errors.password ? "border-red-500" : ""}
+                autoComplete="new-password"
+              />
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+              )}
+            </div>
+
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Creating account..." : "Create Account"}
+            </Button>
           </form>
         </div>
       </main>
