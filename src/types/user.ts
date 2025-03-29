@@ -30,3 +30,10 @@ export interface PromotionalItem {
   discount?: string;
   createdAt: string;
 }
+
+export interface DashboardStats {
+  totalVisits: number;
+  totalClicks: number;
+  clickRate: number;
+  topPerformingItem?: PromotionalItem;
+}
