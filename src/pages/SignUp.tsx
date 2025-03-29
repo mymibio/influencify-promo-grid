@@ -2,13 +2,14 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -23,9 +24,27 @@ const SignUp = () => {
     username: ""
   });
 
+  // Extract username from URL query parameters if present
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const usernameParam = params.get('username');
+    
+    if (usernameParam) {
+      setFormData(prev => ({ ...prev, username: usernameParam }));
+    }
+  }, [location.search]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    // For username field, apply restrictions
+    if (name === "username") {
+      const sanitizedValue = value.toLowerCase().replace(/[^a-z0-9_]/g, "");
+      setFormData((prev) => ({ ...prev, [name]: sanitizedValue }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+    
     // Clear error when user starts typing
     if (errors[name as keyof typeof errors]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -186,9 +205,14 @@ const SignUp = () => {
                 onChange={handleChange}
                 placeholder="Choose a username"
                 className={errors.username ? "border-red-500" : ""}
+                // Make it readonly if it came from URL parameter
+                readOnly={location.search.includes('username=')}
               />
               {errors.username && (
                 <p className="text-red-500 text-xs mt-1">{errors.username}</p>
+              )}
+              {location.search.includes('username=') && (
+                <p className="text-green-500 text-xs mt-1">This username is available!</p>
               )}
             </div>
 
