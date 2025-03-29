@@ -312,16 +312,25 @@ const generateAdditionalPosts = () => {
   
   // Generate 90 more posts to have a total of 100
   for (let i = 11; i <= 100; i++) {
+    // Make sure we have topics left to use
+    if (topics.length === 0) {
+      console.warn(`No more topics available. Stopping at post ${i-1}.`);
+      break;
+    }
+    
     const randomTopicIndex = Math.floor(Math.random() * topics.length);
-    // Check if we still have topics available
-    if (randomTopicIndex >= topics.length || !topics[randomTopicIndex]) {
-      console.warn(`No more topics available at index ${randomTopicIndex}. Skipping post ${i}.`);
+    
+    // Double-check index bounds
+    if (randomTopicIndex >= topics.length) {
+      console.warn(`Topic index out of bounds: ${randomTopicIndex}. Skipping post ${i}.`);
       continue;
     }
     
     const title = topics[randomTopicIndex];
-    if (!title) {
-      console.warn(`Title is undefined for index ${randomTopicIndex}. Skipping post ${i}.`);
+    
+    // Verify title exists
+    if (!title || typeof title !== 'string') {
+      console.warn(`Invalid title at index ${randomTopicIndex}. Skipping post ${i}.`);
       continue;
     }
     
@@ -336,7 +345,7 @@ const generateAdditionalPosts = () => {
     const pastDate = new Date(today.setDate(today.getDate() - Math.floor(Math.random() * 365)));
     const date = pastDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     
-    // Generate slug from title - Adding a null/undefined check
+    // Generate slug from title with safer checks
     const slug = title
       .toLowerCase()
       .replace(/[^\w\s-]/g, '')
