@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Monitor } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +8,7 @@ interface ProfilePreviewProps {
   items: PromotionalItem[];
   selectedTheme: string;
   className?: string;
+  hideOnMobile?: boolean;
 }
 
 // Helper function to get theme styles based on theme ID
@@ -94,9 +94,9 @@ export const getThemeStyles = (themeId: string) => {
   return themes[themeId as keyof typeof themes] || themes.default;
 };
 
-const ProfilePreview: React.FC<ProfilePreviewProps> = ({ user, items, selectedTheme, className }) => {
+const ProfilePreview: React.FC<ProfilePreviewProps> = ({ user, items, selectedTheme, className, hideOnMobile = false }) => {
   return (
-    <Card className={`sticky top-8 ${className}`}>
+    <Card className={`sticky top-8 ${hideOnMobile ? 'hidden md:block' : ''} ${className || ''}`}>
       <CardHeader>
         <CardTitle className="flex items-center">
           <Monitor className="mr-2 h-5 w-5" />

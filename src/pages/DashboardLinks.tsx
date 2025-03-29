@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import ProfilePreview from "@/components/dashboard/profile-preview";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Mock user data for demonstration
 const sampleUser: User = {
@@ -202,12 +203,13 @@ const DashboardLinks = () => {
           </div>
         </div>
         
-        {/* Live Preview Section */}
+        {/* Live Preview Section - Only shows on tablet and desktop */}
         <div className="order-2 lg:order-2">
           <ProfilePreview
             user={sampleUser}
             items={filteredItems.length > 0 ? filteredItems.slice(0, 4) : []}
             selectedTheme={selectedTheme}
+            hideOnMobile={true}
           />
         </div>
       </div>
