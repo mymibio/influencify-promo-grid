@@ -1,9 +1,16 @@
 
-import React from "react";
+import React, { useState } from "react";
 import DashboardLayout from "@/components/dashboard/dashboard-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, PromotionalItem } from "@/types/user";
 import ProfilePreview from "@/components/dashboard/profile-preview";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { PlusCircle } from "lucide-react";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import AddItemDialog from "@/components/dashboard/add-item-dialog";
+import { toast } from "sonner";
+import PromotionalGrid from "@/components/profile/promotional-grid";
 
 // Sample user data
 const sampleUser: User = {
@@ -72,6 +79,28 @@ const sampleItems: PromotionalItem[] = [
 ];
 
 const Dashboard = () => {
+  const [items, setItems] = useState<PromotionalItem[]>(sampleItems);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState("default");
+
+  const handleAddItem = (newItem: PromotionalItem) => {
+    setItems([newItem, ...items]);
+    toast.success("Item added successfully");
+  };
+  
+  const handleEditItem = (id: string) => {
+    toast.info("Edit functionality would open here");
+  };
+  
+  const handleDeleteItem = (id: string) => {
+    setItems(items.filter(item => item.id !== id));
+    toast.success("Item deleted successfully");
+  };
+  
+  const handleDragItem = (id: string) => {
+    toast.info("Drag functionality would be implemented here");
+  };
+
   return (
     <DashboardLayout user={sampleUser}>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -79,6 +108,20 @@ const Dashboard = () => {
           <div className="space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <h1 className="text-3xl font-bold">Dashboard</h1>
+              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    Add New Link
+                  </Button>
+                </DialogTrigger>
+                <AddItemDialog 
+                  open={isAddDialogOpen}
+                  onClose={() => setIsAddDialogOpen(false)}
+                  onAdd={handleAddItem}
+                  aspectRatio="9:16"
+                />
+              </Dialog>
             </div>
             
             <Card>
@@ -111,21 +154,27 @@ const Dashboard = () => {
             
             <Card>
               <CardHeader>
-                <CardTitle>Latest Promotional Items</CardTitle>
+                <CardTitle>Your Promotional Links</CardTitle>
                 <CardDescription>
-                  Your recent promotional links and coupons
+                  Your promotional links and coupons
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                  {sampleItems.slice(0, 2).map((item) => (
-                    <div key={item.id} className="p-4 border rounded-lg">
-                      <h4 className="font-medium">{item.title}</h4>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {item.type === 'coupon' ? 'Coupon' : 'Product Link'}
-                      </p>
-                    </div>
-                  ))}
+                <div className="space-y-4">
+                  <Input
+                    placeholder="Search links..."
+                    className="max-w-sm mb-4"
+                  />
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <PromotionalGrid 
+                      items={items.slice(0, 4)} 
+                      editable={true}
+                      onEdit={handleEditItem}
+                      onDelete={handleDeleteItem}
+                      onDrag={handleDragItem}
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -136,8 +185,8 @@ const Dashboard = () => {
         <div className="hidden lg:block">
           <ProfilePreview
             user={sampleUser}
-            items={sampleItems}
-            selectedTheme="default"
+            items={items}
+            selectedTheme={selectedTheme}
             hideOnMobile={true}
           />
         </div>
