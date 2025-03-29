@@ -2,10 +2,11 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/ui/navbar";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +15,18 @@ const Login = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Check if user is already signed in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data?.session) {
+        navigate("/dashboard");
+      }
+    };
+    
+    checkSession();
+  }, [navigate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -26,14 +39,28 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    // In a real app, we would send this data to an API
-    // For now, let's simulate a successful login
-    
-    setTimeout(() => {
+    try {
+      // Sign in with Supabase auth
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+      
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      
+      if (data?.user) {
+        toast.success("Signed in successfully! Redirecting to dashboard...");
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
       setIsLoading(false);
-      toast.success("Logged in successfully! Redirecting to dashboard...");
-      navigate("/dashboard");
-    }, 1500);
+    }
   };
 
   return (
@@ -44,7 +71,7 @@ const Login = () => {
           <div className="text-center">
             <h1 className="text-2xl font-bold">Welcome Back</h1>
             <p className="text-muted-foreground mt-2">
-              Log in to manage your influencer page
+              Sign in to manage your influencer page
             </p>
           </div>
           
@@ -87,7 +114,7 @@ const Login = () => {
               className="w-full bg-brand-purple hover:bg-brand-dark-purple" 
               disabled={isLoading}
             >
-              {isLoading ? "Logging in..." : "Log In"}
+              {isLoading ? "Signing in..." : "Sign In"}
             </Button>
             
             <p className="text-center text-sm text-muted-foreground">
