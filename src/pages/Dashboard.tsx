@@ -1,20 +1,19 @@
-
 import { useState } from "react";
 import { User, PromotionalItem } from "@/types/user";
 import { Button } from "@/components/ui/button";
-import { Instagram, Facebook, MessageCircle, Mail, Youtube, Twitter, Plus, Copy, Link, Pencil } from "lucide-react";
+import { Instagram, Facebook, MessageCircle, Mail, Youtube, Twitter, Plus, Copy, Link, Pencil, LayoutGrid, BarChart, Palette, Settings } from "lucide-react";
 import SimpleSidebar from "@/components/dashboard/simple-sidebar";
 import AddItemCard from "@/components/dashboard/add-item-card";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
 import PromotionalGrid from "@/components/profile/promotional-grid";
 import ProfilePreview from "@/components/dashboard/profile-preview";
+import ProfileHeader from "@/components/profile/profile-header";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import MobileNavigation from "@/components/dashboard/mobile-navigation";
 
 const sampleUser: User = {
   id: "123",
@@ -245,12 +244,23 @@ const Dashboard = () => {
             </div>
           )}
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-            <Card className="col-span-12 lg:col-span-4 lg:row-span-2 bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-3xl overflow-hidden animate-fade-in">
-              <CardContent className="p-6">
-                <div className="flex flex-col items-center gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {!isMobile && (
+              <div className="hidden lg:block">
+                <ProfilePreview 
+                  user={user}
+                  items={items}
+                  selectedTheme={selectedTheme}
+                  className="w-full"
+                />
+              </div>
+            )}
+            
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-lg shadow-sm border">
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-6 p-4 sm:p-6">
                   <div className="relative">
-                    <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white shadow-md">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden flex-shrink-0 border-2 border-white shadow-md">
                       {user.profilePicture ? (
                         <img 
                           src={user.profilePicture} 
@@ -259,7 +269,7 @@ const Dashboard = () => {
                         />
                       ) : (
                         <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                          <span className="text-xl font-semibold">{getInitials(user.name)}</span>
+                          <span className="text-xl font-semibold">{user.name.charAt(0)}</span>
                         </div>
                       )}
                     </div>
@@ -272,12 +282,15 @@ const Dashboard = () => {
                     </Button>
                   </div>
                   
-                  <div className="flex flex-col items-center text-center">
-                    <h2 className="text-2xl font-bold">{user.name}</h2>
-                    <p className="text-muted-foreground text-sm">@{user.username}</p>
+                  <div className="flex-1 flex flex-col text-center md:text-left">
+                    <h1 className="text-2xl sm:text-3xl font-bold">{user.name}</h1>
+                    
+                    <div className="text-muted-foreground text-sm mb-2">
+                      @{user.username}
+                    </div>
                     
                     {isEditingBio ? (
-                      <div className="flex flex-col gap-2 w-full mt-2">
+                      <div className="flex flex-col gap-2">
                         <Input
                           value={editedBio}
                           onChange={(e) => setEditedBio(e.target.value)}
@@ -300,8 +313,8 @@ const Dashboard = () => {
                         </div>
                       </div>
                     ) : (
-                      <div className="relative group mt-2">
-                        <p className="text-sm text-gray-600">
+                      <div className="relative group">
+                        <p className="text-sm sm:text-base text-gray-600 max-w-lg">
                           {user.bio}
                         </p>
                         <Button 
@@ -315,117 +328,82 @@ const Dashboard = () => {
                       </div>
                     )}
                   </div>
-                  
-                  <div className="flex flex-wrap gap-2 justify-center mt-2">
-                    {user.socialLinks && Object.entries(user.socialLinks).map(([platform, handle]) => (
-                      <div 
-                        key={platform} 
-                        className="relative group"
+                </div>
+                
+                <div className="flex flex-wrap gap-2 justify-center pb-6">
+                  {user.socialLinks && Object.entries(user.socialLinks).map(([platform, handle]) => (
+                    <div 
+                      key={platform} 
+                      className="relative group"
+                    >
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-10 w-10 rounded-full"
+                        onClick={() => {
+                          setCurrentSocialPlatform(platform);
+                          setSocialHandle(handle);
+                          setIsSocialDialogOpen(true);
+                        }}
                       >
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-10 w-10 rounded-full"
-                          onClick={() => {
-                            setCurrentSocialPlatform(platform);
-                            setSocialHandle(handle);
-                            setIsSocialDialogOpen(true);
-                          }}
-                        >
-                          {getSocialIcon(platform)}
-                        </Button>
-                      </div>
-                    ))}
-                    
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-10 w-10 rounded-full"
-                      onClick={() => {
-                        setCurrentSocialPlatform("");
-                        setSocialHandle("");
-                        setIsSocialDialogOpen(true);
-                      }}
-                    >
-                      <Plus size={16} />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="col-span-12 lg:col-span-8 bg-gradient-to-r from-blue-50 to-purple-50 border border-gray-100 shadow-sm rounded-3xl overflow-hidden animate-fade-in">
-              <CardContent className="p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-blue-500 rounded-full p-2 text-white">
-                      <Link size={18} />
+                        {getSocialIcon(platform)}
+                      </Button>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-lg">Your LinkPromo URL</h3>
-                      <p className="text-sm text-muted-foreground">Share your profile with the world</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border shadow-sm">
-                    <span className="text-blue-600 font-medium">linkpromo.io/{user.username}</span>
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      className="h-8 w-8 rounded-full hover:bg-blue-50"
-                      onClick={handleCopyLink}
-                    >
-                      <Copy size={16} />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            {!isMobile && (
-              <Card className="hidden lg:block lg:col-span-4 border-none shadow-none rounded-3xl overflow-hidden">
-                <CardContent className="p-0">
-                  <ProfilePreview 
-                    user={user}
-                    items={items}
-                    selectedTheme={selectedTheme}
-                    className="w-full h-[600px]"
-                  />
-                </CardContent>
-              </Card>
-            )}
-            
-            <Card className="col-span-12 lg:col-span-8 bg-white/80 backdrop-blur-sm border border-gray-100 shadow-sm rounded-3xl overflow-hidden animate-fade-in">
-              <CardHeader className="pb-0">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <CardTitle className="text-xl font-bold">Your Coupons</CardTitle>
-                    <CardDescription>
-                      Add and manage your promotional coupons
-                    </CardDescription>
-                  </div>
-                  <Button 
+                  ))}
+                  
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-10 w-10 rounded-full"
                     onClick={() => {
-                      setEditingItem(null);
-                      setIsDialogOpen(true);
+                      setCurrentSocialPlatform("");
+                      setSocialHandle("");
+                      setIsSocialDialogOpen(true);
                     }}
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700"
                   >
-                    <Plus size={16} className="mr-1" />
-                    Add Coupon
+                    <Plus size={16} />
                   </Button>
                 </div>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <PromotionalGrid 
-                  items={items} 
-                  onEdit={handleEditCard}
-                  onDelete={handleDeleteCard}
-                  onDrag={handleDragCard}
-                  onReorder={handleReorderCards}
-                  editable={true}
-                />
-                
-                <div className="mt-6 grid grid-cols-2 gap-4">
+              </div>
+              
+              <div className="mt-4 bg-white rounded-lg border p-3 shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Link size={18} className="text-blue-500" />
+                    <span className="text-sm">
+                      Your LinkPromo is live: <span className="text-blue-500 font-medium">linkpromo.io/{user.username}</span>
+                    </span>
+                  </div>
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    className="bg-blue-500 hover:bg-blue-600 text-white"
+                    onClick={handleCopyLink}
+                  >
+                    <Copy size={16} className="mr-1" />
+                    Copy URL
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="mb-6 mt-8">
+                <h2 className="text-xl font-bold">Your Coupons</h2>
+                <p className="text-muted-foreground">
+                  This is how your coupons will appear to visitors. Add more coupons or edit existing ones.
+                </p>
+              </div>
+
+              <PromotionalGrid 
+                items={items} 
+                onEdit={handleEditCard}
+                onDelete={handleDeleteCard}
+                onDrag={handleDragCard}
+                onReorder={handleReorderCards}
+                editable={true}
+              />
+              
+              <div className="mt-6">
+                <div className="grid grid-cols-2 gap-4">
                   <AddItemCard 
                     aspectRatio="9:16" 
                     onClick={() => {
@@ -443,11 +421,13 @@ const Dashboard = () => {
                     label="Add Coupon" 
                   />
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </main>
+      
+      {isMobile && <MobileNavigation />}
       
       <AddItemDialog
         open={isDialogOpen}
