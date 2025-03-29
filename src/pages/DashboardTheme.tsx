@@ -3,7 +3,7 @@ import { useState } from "react";
 import SimpleSidebar from "@/components/dashboard/simple-sidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import ThemeSelector from "@/components/dashboard/theme-selector";
-import { Smartphone, Check, Monitor } from "lucide-react";
+import { Monitor } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { User, PromotionalItem } from "@/types/user";
@@ -65,8 +65,6 @@ const DashboardTheme = () => {
       
       <main className="flex-1 overflow-auto">
         <div className="container mx-auto px-4 py-8">
-          <h1 className="text-3xl font-bold mb-6">Theme Customization</h1>
-          
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Live Preview Section - Takes 1/3 of screen on large displays */}
             <div className="order-2 lg:order-1">
@@ -100,18 +98,6 @@ const DashboardTheme = () => {
                       
                       {/* Content with theme-specific background */}
                       <div className={`p-4 flex-1 ${getThemeStyles(selectedTheme).background} overflow-y-auto h-[426px]`}>
-                        <div className="flex flex-col items-center mb-3">
-                          <h3 className={`font-bold text-lg ${getThemeStyles(selectedTheme).textColor}`}>
-                            {sampleUser.name}
-                          </h3>
-                          <p className={`text-sm text-center mt-1 ${getThemeStyles(selectedTheme).textColor} opacity-80`}>
-                            @{sampleUser.username}
-                          </p>
-                          <p className={`text-xs text-center mt-1 ${getThemeStyles(selectedTheme).textColor} opacity-70 max-w-52`}>
-                            {sampleUser.bio}
-                          </p>
-                        </div>
-                        
                         {/* Social Media Icons */}
                         <div className="flex justify-center space-x-3 mb-4">
                           {Object.entries(sampleUser.socialLinks || {}).map(([platform, handle]) => (
@@ -187,12 +173,6 @@ const DashboardTheme = () => {
                             <div className="flex justify-center mb-3">
                               <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"></div>
                             </div>
-                            <p className="font-medium">{colorScheme}</p>
-                            {selectedTheme === colorScheme.toLowerCase() && (
-                              <div className="flex justify-center mt-2">
-                                <Check size={16} className="text-green-500" />
-                              </div>
-                            )}
                           </div>
                         ))}
                       </div>
@@ -217,14 +197,6 @@ const DashboardTheme = () => {
                             
                             {/* Content */}
                             <div className="p-4 flex-1 flex flex-col items-center">
-                              {/* Username */}
-                              <p className={`text-center font-bold mt-2 ${getThemeStyles(selectedTheme).textColor}`}>@username</p>
-                              
-                              {/* Bio */}
-                              <p className={`text-center text-sm mt-1 mb-4 ${getThemeStyles(selectedTheme).textColor}`}>
-                                Digital creator & tech enthusiast
-                              </p>
-                              
                               {/* Social Icons */}
                               <div className="flex space-x-4 mb-6">
                                 {[1, 2, 3].map((i) => (
@@ -242,12 +214,6 @@ const DashboardTheme = () => {
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </div>
-                      <div className="flex justify-center mt-4">
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <Smartphone size={16} className="mr-2" />
-                          This is how your profile will appear on mobile devices
                         </div>
                       </div>
                     </CardContent>

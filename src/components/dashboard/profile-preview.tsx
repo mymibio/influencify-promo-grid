@@ -1,8 +1,10 @@
 
 import React from "react";
-import { Monitor } from "lucide-react";
+import { Monitor, Copy } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, PromotionalItem } from "@/types/user";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface ProfilePreviewProps {
   user: User;
@@ -96,14 +98,40 @@ export const getThemeStyles = (themeId: string) => {
 };
 
 const ProfilePreview: React.FC<ProfilePreviewProps> = ({ user, items, selectedTheme, className, hideOnMobile = false }) => {
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(`https://yourdomain.com/${user.username}`)
+      .then(() => {
+        toast.success("Link copied to clipboard!");
+      })
+      .catch(() => {
+        toast.error("Failed to copy link");
+      });
+  };
+
   return (
     <Card className={`sticky top-8 ${hideOnMobile ? 'hidden md:block' : ''} ${className || ''}`}>
-      <CardHeader>
+      <CardHeader className="space-y-1">
         <CardTitle className="flex items-center">
           <Monitor className="mr-2 h-5 w-5" />
           Live Preview
         </CardTitle>
         <CardDescription>See how your profile looks with selected theme</CardDescription>
+        
+        {/* Link Copy UI */}
+        <div className="flex items-center gap-1 bg-gradient-to-r from-blue-50 to-indigo-50 border border-indigo-100 p-1.5 rounded-full mt-2">
+          <div className="flex items-center gap-2 pl-2 flex-1">
+            <span className="text-sm font-medium text-gray-700 truncate">yourdomain.com/{user.username}</span>
+          </div>
+          <Button 
+            size="sm"
+            variant="secondary" 
+            className="h-8 rounded-full bg-white hover:bg-gray-100 transition-colors flex-shrink-0"
+            onClick={handleCopyLink}
+          >
+            <Copy size={14} className="mr-1" />
+            <span className="text-xs">Copy</span>
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="p-4">
         <div className="border-8 border-gray-800 rounded-3xl p-2 bg-gray-800 shadow-xl mx-auto max-w-[280px]">
@@ -125,26 +153,11 @@ const ProfilePreview: React.FC<ProfilePreviewProps> = ({ user, items, selectedTh
                     </div>
                   )}
                 </div>
-                
-                {/* User Info */}
-                <div>
-                  <h3 className={`font-bold ${getThemeStyles(selectedTheme).textColor === 'text-gray-800' ? 'text-white' : getThemeStyles(selectedTheme).textColor}`}>
-                    {user.name}
-                  </h3>
-                  <p className={`text-xs ${getThemeStyles(selectedTheme).textColor === 'text-gray-800' ? 'text-white/80' : getThemeStyles(selectedTheme).textColor} opacity-80`}>
-                    @{user.username}
-                  </p>
-                </div>
               </div>
             </div>
             
             {/* Content with theme-specific background */}
             <div className={`p-4 flex-1 ${getThemeStyles(selectedTheme).background} overflow-y-auto h-[426px]`}>
-              {/* Bio */}
-              <p className={`text-xs ${getThemeStyles(selectedTheme).textColor} opacity-70 mb-4`}>
-                {user.bio}
-              </p>
-              
               {/* Social Media Icons */}
               <div className="flex flex-wrap justify-center gap-2 mb-4">
                 {Object.entries(user.socialLinks || {}).map(([platform, handle]) => (

@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { LayoutGrid, BarChart, Palette, Settings, Plus } from "lucide-react";
+import { LayoutGrid, BarChart, Palette, Settings, Plus, Link2 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
@@ -25,8 +25,18 @@ const MobileNavigation = () => {
 
   const handleAddItem = (newItem: PromotionalItem) => {
     // In a real app, you would save this to your backend
-    toast.success("Coupon added successfully!");
+    toast.success("Item added successfully!");
     setIsAddDialogOpen(false);
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText("https://yourdomain.com/fashionista")
+      .then(() => {
+        toast.success("Link copied to clipboard!");
+      })
+      .catch(() => {
+        toast.error("Failed to copy link");
+      });
   };
   
   return (
@@ -67,7 +77,7 @@ const MobileNavigation = () => {
             <Plus size={22} className="text-white" />
           </button>
           <div className="mt-6">
-            <span className="text-xs font-medium text-primary">Add Link</span>
+            <span className="text-xs font-medium text-primary">Add</span>
           </div>
         </div>
         
@@ -97,7 +107,7 @@ const MobileNavigation = () => {
           <span className="text-xs font-medium mt-1">Settings</span>
         </Link>
 
-        {/* Add Coupon Dialog */}
+        {/* Add Item Dialog */}
         <AddItemDialog
           open={isAddDialogOpen}
           onClose={() => setIsAddDialogOpen(false)}

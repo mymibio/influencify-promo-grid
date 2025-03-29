@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -125,16 +126,8 @@ const PhonePreview: React.FC<{ theme: ThemeStyle }> = ({ theme }) => {
           
           {/* Content */}
           <div className="p-4 flex-1 flex flex-col items-center">
-            {/* Username */}
-            <p className={`text-center font-bold mt-2 ${theme.textColor}`}>@username</p>
-            
-            {/* Bio */}
-            <p className={`text-center text-sm mt-1 mb-4 ${theme.textColor}`}>
-              Digital creator & tech enthusiast
-            </p>
-            
             {/* Social Icons */}
-            <div className="flex space-x-4 mb-6">
+            <div className="flex space-x-4 mb-6 mt-4">
               {[1, 2, 3].map((i) => (
                 <div key={i} className={`w-6 h-6 rounded-full ${theme.textColor} flex items-center justify-center`}>
                   <div className={`w-4 h-4 ${theme.background === 'bg-white' ? 'bg-gray-800' : 'bg-gray-200'} rounded-sm`}></div>
