@@ -1,5 +1,5 @@
 
-import { LayoutGrid, Settings } from "lucide-react";
+import { LayoutGrid, Settings, BarChart, Palette } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const SimpleSidebar = () => {
@@ -13,6 +13,22 @@ const SimpleSidebar = () => {
           >
             <LayoutGrid className="mr-3 h-5 w-5" />
             <span className="text-sm font-medium">Dashboard</span>
+          </Link>
+          
+          <Link 
+            to="/dashboard/analytics" 
+            className="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+          >
+            <BarChart className="mr-3 h-5 w-5" />
+            <span className="text-sm font-medium">Analytics</span>
+          </Link>
+          
+          <Link 
+            to="/dashboard/theme" 
+            className="flex items-center px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md"
+          >
+            <Palette className="mr-3 h-5 w-5" />
+            <span className="text-sm font-medium">Theme</span>
           </Link>
           
           <Link 

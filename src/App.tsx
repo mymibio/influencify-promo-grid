@@ -14,6 +14,8 @@ import Dashboard from "./pages/Dashboard";
 import DashboardLinks from "./pages/DashboardLinks";
 import DashboardProfile from "./pages/DashboardProfile";
 import DashboardSettings from "./pages/DashboardSettings";
+import DashboardAnalytics from "./pages/DashboardAnalytics";
+import DashboardTheme from "./pages/DashboardTheme";
 
 // Create a client inside the component
 function App() {
@@ -34,6 +36,8 @@ function App() {
             <Route path="/dashboard/links" element={<DashboardLinks />} />
             <Route path="/dashboard/profile" element={<DashboardProfile />} />
             <Route path="/dashboard/settings" element={<DashboardSettings />} />
+            <Route path="/dashboard/analytics" element={<DashboardAnalytics />} />
+            <Route path="/dashboard/theme" element={<DashboardTheme />} />
             <Route path="/:username" element={<UserProfile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
