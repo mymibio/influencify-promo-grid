@@ -12,6 +12,7 @@ import ProfilePreview from "@/components/dashboard/profile-preview";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { PromotionalCard } from "@/components/cards/promotional-card";
 
 // Mock user data for demonstration
 const sampleUser: User = {
@@ -73,6 +74,7 @@ const DashboardLinks = () => {
   const [items, setItems] = useState<PromotionalItem[]>(sampleItems);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState("default");
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
   
   const filteredItems = items.filter(item => 
     item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -93,6 +95,10 @@ const DashboardLinks = () => {
     // In a real app, this would navigate to the edit page or open a modal
     toast.info("Edit functionality would open here");
   };
+
+  const handleDragItem = (id: string) => {
+    toast.info("Drag functionality would be implemented here");
+  };
   
   return (
     <DashboardLayout user={sampleUser}>
@@ -102,20 +108,40 @@ const DashboardLinks = () => {
           <div className="space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <h1 className="text-3xl font-bold">Promotional Links</h1>
-              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button>
-                    <PlusCircle className="h-4 w-4 mr-2" />
-                    Add New Link
+              <div className="flex items-center gap-2">
+                <div className="flex items-center bg-muted rounded-lg p-1">
+                  <Button 
+                    variant={viewMode === 'table' ? 'default' : 'ghost'} 
+                    size="sm" 
+                    onClick={() => setViewMode('table')}
+                    className="rounded-md"
+                  >
+                    Table
                   </Button>
-                </DialogTrigger>
-                <AddItemDialog 
-                  open={isAddDialogOpen}
-                  onClose={() => setIsAddDialogOpen(false)}
-                  onAdd={handleAddItem}
-                  aspectRatio="9:16"
-                />
-              </Dialog>
+                  <Button 
+                    variant={viewMode === 'grid' ? 'default' : 'ghost'} 
+                    size="sm" 
+                    onClick={() => setViewMode('grid')}
+                    className="rounded-md"
+                  >
+                    Grid
+                  </Button>
+                </div>
+                <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <PlusCircle className="h-4 w-4 mr-2" />
+                      Add New Link
+                    </Button>
+                  </DialogTrigger>
+                  <AddItemDialog 
+                    open={isAddDialogOpen}
+                    onClose={() => setIsAddDialogOpen(false)}
+                    onAdd={handleAddItem}
+                    aspectRatio="9:16"
+                  />
+                </Dialog>
+              </div>
             </div>
             
             <Card>
@@ -133,71 +159,92 @@ const DashboardLinks = () => {
                   />
                 </div>
                 
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Format</TableHead>
-                        <TableHead>Created</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredItems.length > 0 ? (
-                        filteredItems.map((item) => (
-                          <TableRow key={item.id}>
-                            <TableCell>
-                              <div className="font-medium truncate max-w-[200px]">{item.title}</div>
-                            </TableCell>
-                            <TableCell>
-                              <span className="capitalize">{item.type}</span>
-                            </TableCell>
-                            <TableCell>{item.aspectRatio}</TableCell>
-                            <TableCell>{new Date(item.createdAt).toLocaleDateString()}</TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  onClick={() => handleEditItem(item.id)}
-                                >
-                                  <Edit2 className="h-4 w-4" />
-                                  <span className="sr-only">Edit</span>
-                                </Button>
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  onClick={() => handleDeleteItem(item.id)}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                  <span className="sr-only">Delete</span>
-                                </Button>
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  asChild
-                                >
-                                  <a href={item.url} target="_blank" rel="noopener noreferrer">
-                                    <ExternalLink className="h-4 w-4" />
-                                    <span className="sr-only">Visit</span>
-                                  </a>
-                                </Button>
-                              </div>
+                {viewMode === 'table' ? (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Title</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Format</TableHead>
+                          <TableHead>Created</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredItems.length > 0 ? (
+                          filteredItems.map((item) => (
+                            <TableRow key={item.id}>
+                              <TableCell>
+                                <div className="font-medium truncate max-w-[200px]">{item.title}</div>
+                              </TableCell>
+                              <TableCell>
+                                <span className="capitalize">{item.type}</span>
+                              </TableCell>
+                              <TableCell>{item.aspectRatio}</TableCell>
+                              <TableCell>{new Date(item.createdAt).toLocaleDateString()}</TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    onClick={() => handleEditItem(item.id)}
+                                  >
+                                    <Edit2 className="h-4 w-4" />
+                                    <span className="sr-only">Edit</span>
+                                  </Button>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    onClick={() => handleDeleteItem(item.id)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                    <span className="sr-only">Delete</span>
+                                  </Button>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    asChild
+                                  >
+                                    <a href={item.url} target="_blank" rel="noopener noreferrer">
+                                      <ExternalLink className="h-4 w-4" />
+                                      <span className="sr-only">Visit</span>
+                                    </a>
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={5} className="text-center py-4 text-muted-foreground">
+                              No items found.
                             </TableCell>
                           </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={5} className="text-center py-4 text-muted-foreground">
-                            No items found.
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {filteredItems.length > 0 ? (
+                      filteredItems.map((item) => (
+                        <PromotionalCard
+                          key={item.id}
+                          item={item}
+                          onEdit={handleEditItem}
+                          onDelete={handleDeleteItem}
+                          onDrag={handleDragItem}
+                          editable={true}
+                        />
+                      ))
+                    ) : (
+                      <div className="col-span-full text-center py-10 text-muted-foreground">
+                        No items found.
+                      </div>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
