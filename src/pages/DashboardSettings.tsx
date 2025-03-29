@@ -8,8 +8,10 @@ import { FormLabel } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import SimpleSidebar from "@/components/dashboard/simple-sidebar";
-import { BarChart2, BarChart, ArrowUp, ArrowDown, Users, Clock } from "lucide-react";
+import { BarChart2, BarChart, ArrowUp, ArrowDown, Users, Clock, Pencil, Check, Copy, X } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import ThemeSelector from "@/components/dashboard/theme-selector";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Mock user data
 const sampleUser: User = {
@@ -40,22 +42,6 @@ const analyticsData = {
   lastUpdated: new Date().toISOString()
 };
 
-type ThemeOption = {
-  id: string;
-  name: string;
-  primaryColor: string;
-  secondaryColor: string;
-  accentColor: string;
-}
-
-const themeOptions: ThemeOption[] = [
-  { id: "default", name: "Default Purple", primaryColor: "#8B5CF6", secondaryColor: "#A78BFA", accentColor: "#F5F3FF" },
-  { id: "blue", name: "Ocean Blue", primaryColor: "#0EA5E9", secondaryColor: "#38BDF8", accentColor: "#E0F2FE" },
-  { id: "green", name: "Emerald Green", primaryColor: "#10B981", secondaryColor: "#34D399", accentColor: "#ECFDF5" },
-  { id: "pink", name: "Hot Pink", primaryColor: "#EC4899", secondaryColor: "#F472B6", accentColor: "#FCE7F3" },
-  { id: "orange", name: "Sunset Orange", primaryColor: "#F97316", secondaryColor: "#FB923C", accentColor: "#FFF7ED" }
-];
-
 const DashboardSettings = () => {
   const [user, setUser] = useState(sampleUser);
   const [settings, setSettings] = useState({
@@ -65,6 +51,9 @@ const DashboardSettings = () => {
   });
   const [selectedTheme, setSelectedTheme] = useState("default");
   const [analyticsTimeframe, setAnalyticsTimeframe] = useState("7d");
+  const [editingBio, setEditingBio] = useState(false);
+  const [bioText, setBioText] = useState(sampleUser.bio);
+  const isMobile = useIsMobile();
   
   const handleSettingChange = (setting: string, value: boolean) => {
     setSettings(prev => ({
@@ -80,11 +69,26 @@ const DashboardSettings = () => {
     toast.success("Settings saved successfully!");
   };
 
-  const handleThemeChange = (value: string) => {
-    if (value) {
-      setSelectedTheme(value);
-      toast.success(`Theme changed to ${themeOptions.find(t => t.id === value)?.name}`);
-    }
+  const handleThemeChange = (themeId: string) => {
+    setSelectedTheme(themeId);
+  };
+
+  const handleEditBio = () => {
+    setEditingBio(true);
+  };
+
+  const handleSaveBio = () => {
+    setUser(prev => ({
+      ...prev,
+      bio: bioText
+    }));
+    setEditingBio(false);
+    toast.success("Bio updated successfully!");
+  };
+
+  const handleCancelEditBio = () => {
+    setBioText(user.bio);
+    setEditingBio(false);
   };
   
   return (
@@ -94,6 +98,43 @@ const DashboardSettings = () => {
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">
           <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+          
+          {/* User Bio Section */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Bio</CardTitle>
+              <CardDescription>Your profile description seen by visitors</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {editingBio ? (
+                <div className="space-y-4">
+                  <Input 
+                    value={bioText} 
+                    onChange={(e) => setBioText(e.target.value)} 
+                    placeholder="Enter your bio" 
+                    className="min-h-[80px]"
+                  />
+                  <div className="flex space-x-2">
+                    <Button onClick={handleSaveBio} size="sm">
+                      <Check className="h-4 w-4 mr-2" />
+                      Save
+                    </Button>
+                    <Button onClick={handleCancelEditBio} variant="outline" size="sm">
+                      <X className="h-4 w-4 mr-2" />
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex justify-between items-start">
+                  <p className="text-gray-600">{user.bio}</p>
+                  <Button variant="ghost" size="sm" onClick={handleEditBio}>
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
           
           {/* Analytics Section */}
           <div className="mb-8">
@@ -215,28 +256,11 @@ const DashboardSettings = () => {
           {/* Theme Selection */}
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Page Theme</CardTitle>
-              <CardDescription>Customize how your page looks to visitors</CardDescription>
+              <CardTitle>Profile Theme</CardTitle>
+              <CardDescription>Choose how your profile page looks to visitors</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                {themeOptions.map((theme) => (
-                  <div 
-                    key={theme.id}
-                    onClick={() => handleThemeChange(theme.id)}
-                    className={`cursor-pointer rounded-lg p-4 border-2 transition-all ${selectedTheme === theme.id ? 'border-primary ring-2 ring-primary ring-opacity-50' : 'border-transparent hover:border-gray-200'}`}
-                  >
-                    <div className="flex flex-col items-center space-y-2">
-                      <div className="flex space-x-1">
-                        <div className="w-6 h-6 rounded-full" style={{ backgroundColor: theme.primaryColor }}></div>
-                        <div className="w-6 h-6 rounded-full" style={{ backgroundColor: theme.secondaryColor }}></div>
-                        <div className="w-6 h-6 rounded-full" style={{ backgroundColor: theme.accentColor }}></div>
-                      </div>
-                      <span className="text-sm font-medium">{theme.name}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <ThemeSelector selectedTheme={selectedTheme} onThemeChange={handleThemeChange} />
             </CardContent>
           </Card>
           

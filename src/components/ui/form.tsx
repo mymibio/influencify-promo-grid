@@ -56,6 +56,8 @@ const useFormField = () => {
       formItemId: itemContext ? `${itemContext.id}-form-item` : undefined,
       formDescriptionId: itemContext ? `${itemContext.id}-form-item-description` : undefined,
       formMessageId: itemContext ? `${itemContext.id}-form-item-message` : undefined,
+      // Add error property to match the return type when inside a form
+      error: undefined
     }
   }
 
