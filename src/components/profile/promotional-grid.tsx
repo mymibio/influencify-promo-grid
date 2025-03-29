@@ -17,8 +17,8 @@ const PromotionalGrid = ({ items }: PromotionalGridProps) => {
   }, [items]);
 
   return (
-    <div className="container px-4 pb-16">
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+    <div className="container px-2 sm:px-4 pb-16">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4">
         {randomizedItems.map((item) => (
           <div key={item.id} className="w-full">
             <PromotionalCard item={item} />

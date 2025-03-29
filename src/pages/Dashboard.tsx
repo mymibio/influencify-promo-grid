@@ -37,7 +37,7 @@ const sampleItems: PromotionalItem[] = [
     image: "https://images.unsplash.com/photo-1607083206968-13611e3d76db?q=80&w=2340&h=1000&auto=format&fit=crop",
     url: "https://amazon.com",
     type: "coupon",
-    aspectRatio: "1:1",
+    aspectRatio: "9:16",
     couponCode: "SUMMER20",
     discount: "20% OFF",
     createdAt: new Date().toISOString()
@@ -50,7 +50,7 @@ const sampleItems: PromotionalItem[] = [
     image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=2340&h=1000&auto=format&fit=crop",
     url: "https://sephora.com",
     type: "coupon",
-    aspectRatio: "1:1",
+    aspectRatio: "9:16",
     couponCode: "BEAUTY15",
     discount: "15% OFF",
     createdAt: new Date().toISOString()

@@ -33,31 +33,31 @@ export const PromotionalCard = ({ item }: PromotionalCardProps) => {
             alt={item.title} 
             className={cn(
               "w-full object-cover transition-transform group-hover:scale-105",
-              item.aspectRatio === "1:1" ? "h-36 sm:h-40" : "h-44 sm:h-52"
+              item.aspectRatio === "1:1" ? "h-36 sm:h-40" : "h-52 sm:h-64 md:h-72"
             )}
           />
         </div>
       )}
       
-      <CardContent className="p-3 sm:p-5 flex-1 flex flex-col">
+      <CardContent className="p-2 sm:p-4 flex-1 flex flex-col">
         <div className="flex-1">
-          <h3 className="font-bold text-lg sm:text-xl mb-1 line-clamp-2">{item.title}</h3>
+          <h3 className="font-bold text-base sm:text-lg mb-1 line-clamp-2">{item.title}</h3>
           
           {item.description && (
-            <p className="text-muted-foreground text-xs sm:text-sm line-clamp-2 mb-2">
+            <p className="text-muted-foreground text-xs sm:text-sm line-clamp-2 mb-1 sm:mb-2">
               {item.description}
             </p>
           )}
         </div>
         
-        <div className="mt-2 sm:mt-4 space-y-2 sm:space-y-3">
+        <div className="mt-1 sm:mt-2 space-y-1 sm:space-y-2">
           {item.couponCode && (
             <div className="relative">
-              <div className="flex items-center justify-between bg-blue-100 p-2 sm:p-3 rounded-lg">
+              <div className="flex items-center justify-between bg-blue-100 p-1.5 sm:p-2 rounded-lg">
                 <div className="flex-1 text-center">
-                  <p className="text-sm sm:text-base font-medium tracking-wide">{item.couponCode}</p>
+                  <p className="text-xs sm:text-sm font-medium tracking-wide">{item.couponCode}</p>
                   {item.discount && (
-                    <p className="text-xs sm:text-sm text-blue-600 font-medium">
+                    <p className="text-xs text-blue-600 font-medium">
                       {item.discount}
                     </p>
                   )}
@@ -66,11 +66,11 @@ export const PromotionalCard = ({ item }: PromotionalCardProps) => {
                   size="sm" 
                   variant="ghost" 
                   onClick={handleCopyCode}
-                  className="h-6 w-6 sm:h-8 sm:w-8 p-0"
+                  className="h-5 w-5 sm:h-6 sm:w-6 p-0"
                   aria-label="Copy code"
                   title="Copy code"
                 >
-                  <Copy className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <Copy className="h-3 w-3" />
                 </Button>
               </div>
             </div>
@@ -78,7 +78,7 @@ export const PromotionalCard = ({ item }: PromotionalCardProps) => {
           
           {item.url && (
             <div>
-              <Button asChild className="w-full bg-green-500 hover:bg-green-600 rounded-full h-8 sm:h-10 text-xs sm:text-sm font-medium">
+              <Button asChild className="w-full bg-green-500 hover:bg-green-600 rounded-full h-6 sm:h-8 text-xs font-medium">
                 <Link to={item.url} target="_blank" rel="noopener noreferrer">
                   Visit Website
                 </Link>
