@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { User, PromotionalItem } from "@/types/user";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -124,6 +125,10 @@ const Dashboard = () => {
     toast.info("Drag the card to reorder your items");
   };
   
+  const handleReorderCards = (reorderedItems: PromotionalItem[]) => {
+    setItems(reorderedItems);
+  };
+  
   const handleSaveItem = (updatedItem: PromotionalItem) => {
     if (editingItem) {
       setItems(prevItems => 
@@ -242,6 +247,7 @@ const Dashboard = () => {
             onEdit={handleEditCard}
             onDelete={handleDeleteCard}
             onDrag={handleDragCard}
+            onReorder={handleReorderCards}
             editable={true}
           />
           
