@@ -118,9 +118,13 @@
 }
 
 .card-1-1 {
-  aspect-ratio: 1/1;
+  aspect-ratio: auto;
+  border-radius: 24px;
+  overflow: hidden;
 }
 
 .card-9-16 {
-  aspect-ratio: 9/16;
+  aspect-ratio: auto;
+  border-radius: 24px;
+  overflow: hidden;
 }
