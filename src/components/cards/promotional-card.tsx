@@ -4,7 +4,7 @@ import { PromotionalItem } from "@/types/user";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { ExternalLink, Copy } from "lucide-react";
+import { Copy } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface PromotionalCardProps {
@@ -22,7 +22,7 @@ export const PromotionalCard = ({ item }: PromotionalCardProps) => {
   return (
     <Card 
       className={cn(
-        "group overflow-hidden h-full flex flex-col rounded-3xl shadow-sm border-0",
+        "group overflow-hidden h-full w-full flex flex-col rounded-3xl shadow-sm border-0",
         item.aspectRatio === "1:1" ? "card-1-1" : "card-9-16"
       )}
     >
@@ -33,31 +33,31 @@ export const PromotionalCard = ({ item }: PromotionalCardProps) => {
             alt={item.title} 
             className={cn(
               "w-full object-cover transition-transform group-hover:scale-105",
-              item.aspectRatio === "1:1" ? "h-40" : "h-52"
+              item.aspectRatio === "1:1" ? "h-36 sm:h-40" : "h-44 sm:h-52"
             )}
           />
         </div>
       )}
       
-      <CardContent className="p-5 flex-1 flex flex-col">
+      <CardContent className="p-3 sm:p-5 flex-1 flex flex-col">
         <div className="flex-1">
-          <h3 className="font-bold text-2xl mb-1">{item.title}</h3>
+          <h3 className="font-bold text-lg sm:text-xl mb-1 line-clamp-2">{item.title}</h3>
           
           {item.description && (
-            <p className="text-muted-foreground text-sm">
+            <p className="text-muted-foreground text-xs sm:text-sm line-clamp-2">
               {item.description}
             </p>
           )}
         </div>
         
-        <div className="mt-4 space-y-3">
+        <div className="mt-2 sm:mt-4 space-y-2 sm:space-y-3">
           {item.couponCode && (
             <div className="relative">
-              <div className="flex items-center bg-blue-100 p-3 rounded-lg">
+              <div className="flex items-center bg-blue-100 p-2 sm:p-3 rounded-lg">
                 <div className="flex-1 text-center">
-                  <p className="text-lg font-medium">{item.couponCode}</p>
+                  <p className="text-sm sm:text-lg font-medium">{item.couponCode}</p>
                   {item.discount && (
-                    <p className="text-sm text-blue-600 font-medium">
+                    <p className="text-xs sm:text-sm text-blue-600 font-medium">
                       {item.discount}
                     </p>
                   )}
@@ -66,19 +66,19 @@ export const PromotionalCard = ({ item }: PromotionalCardProps) => {
                   size="sm" 
                   variant="ghost" 
                   onClick={handleCopyCode}
-                  className="absolute right-2 top-2 h-8 w-8 p-0"
+                  className="absolute right-1 top-1 sm:right-2 sm:top-2 h-6 w-6 sm:h-8 sm:w-8 p-0"
                 >
-                  <Copy className="h-4 w-4" />
+                  <Copy className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </div>
             </div>
           )}
           
           {item.url && (
-            <div className="mt-3">
-              <Button asChild className="w-full bg-green-500 hover:bg-green-600 rounded-full h-12 text-base">
+            <div>
+              <Button asChild className="w-full bg-green-500 hover:bg-green-600 rounded-full h-8 sm:h-12 text-xs sm:text-base">
                 <Link to={item.url} target="_blank" rel="noopener noreferrer">
-                  visit webste
+                  visit website
                 </Link>
               </Button>
             </div>

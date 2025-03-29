@@ -93,32 +93,16 @@
   grid-gap: 16px;
 }
 
-.masonry-grid {
-  column-count: 2;
-  column-gap: 16px;
-}
-
-/* Always keep 2 columns even on small screens */
-@media (max-width: 639px) {
-  .masonry-grid {
-    column-count: 2;
-    column-gap: 12px;
-  }
-}
-
-.masonry-item {
-  break-inside: avoid;
-  margin-bottom: 16px;
-}
+/* Removed masonry grid styles as we're now using a regular grid */
 
 .card-1-1 {
-  aspect-ratio: auto;
+  aspect-ratio: 1/1;
   border-radius: 24px;
   overflow: hidden;
 }
 
 .card-9-16 {
-  aspect-ratio: auto;
+  aspect-ratio: 9/16;
   border-radius: 24px;
   overflow: hidden;
 }
