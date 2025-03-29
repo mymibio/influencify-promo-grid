@@ -6,13 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, Edit2, Trash2, ExternalLink } from "lucide-react";
+import { PlusCircle, Edit2, Trash2, ExternalLink, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import ProfilePreview from "@/components/dashboard/profile-preview";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { PromotionalCard } from "@/components/cards/promotional-card";
+import PromotionalGrid from "@/components/profile/promotional-grid";
 
 // Mock user data for demonstration
 const sampleUser: User = {
@@ -75,6 +76,7 @@ const DashboardLinks = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState("default");
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
+  const isMobile = useIsMobile();
   
   const filteredItems = items.filter(item => 
     item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -100,11 +102,74 @@ const DashboardLinks = () => {
     toast.info("Drag functionality would be implemented here");
   };
   
+  const handleReorderItems = (reorderedItems: PromotionalItem[]) => {
+    setItems(reorderedItems);
+    toast.success("Items reordered successfully");
+  };
+  
   return (
     <DashboardLayout user={sampleUser}>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Links Management Section */}
-        <div className="lg:col-span-2 order-1">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* Left Side - Live Profile Preview (only visible on desktop) */}
+        <div className="hidden xl:block">
+          <Card className="sticky top-8">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Smartphone className="mr-2 h-5 w-5" />
+                Phone Preview
+              </CardTitle>
+              <CardDescription>How your profile appears on mobile devices</CardDescription>
+            </CardHeader>
+            <CardContent className="p-4">
+              <div className="mx-auto max-w-[360px] overflow-hidden rounded-3xl border-8 border-gray-800 bg-gray-800">
+                <div className="h-[600px] overflow-y-auto bg-white">
+                  {/* Profile Header */}
+                  <div className="flex flex-col items-center p-6 border-b">
+                    <div className="w-24 h-24 rounded-full overflow-hidden mb-4">
+                      {sampleUser.profilePicture ? (
+                        <img 
+                          src={sampleUser.profilePicture} 
+                          alt={sampleUser.name} 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+                          <span className="text-2xl font-bold">{sampleUser.name.charAt(0)}</span>
+                        </div>
+                      )}
+                    </div>
+                    <h2 className="text-xl font-bold">{sampleUser.name}</h2>
+                    <p className="text-gray-500 text-sm mt-1">@{sampleUser.username}</p>
+                    <p className="text-center text-sm mt-2">{sampleUser.bio}</p>
+                    
+                    {/* Social Links */}
+                    <div className="flex justify-center space-x-4 mt-4">
+                      {Object.entries(sampleUser.socialLinks || {}).map(([platform]) => (
+                        <div 
+                          key={platform} 
+                          className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100"
+                        >
+                          <span className="font-medium">{platform.charAt(0).toUpperCase()}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Profile Content */}
+                  <div className="p-4">
+                    <PromotionalGrid 
+                      items={filteredItems} 
+                      editable={false}
+                    />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        {/* Center Section - Links Management */}
+        <div className="xl:col-span-1">
           <div className="space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <h1 className="text-3xl font-bold">Promotional Links</h1>
@@ -228,16 +293,14 @@ const DashboardLinks = () => {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {filteredItems.length > 0 ? (
-                      filteredItems.map((item) => (
-                        <PromotionalCard
-                          key={item.id}
-                          item={item}
-                          onEdit={handleEditItem}
-                          onDelete={handleDeleteItem}
-                          onDrag={handleDragItem}
-                          editable={true}
-                        />
-                      ))
+                      <PromotionalGrid
+                        items={filteredItems}
+                        onEdit={handleEditItem}
+                        onDelete={handleDeleteItem}
+                        onDrag={handleDragItem}
+                        onReorder={handleReorderItems}
+                        editable={true}
+                      />
                     ) : (
                       <div className="col-span-full text-center py-10 text-muted-foreground">
                         No items found.
@@ -250,8 +313,8 @@ const DashboardLinks = () => {
           </div>
         </div>
         
-        {/* Live Preview Section - Only shows on tablet and desktop */}
-        <div className="order-2 lg:order-2">
+        {/* Right Side - Live Preview Section */}
+        <div className="hidden lg:block xl:col-span-1">
           <ProfilePreview
             user={sampleUser}
             items={filteredItems.length > 0 ? filteredItems.slice(0, 4) : []}
