@@ -1,3 +1,4 @@
+
 import { User, PromotionalItem } from "@/types/user";
 import PromotionalGrid from "@/components/profile/promotional-grid";
 import { useParams } from "react-router-dom";
@@ -145,20 +146,21 @@ const UserProfile = () => {
           <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">
             {sampleUser.bio}
           </p>
-          
-          <div className="flex flex-wrap gap-2">
-            {sampleUser.socialLinks && Object.entries(sampleUser.socialLinks).slice(0, 6).map(([platform]) => (
-              <a 
-                key={platform}
-                href={`#${platform}`}
-                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
-                aria-label={platform}
-              >
-                {getSocialIcon(platform)}
-              </a>
-            ))}
-          </div>
         </div>
+      </div>
+      
+      {/* Centered social links */}
+      <div className="flex flex-wrap gap-2 justify-center mb-6">
+        {sampleUser.socialLinks && Object.entries(sampleUser.socialLinks).slice(0, 6).map(([platform]) => (
+          <a 
+            key={platform}
+            href={`#${platform}`}
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+            aria-label={platform}
+          >
+            {getSocialIcon(platform)}
+          </a>
+        ))}
       </div>
       
       <div className="flex overflow-x-auto gap-2 pb-2 mb-4 scrollbar-hide">
