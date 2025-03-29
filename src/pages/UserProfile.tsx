@@ -1,10 +1,10 @@
 
 import { User, PromotionalItem } from "@/types/user";
-import ProfileHeader from "@/components/profile/profile-header";
 import PromotionalGrid from "@/components/profile/promotional-grid";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Instagram, Twitter, Youtube, Facebook, MessageCircle, Mail } from "lucide-react";
 
 // Mock user data for demonstration
 const sampleUser: User = {
@@ -110,6 +110,19 @@ const availableCategories = [
   "All", "Fashion", "Beauty", "Lifestyle", "Travel", "Technology", "Food", "Fitness", "Home", "Accessories"
 ];
 
+// Helper function to get the appropriate social icon
+const getSocialIcon = (platform: string) => {
+  switch (platform) {
+    case "instagram": return <Instagram size={20} />;
+    case "twitter": return <Twitter size={20} />;
+    case "youtube": return <Youtube size={20} />;
+    case "facebook": return <Facebook size={20} />;
+    case "whatsapp": return <MessageCircle size={20} />;
+    case "email": return <Mail size={20} />;
+    default: return null;
+  }
+};
+
 const UserProfile = () => {
   const { username } = useParams<{ username: string }>();
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -120,34 +133,34 @@ const UserProfile = () => {
     
   return (
     <div className="max-w-2xl mx-auto px-4 pt-6 pb-12">
-      {/* Compact Profile Card */}
-      <div className="bg-white rounded-2xl shadow-md mb-6 overflow-hidden">
-        <div className="flex flex-col items-center pt-8 px-4 pb-6">
-          {/* Profile Picture */}
-          <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-white shadow-sm">
-            <img 
-              src={sampleUser.profilePicture} 
-              alt={sampleUser.name}
-              className="w-full h-full object-cover"
-            />
-          </div>
-          
-          {/* User Info */}
-          <h1 className="text-2xl font-bold">{sampleUser.name}</h1>
-          <p className="text-gray-500 mb-3">@{sampleUser.username}</p>
-          <p className="text-center text-sm text-gray-600 mb-5 max-w-md">
+      {/* Profile Header - Redesigned to match image */}
+      <div className="flex gap-6 mb-6">
+        {/* Profile Picture */}
+        <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0">
+          <img 
+            src={sampleUser.profilePicture} 
+            alt={sampleUser.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+        
+        {/* User Info */}
+        <div className="flex-1">
+          <h1 className="text-3xl font-bold">{sampleUser.name}</h1>
+          <p className="text-gray-700 mb-4">
             {sampleUser.bio}
           </p>
           
           {/* Social Links */}
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-2">
             {sampleUser.socialLinks && Object.entries(sampleUser.socialLinks).slice(0, 6).map(([platform]) => (
               <a 
                 key={platform}
                 href={`#${platform}`}
                 className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                aria-label={platform}
               >
-                <span className="text-sm font-bold">{platform.charAt(0).toUpperCase()}</span>
+                {getSocialIcon(platform)}
               </a>
             ))}
           </div>
@@ -170,7 +183,7 @@ const UserProfile = () => {
         ))}
       </div>
       
-      {/* Promotional Grid - More compact */}
+      {/* Promotional Grid */}
       <div className="bg-white rounded-2xl overflow-hidden shadow-md">
         <PromotionalGrid items={filteredItems} />
       </div>
