@@ -1,13 +1,17 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { LayoutGrid, BarChart, Palette, Settings, Plus } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import AddItemDialog from "@/components/dashboard/add-item-dialog";
+import { PromotionalItem } from "@/types/user";
+import { toast } from "sonner";
 
 const MobileNavigation = () => {
   const location = useLocation();
   const currentPath = location.pathname;
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   
   const isActive = (path: string) => {
     if (path === "/dashboard" && currentPath === "/dashboard") {
@@ -18,6 +22,12 @@ const MobileNavigation = () => {
     }
     return false;
   };
+
+  const handleAddItem = (newItem: PromotionalItem) => {
+    // In a real app, you would save this to your backend
+    toast.success("Coupon added successfully!");
+    setIsAddDialogOpen(false);
+  };
   
   return (
     <div className="fixed bottom-4 left-0 right-0 z-50 flex justify-center md:hidden">
@@ -27,7 +37,7 @@ const MobileNavigation = () => {
           className={cn(
             "flex flex-col items-center justify-center rounded-full p-2 transition-all duration-200 hover:bg-gray-100",
             isActive("/dashboard") 
-              ? "text-primary bg-primary/10 shadow-sm" 
+              ? "text-primary bg-primary/10" 
               : "text-muted-foreground hover:text-primary"
           )}
         >
@@ -40,7 +50,7 @@ const MobileNavigation = () => {
           className={cn(
             "flex flex-col items-center justify-center rounded-full p-2 transition-all duration-200 hover:bg-gray-100",
             isActive("/dashboard/analytics") 
-              ? "text-primary bg-primary/10 shadow-sm" 
+              ? "text-primary bg-primary/10" 
               : "text-muted-foreground hover:text-primary"
           )}
         >
@@ -49,24 +59,24 @@ const MobileNavigation = () => {
         </Link>
         
         {/* Add Link Button in Middle */}
-        <Link
-          to="/dashboard/links"
-          className="relative flex flex-col items-center justify-center"
-        >
-          <div className="absolute -top-6 rounded-full p-3 bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110">
+        <div className="relative flex flex-col items-center justify-center">
+          <button 
+            onClick={() => setIsAddDialogOpen(true)}
+            className="absolute -top-6 rounded-full p-3 bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
+          >
             <Plus size={22} className="text-white" />
-          </div>
+          </button>
           <div className="mt-6">
             <span className="text-xs font-medium text-primary">Add Link</span>
           </div>
-        </Link>
+        </div>
         
         <Link 
           to="/dashboard/theme" 
           className={cn(
             "flex flex-col items-center justify-center rounded-full p-2 transition-all duration-200 hover:bg-gray-100",
             isActive("/dashboard/theme") 
-              ? "text-primary bg-primary/10 shadow-sm" 
+              ? "text-primary bg-primary/10" 
               : "text-muted-foreground hover:text-primary"
           )}
         >
@@ -79,13 +89,22 @@ const MobileNavigation = () => {
           className={cn(
             "flex flex-col items-center justify-center rounded-full p-2 transition-all duration-200 hover:bg-gray-100",
             isActive("/dashboard/settings") 
-              ? "text-primary bg-primary/10 shadow-sm" 
+              ? "text-primary bg-primary/10" 
               : "text-muted-foreground hover:text-primary"
           )}
         >
           <Settings size={20} />
           <span className="text-xs font-medium mt-1">Settings</span>
         </Link>
+
+        {/* Add Coupon Dialog */}
+        <AddItemDialog
+          open={isAddDialogOpen}
+          onClose={() => setIsAddDialogOpen(false)}
+          onAdd={handleAddItem}
+          aspectRatio="9:16"
+          editItem={null}
+        />
       </nav>
     </div>
   );
