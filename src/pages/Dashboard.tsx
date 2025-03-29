@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { User, PromotionalItem } from "@/types/user";
 import { Button } from "@/components/ui/button";
-import { Instagram, Facebook, MessageCircle, Mail, Youtube, Twitter, Plus, Copy, Link, Pencil, Menu, Settings, LayoutGrid, BarChart, Palette } from "lucide-react";
+import { Instagram, Facebook, MessageCircle, Mail, Youtube, Twitter, Plus, Copy, Link, Pencil, LayoutGrid, BarChart, Palette, Settings } from "lucide-react";
 import SimpleSidebar from "@/components/dashboard/simple-sidebar";
 import AddItemCard from "@/components/dashboard/add-item-card";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import MobileNavigation from "@/components/dashboard/mobile-navigation";
 
 const sampleUser: User = {
   id: "123",
@@ -74,7 +74,6 @@ const Dashboard = () => {
   const [selectedTheme, setSelectedTheme] = useState("default");
   const [currentSocialPlatform, setCurrentSocialPlatform] = useState<string>("");
   const [socialHandle, setSocialHandle] = useState<string>("");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isMobile = useIsMobile();
   
   const getInitials = (name: string) => {
@@ -234,23 +233,14 @@ const Dashboard = () => {
   };
   
   return (
-    <div className="flex min-h-screen w-full bg-gray-50">
+    <div className="flex min-h-screen w-full bg-gray-50 pb-16 md:pb-0">
       <SimpleSidebar />
       
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">
-          {/* Mobile Header with Menu Button */}
           {isMobile && (
-            <div className="flex items-center justify-between mb-4">
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => setMobileMenuOpen(true)}
-              >
-                <Menu size={24} />
-              </Button>
+            <div className="flex items-center justify-center mb-4">
               <h1 className="text-xl font-bold">Dashboard</h1>
-              <div className="w-10"></div> {/* Empty div for balanced spacing */}
             </div>
           )}
           
@@ -340,7 +330,6 @@ const Dashboard = () => {
                   </div>
                 </div>
                 
-                {/* Centered social links */}
                 <div className="flex flex-wrap gap-2 justify-center pb-6">
                   {user.socialLinks && Object.entries(user.socialLinks).map(([platform, handle]) => (
                     <div 
@@ -438,6 +427,8 @@ const Dashboard = () => {
         </div>
       </main>
       
+      {isMobile && <MobileNavigation />}
+      
       <AddItemDialog
         open={isDialogOpen}
         onClose={() => {
@@ -522,78 +513,6 @@ const Dashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
-      
-      {/* Mobile Menu Sheet */}
-      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent side="left" className="w-[250px] p-0">
-          <div className="flex flex-col h-full">
-            <div className="p-4 border-b">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden">
-                  {user.profilePicture ? (
-                    <img src={user.profilePicture} alt={user.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-sm font-semibold">{user.name.charAt(0)}</span>
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <p className="font-medium">{user.name}</p>
-                  <p className="text-xs text-muted-foreground">@{user.username}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex-1 py-2">
-              <div className="px-2">
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start mb-1"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <LayoutGrid className="mr-2 h-4 w-4" />
-                  Dashboard
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start mb-1"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <BarChart className="mr-2 h-4 w-4" />
-                  Analytics
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start mb-1"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <Palette className="mr-2 h-4 w-4" />
-                  Theme Settings
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start mb-1"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </Button>
-              </div>
-            </div>
-            
-            <div className="p-4 border-t">
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Close Menu
-              </Button>
-            </div>
-          </div>
-        </SheetContent>
-      </Sheet>
     </div>
   );
 };
