@@ -3,12 +3,13 @@ import { useState } from "react";
 import { User, PromotionalItem } from "@/types/user";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Instagram, Facebook, MessageCircle, Mail, Plus, Copy, Link } from "lucide-react";
+import { Instagram, Facebook, MessageCircle, Mail, Plus, Copy, Link, Edit, Save } from "lucide-react";
 import SimpleSidebar from "@/components/dashboard/simple-sidebar";
 import AddItemCard from "@/components/dashboard/add-item-card";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
 import PromotionalGrid from "@/components/profile/promotional-grid";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 
 // Mock user data
 const sampleUser: User = {
@@ -60,6 +61,8 @@ const Dashboard = () => {
   const [user, setUser] = useState(sampleUser);
   const [items, setItems] = useState(sampleItems);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditingBio, setIsEditingBio] = useState(false);
+  const [editedBio, setEditedBio] = useState(user.bio || "");
   
   const getInitials = (name: string) => {
     return name
@@ -87,6 +90,19 @@ const Dashboard = () => {
         toast.error("Failed to copy link");
       });
   };
+
+  const handleEditBio = () => {
+    setIsEditingBio(true);
+  };
+
+  const handleSaveBio = () => {
+    setUser(prev => ({
+      ...prev,
+      bio: editedBio
+    }));
+    setIsEditingBio(false);
+    toast.success("Bio updated successfully!");
+  };
   
   return (
     <div className="flex min-h-screen w-full bg-gray-50">
@@ -106,7 +122,29 @@ const Dashboard = () => {
             
             <div className="text-center md:text-left">
               <h1 className="text-3xl font-bold">{user.name}</h1>
-              <p className="text-gray-600 mt-1">{user.bio || "Bio..."}</p>
+              
+              <div className="mt-1 relative">
+                {isEditingBio ? (
+                  <div className="flex items-center gap-2">
+                    <Input 
+                      value={editedBio} 
+                      onChange={(e) => setEditedBio(e.target.value)}
+                      className="pr-10"
+                      maxLength={160}
+                    />
+                    <Button size="sm" variant="ghost" onClick={handleSaveBio} className="absolute right-2">
+                      <Save size={16} />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <p className="text-gray-600">{user.bio || "Add a bio..."}</p>
+                    <Button size="sm" variant="ghost" onClick={handleEditBio} className="p-1 h-auto">
+                      <Edit size={16} className="text-gray-500" />
+                    </Button>
+                  </div>
+                )}
+              </div>
               
               <div className="flex gap-2 mt-4 justify-center md:justify-start">
                 {user.socialLinks?.instagram && (
@@ -144,7 +182,7 @@ const Dashboard = () => {
                     </span>
                   </div>
                   <Button 
-                    variant="primary" 
+                    variant="default" 
                     size="sm" 
                     className="bg-blue-500 hover:bg-blue-600 text-white"
                     onClick={handleCopyLink}
