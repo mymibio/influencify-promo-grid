@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Monitor } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -108,38 +109,44 @@ const ProfilePreview: React.FC<ProfilePreviewProps> = ({ user, items, selectedTh
         <div className="border-8 border-gray-800 rounded-3xl p-2 bg-gray-800 shadow-xl mx-auto max-w-[280px]">
           <div className="rounded-2xl overflow-hidden h-[500px] bg-white">
             {/* Header with theme-specific background */}
-            <div className={`h-24 ${getThemeStyles(selectedTheme).header} flex items-center justify-center`}>
-              <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                {user.profilePicture ? (
-                  <img 
-                    src={user.profilePicture} 
-                    alt={user.name} 
-                    className="w-14 h-14 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-14 h-14 rounded-full bg-gray-300 flex items-center justify-center">
-                    <span className="text-lg font-bold">{user.name.charAt(0)}</span>
-                  </div>
-                )}
+            <div className={`p-4 ${getThemeStyles(selectedTheme).header}`}>
+              <div className="flex items-center gap-4">
+                {/* Profile Picture */}
+                <div className="w-16 h-16 rounded-full overflow-hidden bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  {user.profilePicture ? (
+                    <img 
+                      src={user.profilePicture} 
+                      alt={user.name} 
+                      className="w-14 h-14 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-14 h-14 rounded-full bg-gray-300 flex items-center justify-center">
+                      <span className="text-lg font-bold">{user.name.charAt(0)}</span>
+                    </div>
+                  )}
+                </div>
+                
+                {/* User Info */}
+                <div>
+                  <h3 className={`font-bold ${getThemeStyles(selectedTheme).textColor === 'text-gray-800' ? 'text-white' : getThemeStyles(selectedTheme).textColor}`}>
+                    {user.name}
+                  </h3>
+                  <p className={`text-xs ${getThemeStyles(selectedTheme).textColor === 'text-gray-800' ? 'text-white/80' : getThemeStyles(selectedTheme).textColor} opacity-80`}>
+                    @{user.username}
+                  </p>
+                </div>
               </div>
             </div>
             
             {/* Content with theme-specific background */}
             <div className={`p-4 flex-1 ${getThemeStyles(selectedTheme).background} overflow-y-auto h-[426px]`}>
-              <div className="flex flex-col items-center mb-3">
-                <h3 className={`font-bold text-lg ${getThemeStyles(selectedTheme).textColor}`}>
-                  {user.name}
-                </h3>
-                <p className={`text-sm text-center mt-1 ${getThemeStyles(selectedTheme).textColor} opacity-80`}>
-                  @{user.username}
-                </p>
-                <p className={`text-xs text-center mt-1 ${getThemeStyles(selectedTheme).textColor} opacity-70 max-w-52`}>
-                  {user.bio}
-                </p>
-              </div>
+              {/* Bio */}
+              <p className={`text-xs ${getThemeStyles(selectedTheme).textColor} opacity-70 mb-4`}>
+                {user.bio}
+              </p>
               
               {/* Social Media Icons */}
-              <div className="flex justify-center space-x-3 mb-4">
+              <div className="flex flex-wrap justify-center gap-2 mb-4">
                 {Object.entries(user.socialLinks || {}).map(([platform, handle]) => (
                   <div 
                     key={platform} 

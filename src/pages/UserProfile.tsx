@@ -104,11 +104,19 @@ const UserProfile = () => {
   // For demo purposes, we're using our sample data
   
   return (
-    <div className="min-h-screen">
-      <ProfileHeader user={sampleUser} />
-      <PromotionalGrid items={sampleItems} />
+    <div className="min-h-screen max-w-4xl mx-auto px-4 py-6">
+      <div className="mb-6">
+        <ProfileHeader 
+          user={sampleUser} 
+          compact={true} 
+        />
+      </div>
       
-      <footer className="py-4 text-center text-sm text-muted-foreground border-t">
+      <div className="mt-4">
+        <PromotionalGrid items={sampleItems} />
+      </div>
+      
+      <footer className="py-4 text-center text-sm text-muted-foreground border-t mt-8">
         <p>
           Powered by <span className="font-medium text-brand-purple">Influencify</span>
         </p>
