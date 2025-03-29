@@ -77,6 +77,24 @@ const SignUp = () => {
     try {
       setIsLoading(true);
 
+      // First check if username already exists
+      const { data: existingUsers, error: checkError } = await supabase
+        .from('user_profiles')
+        .select('username')
+        .eq('username', formData.username)
+        .single();
+
+      if (existingUsers) {
+        toast.error("Username already taken. Please choose another one.");
+        setErrors(prev => ({ ...prev, username: "Username already taken" }));
+        return;
+      }
+
+      if (checkError && checkError.code !== 'PGRST116') {
+        // PGRST116 means no rows returned, which is what we want
+        throw checkError;
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -89,18 +107,30 @@ const SignUp = () => {
       });
 
       if (error) {
-        toast.error(error.message);
-        return;
+        throw error;
       }
 
       if (data.user) {
+        // Create user profile record
+        await supabase.from('user_profiles').insert({
+          id: data.user.id,
+          username: formData.username,
+          name: formData.name,
+          email: formData.email
+        });
+
         toast.success("Account created successfully!");
+        
         // Redirect to dashboard immediately after signup
         navigate('/dashboard');
       }
-    } catch (error) {
-      toast.error("An unexpected error occurred");
-      console.error(error);
+    } catch (error: any) {
+      console.error("Signup error:", error);
+      if (error.code === '23505') {
+        toast.error("Email already registered. Try signing in instead.");
+      } else {
+        toast.error(error.message || "Failed to create account");
+      }
     } finally {
       setIsLoading(false);
     }
