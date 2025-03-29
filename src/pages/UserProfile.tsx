@@ -1,12 +1,11 @@
-
 import { User, PromotionalItem } from "@/types/user";
 import PromotionalGrid from "@/components/profile/promotional-grid";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Instagram, Twitter, Youtube, Facebook, MessageCircle, Mail } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
-// Mock user data for demonstration
 const sampleUser: User = {
   id: "123",
   username: "fashionista",
@@ -26,7 +25,6 @@ const sampleUser: User = {
   createdAt: new Date().toISOString()
 };
 
-// Mock promotional items
 const sampleItems: PromotionalItem[] = [
   {
     id: "1",
@@ -110,7 +108,6 @@ const availableCategories = [
   "All", "Fashion", "Beauty", "Lifestyle", "Travel", "Technology", "Food", "Fitness", "Home", "Accessories"
 ];
 
-// Helper function to get the appropriate social icon
 const getSocialIcon = (platform: string) => {
   switch (platform) {
     case "instagram": return <Instagram size={20} />;
@@ -126,6 +123,7 @@ const getSocialIcon = (platform: string) => {
 const UserProfile = () => {
   const { username } = useParams<{ username: string }>();
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const isMobile = useIsMobile();
   
   const filteredItems = selectedCategory === "All" 
     ? sampleItems 
@@ -133,10 +131,8 @@ const UserProfile = () => {
     
   return (
     <div className="max-w-2xl mx-auto px-4 pt-6 pb-12">
-      {/* Profile Header - Redesigned to match image */}
-      <div className="flex gap-6 mb-6">
-        {/* Profile Picture */}
-        <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0">
+      <div className="flex gap-4 sm:gap-6 mb-6">
+        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden flex-shrink-0">
           <img 
             src={sampleUser.profilePicture} 
             alt={sampleUser.name}
@@ -144,20 +140,18 @@ const UserProfile = () => {
           />
         </div>
         
-        {/* User Info */}
         <div className="flex-1">
-          <h1 className="text-3xl font-bold">{sampleUser.name}</h1>
-          <p className="text-gray-700 mb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold">{sampleUser.name}</h1>
+          <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">
             {sampleUser.bio}
           </p>
           
-          {/* Social Links */}
           <div className="flex flex-wrap gap-2">
             {sampleUser.socialLinks && Object.entries(sampleUser.socialLinks).slice(0, 6).map(([platform]) => (
               <a 
                 key={platform}
                 href={`#${platform}`}
-                className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+                className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
                 aria-label={platform}
               >
                 {getSocialIcon(platform)}
@@ -167,7 +161,6 @@ const UserProfile = () => {
         </div>
       </div>
       
-      {/* Category Selection */}
       <div className="flex overflow-x-auto gap-2 pb-2 mb-4 scrollbar-hide">
         {availableCategories.map((category) => (
           <Badge
@@ -183,12 +176,10 @@ const UserProfile = () => {
         ))}
       </div>
       
-      {/* Promotional Grid */}
       <div className="bg-white rounded-2xl overflow-hidden shadow-md">
         <PromotionalGrid items={filteredItems} />
       </div>
       
-      {/* Compact Footer */}
       <div className="text-center text-xs text-gray-400 mt-6">
         Powered by <span className="font-medium">Influencify</span>
       </div>

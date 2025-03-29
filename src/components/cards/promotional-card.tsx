@@ -106,28 +106,28 @@ export const PromotionalCard = ({
             <img 
               src={item.image} 
               alt={item.title} 
-              className="w-full object-cover transition-transform group-hover:scale-105 h-52 sm:h-64 md:h-72"
+              className="w-full object-cover transition-transform group-hover:scale-105 h-36 sm:h-52 md:h-64"
             />
           </div>
         )}
         
         <CardContent className="p-2 sm:p-4 flex-1 flex flex-col">
           <div className="flex-1">
-            <h3 className="font-bold text-base sm:text-lg mb-1 line-clamp-2">{item.title}</h3>
+            <h3 className="font-bold text-sm sm:text-lg mb-0.5 sm:mb-1 line-clamp-2">{item.title}</h3>
             
             {item.description && (
-              <p className="text-muted-foreground text-xs sm:text-sm line-clamp-2 mb-1 sm:mb-2">
+              <p className="text-muted-foreground text-xs sm:text-sm line-clamp-2 mb-0.5 sm:mb-1">
                 {item.description}
               </p>
             )}
           </div>
           
-          <div className="mt-1 sm:mt-2 space-y-1 sm:space-y-2">
+          <div className="mt-0.5 sm:mt-2 space-y-1">
             {item.couponCode && (
               <div className="relative">
-                <div className="flex items-center justify-between bg-blue-100 p-1.5 sm:p-2 rounded-lg">
+                <div className="flex items-center justify-between bg-blue-100 p-1 sm:p-2 rounded-lg">
                   <div className="flex-1 text-center">
-                    <p className="text-xs sm:text-sm font-medium tracking-wide">{item.couponCode}</p>
+                    <p className="text-xs font-medium tracking-wide">{item.couponCode}</p>
                     {item.discount && (
                       <p className="text-xs text-blue-600 font-medium">
                         {item.discount}
@@ -138,7 +138,7 @@ export const PromotionalCard = ({
                     size="sm" 
                     variant="ghost" 
                     onClick={handleCopyCode}
-                    className="h-5 w-5 sm:h-6 sm:w-6 p-0"
+                    className="h-5 w-5 p-0"
                     aria-label="Copy code"
                     title="Copy code"
                   >
@@ -152,7 +152,7 @@ export const PromotionalCard = ({
               <div>
                 <Button 
                   asChild 
-                  className="w-full bg-green-500 hover:bg-green-600 rounded-full h-6 sm:h-8 text-xs font-medium"
+                  className="w-full bg-green-500 hover:bg-green-600 rounded-full h-6 text-xs font-medium"
                   onClick={(e) => e.stopPropagation()} // Prevent card selection when clicking link
                 >
                   <Link to={item.url} target="_blank" rel="noopener noreferrer">

@@ -112,7 +112,7 @@ const PromotionalGrid = ({
 
   return (
     <div className="container px-0 sm:px-2 pb-8">
-      <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 gap-1 sm:gap-3 md:gap-4">
         {displayItems.map((item) => (
           <div 
             key={item.id} 
