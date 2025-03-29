@@ -1,6 +1,7 @@
 
 import { PromotionalItem } from "@/types/user";
 import { PromotionalCard } from "@/components/cards/promotional-card";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PromotionalGridProps {
   items: PromotionalItem[];

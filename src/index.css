@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -95,22 +94,17 @@
 }
 
 .masonry-grid {
-  column-count: 1;
+  column-count: 2;
   column-gap: 16px;
 }
 
-@media (min-width: 640px) {
+/* Always keep 2 columns even on small screens */
+@media (max-width: 639px) {
   .masonry-grid {
     column-count: 2;
+    column-gap: 12px;
   }
 }
-
-/* Removed the 3-column layout for large screens */
-/* @media (min-width: 1024px) {
-  .masonry-grid {
-    column-count: 3;
-  }
-} */
 
 .masonry-item {
   break-inside: avoid;
