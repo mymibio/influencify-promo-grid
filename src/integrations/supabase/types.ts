@@ -9,7 +9,90 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      promotional_items: {
+        Row: {
+          aspect_ratio: string | null
+          category: string | null
+          coupon_code: string | null
+          created_at: string
+          description: string | null
+          discount: string | null
+          id: string
+          image: string | null
+          position: number | null
+          title: string
+          type: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          aspect_ratio?: string | null
+          category?: string | null
+          coupon_code?: string | null
+          created_at?: string
+          description?: string | null
+          discount?: string | null
+          id?: string
+          image?: string | null
+          position?: number | null
+          title: string
+          type: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          aspect_ratio?: string | null
+          category?: string | null
+          coupon_code?: string | null
+          created_at?: string
+          description?: string | null
+          discount?: string | null
+          id?: string
+          image?: string | null
+          position?: number | null
+          title?: string
+          type?: string
+          url?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          bio: string | null
+          categories: string[] | null
+          created_at: string
+          email: string
+          id: string
+          name: string
+          profile_picture: string | null
+          social_links: Json | null
+          username: string
+        }
+        Insert: {
+          bio?: string | null
+          categories?: string[] | null
+          created_at?: string
+          email: string
+          id: string
+          name: string
+          profile_picture?: string | null
+          social_links?: Json | null
+          username: string
+        }
+        Update: {
+          bio?: string | null
+          categories?: string[] | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          profile_picture?: string | null
+          social_links?: Json | null
+          username?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -87,6 +87,7 @@ const SignUp = () => {
       if (existingUsers) {
         toast.error("Username already taken. Please choose another one.");
         setErrors(prev => ({ ...prev, username: "Username already taken" }));
+        setIsLoading(false);
         return;
       }
 
@@ -112,17 +113,25 @@ const SignUp = () => {
 
       if (data.user) {
         // Create user profile record
-        await supabase.from('user_profiles').insert({
+        const { error: profileError } = await supabase.from('user_profiles').insert({
           id: data.user.id,
           username: formData.username,
           name: formData.name,
           email: formData.email
         });
 
+        if (profileError) {
+          console.error("Error creating user profile:", profileError);
+          toast.error("Failed to complete signup. Please try again.");
+          return;
+        }
+
         toast.success("Account created successfully!");
         
-        // Redirect to dashboard immediately after signup
-        navigate('/dashboard');
+        // Redirect to dashboard after signup with a slight delay to ensure data is saved
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 500);
       }
     } catch (error: any) {
       console.error("Signup error:", error);
