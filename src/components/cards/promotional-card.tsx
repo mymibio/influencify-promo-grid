@@ -4,6 +4,7 @@ import { PromotionalItem } from "@/types/user";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { ExternalLink } from "lucide-react";
 
 interface PromotionalCardProps {
   item: PromotionalItem;
@@ -43,7 +44,7 @@ export const PromotionalCard = ({ item }: PromotionalCardProps) => {
           </p>
         )}
         
-        {item.type === "coupon" && item.couponCode && (
+        {item.couponCode && (
           <div className="mt-4">
             <div className="flex items-center gap-2 bg-gray-100 p-2 rounded border">
               <code className="text-sm font-mono flex-1 text-center">
@@ -66,13 +67,15 @@ export const PromotionalCard = ({ item }: PromotionalCardProps) => {
           </div>
         )}
         
-        <div className="mt-4">
-          <Button asChild className="w-full bg-brand-purple hover:bg-brand-dark-purple">
-            <Link to={item.url} target="_blank" rel="noopener noreferrer">
-              {item.type === "product" ? "Shop Now" : "Redeem"}
-            </Link>
-          </Button>
-        </div>
+        {item.url && (
+          <div className="mt-4">
+            <Button asChild className="w-full bg-brand-purple hover:bg-brand-dark-purple flex items-center justify-center gap-2">
+              <Link to={item.url} target="_blank" rel="noopener noreferrer">
+                Visit Website <ExternalLink className="h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
