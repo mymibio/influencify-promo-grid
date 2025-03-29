@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,15 +14,29 @@ interface AddItemDialogProps {
   onClose: () => void;
   onAdd: (item: PromotionalItem) => void;
   aspectRatio: "9:16";
+  editItem?: PromotionalItem | null;
 }
 
-const AddItemDialog = ({ open, onClose, onAdd }: AddItemDialogProps) => {
+const AddItemDialog = ({ open, onClose, onAdd, editItem }: AddItemDialogProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [url, setUrl] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [couponCode, setCouponCode] = useState("");
+  const [discount, setDiscount] = useState("");
+
+  // Populate form when editing an existing item
+  useEffect(() => {
+    if (editItem) {
+      setTitle(editItem.title || "");
+      setDescription(editItem.description || "");
+      setUrl(editItem.url || "");
+      setImagePreview(editItem.image || null);
+      setCouponCode(editItem.couponCode || "");
+      setDiscount(editItem.discount || "");
+    }
+  }, [editItem]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -45,7 +59,7 @@ const AddItemDialog = ({ open, onClose, onAdd }: AddItemDialogProps) => {
     }
 
     const newItem: PromotionalItem = {
-      id: crypto.randomUUID(),
+      id: editItem ? editItem.id : crypto.randomUUID(),
       userId: "123", // This would come from auth in a real app
       title,
       description,
@@ -54,11 +68,12 @@ const AddItemDialog = ({ open, onClose, onAdd }: AddItemDialogProps) => {
       type: "coupon", // Always set to coupon as per requirements
       aspectRatio: "9:16",
       couponCode,
-      createdAt: new Date().toISOString(),
+      discount,
+      createdAt: editItem ? editItem.createdAt : new Date().toISOString(),
     };
 
     onAdd(newItem);
-    toast.success("Coupon added successfully!");
+    toast.success(editItem ? "Coupon updated successfully!" : "Coupon added successfully!");
     resetForm();
     onClose();
   };
@@ -70,13 +85,21 @@ const AddItemDialog = ({ open, onClose, onAdd }: AddItemDialogProps) => {
     setImageFile(null);
     setImagePreview(null);
     setCouponCode("");
+    setDiscount("");
   };
+
+  // Reset form when dialog closes
+  useEffect(() => {
+    if (!open) {
+      resetForm();
+    }
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Add new coupon</DialogTitle>
+          <DialogTitle>{editItem ? "Edit coupon" : "Add new coupon"}</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
@@ -173,11 +196,24 @@ const AddItemDialog = ({ open, onClose, onAdd }: AddItemDialogProps) => {
             />
           </div>
           
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="discount" className="text-right">
+              Discount
+            </Label>
+            <Input
+              id="discount"
+              value={discount}
+              onChange={(e) => setDiscount(e.target.value)}
+              className="col-span-3"
+              placeholder="e.g. 20% OFF"
+            />
+          </div>
+          
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">Add Coupon</Button>
+            <Button type="submit">{editItem ? "Update" : "Add"} Coupon</Button>
           </DialogFooter>
         </form>
       </DialogContent>
