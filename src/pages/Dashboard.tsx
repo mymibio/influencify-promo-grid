@@ -1,8 +1,9 @@
+
 import { useState } from "react";
-import { User, PromotionalItem } from "@/types/user";
+import { User, PromotionalItem, SocialLinks } from "@/types/user";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Instagram, Facebook, MessageCircle, Mail, Plus, Copy, Link, Edit, Save } from "lucide-react";
+import { Instagram, Facebook, MessageCircle, Mail, Plus, Copy, Link, Edit, Save, Pencil, Youtube, Twitter } from "lucide-react";
 import SimpleSidebar from "@/components/dashboard/simple-sidebar";
 import AddItemCard from "@/components/dashboard/add-item-card";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
@@ -11,6 +12,8 @@ import ProfilePreview from "@/components/dashboard/profile-preview";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 const sampleUser: User = {
   id: "123",
@@ -62,11 +65,17 @@ const Dashboard = () => {
   const [user, setUser] = useState(sampleUser);
   const [items, setItems] = useState(sampleItems);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
+  const [isSocialDialogOpen, setIsSocialDialogOpen] = useState(false);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [editedBio, setEditedBio] = useState(user.bio || "");
   const [currentDraggedItem, setCurrentDraggedItem] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<PromotionalItem | null>(null);
   const [selectedTheme, setSelectedTheme] = useState("default");
+  const [currentSocialPlatform, setCurrentSocialPlatform] = useState<string>("");
+  const [socialHandle, setSocialHandle] = useState<string>("");
+  const [newUsername, setNewUsername] = useState(user.username);
+  const [newProfilePicture, setNewProfilePicture] = useState<string | undefined>(user.profilePicture);
   const isMobile = useIsMobile();
   
   const getInitials = (name: string) => {
@@ -148,6 +157,61 @@ const Dashboard = () => {
     setEditingItem(null);
     setIsDialogOpen(false);
   };
+
+  const handleEditProfile = () => {
+    setNewUsername(user.username);
+    setNewProfilePicture(user.profilePicture);
+    setIsProfileDialogOpen(true);
+  };
+  
+  const handleSaveProfile = () => {
+    setUser(prev => ({
+      ...prev,
+      username: newUsername,
+      profilePicture: newProfilePicture
+    }));
+    setIsProfileDialogOpen(false);
+    toast.success("Profile updated successfully!");
+  };
+
+  const handleAddSocialMedia = () => {
+    setIsSocialDialogOpen(true);
+  };
+
+  const handleSaveSocialMedia = () => {
+    if (currentSocialPlatform && socialHandle) {
+      setUser(prev => ({
+        ...prev,
+        socialLinks: {
+          ...prev.socialLinks,
+          [currentSocialPlatform.toLowerCase()]: socialHandle
+        }
+      }));
+      setIsSocialDialogOpen(false);
+      setSocialHandle("");
+      setCurrentSocialPlatform("");
+      toast.success(`${currentSocialPlatform} link added successfully!`);
+    }
+  };
+
+  const getSocialIcon = (platform: string) => {
+    switch (platform.toLowerCase()) {
+      case 'instagram':
+        return <Instagram size={20} className="text-pink-500" />;
+      case 'facebook':
+        return <Facebook size={20} className="text-blue-600" />;
+      case 'whatsapp':
+        return <MessageCircle size={20} className="text-green-500" />;
+      case 'twitter':
+        return <Twitter size={20} className="text-blue-400" />;
+      case 'youtube':
+        return <Youtube size={20} className="text-red-500" />;
+      case 'email':
+        return <Mail size={20} />;
+      default:
+        return <Link size={20} />;
+    }
+  };
   
   return (
     <div className="flex min-h-screen w-full bg-gray-50">
@@ -169,16 +233,25 @@ const Dashboard = () => {
             
             <div className="lg:col-span-2">
               <div className="flex flex-col items-center mb-10 md:flex-row md:justify-start md:gap-8">
-                <Avatar className="h-24 w-24 mb-4 md:mb-0">
-                  {user.profilePicture ? (
-                    <AvatarImage src={user.profilePicture} alt={user.name} />
-                  ) : (
-                    <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
-                  )}
-                </Avatar>
+                <div className="relative">
+                  <Avatar className="h-24 w-24 mb-4 md:mb-0">
+                    {user.profilePicture ? (
+                      <AvatarImage src={user.profilePicture} alt={user.name} />
+                    ) : (
+                      <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                    )}
+                  </Avatar>
+                  <Button 
+                    size="icon" 
+                    className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-primary"
+                    onClick={handleEditProfile}
+                  >
+                    <Pencil size={16} className="text-white" />
+                  </Button>
+                </div>
                 
                 <div className="text-center md:text-left">
-                  <h1 className="text-3xl font-bold">{user.name}</h1>
+                  <h1 className="text-3xl font-bold">@{user.username}</h1>
                   
                   <div className="mt-1 relative">
                     {isEditingBio ? (
@@ -188,6 +261,7 @@ const Dashboard = () => {
                           onChange={(e) => setEditedBio(e.target.value)}
                           className="pr-10"
                           maxLength={160}
+                          placeholder="Add bio"
                         />
                         <Button size="sm" variant="ghost" onClick={handleSaveBio} className="absolute right-2">
                           <Save size={16} />
@@ -195,7 +269,7 @@ const Dashboard = () => {
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
-                        <p className="text-gray-600">{user.bio || "Add a bio..."}</p>
+                        <p className="text-gray-600">{user.bio || "Add bio..."}</p>
                         <Button size="sm" variant="ghost" onClick={handleEditBio} className="p-1 h-auto">
                           <Edit size={16} className="text-gray-500" />
                         </Button>
@@ -203,28 +277,18 @@ const Dashboard = () => {
                     )}
                   </div>
                   
-                  <div className="flex gap-2 mt-4 justify-center md:justify-start">
-                    {user.socialLinks?.instagram && (
-                      <Button variant="outline" size="icon" className="rounded-full bg-white">
-                        <Instagram size={20} className="text-pink-500" />
+                  <div className="flex gap-2 mt-4 justify-center md:justify-start flex-wrap">
+                    {user.socialLinks && Object.entries(user.socialLinks).map(([platform, handle]) => (
+                      <Button key={platform} variant="outline" size="icon" className="rounded-full bg-white">
+                        {getSocialIcon(platform)}
                       </Button>
-                    )}
-                    {user.socialLinks?.facebook && (
-                      <Button variant="outline" size="icon" className="rounded-full bg-white">
-                        <Facebook size={20} className="text-blue-600" />
-                      </Button>
-                    )}
-                    {user.socialLinks?.whatsapp && (
-                      <Button variant="outline" size="icon" className="rounded-full bg-white">
-                        <MessageCircle size={20} className="text-green-500" />
-                      </Button>
-                    )}
-                    {user.socialLinks?.email && (
-                      <Button variant="outline" size="icon" className="rounded-full bg-white">
-                        <Mail size={20} />
-                      </Button>
-                    )}
-                    <Button variant="outline" size="icon" className="rounded-full bg-white">
+                    ))}
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="rounded-full bg-gray-100 border-dashed"
+                      onClick={handleAddSocialMedia}
+                    >
                       <Plus size={20} />
                     </Button>
                   </div>
@@ -302,6 +366,89 @@ const Dashboard = () => {
         aspectRatio="9:16"
         editItem={editingItem}
       />
+
+      {/* Profile Edit Dialog */}
+      <Dialog open={isProfileDialogOpen} onOpenChange={setIsProfileDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Profile</DialogTitle>
+            <DialogDescription>
+              Change your profile picture and username
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input 
+                id="username" 
+                value={newUsername} 
+                onChange={(e) => setNewUsername(e.target.value)} 
+                placeholder="Enter your username"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="profilePicture">Profile Picture URL</Label>
+              <Input 
+                id="profilePicture" 
+                value={newProfilePicture || ''} 
+                onChange={(e) => setNewProfilePicture(e.target.value)} 
+                placeholder="Enter profile picture URL"
+              />
+            </div>
+            <div className="pt-4 flex justify-end">
+              <Button onClick={handleSaveProfile}>Save Changes</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Social Media Dialog */}
+      <Dialog open={isSocialDialogOpen} onOpenChange={setIsSocialDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Social Media</DialogTitle>
+            <DialogDescription>
+              Connect your social media accounts to your profile
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="platform">Platform</Label>
+              <div className="grid grid-cols-3 gap-2">
+                {['Instagram', 'Youtube', 'Twitter', 'Facebook', 'Email', 'WhatsApp'].map(platform => (
+                  <Button 
+                    key={platform}
+                    variant={currentSocialPlatform === platform.toLowerCase() ? "default" : "outline"}
+                    className="flex flex-col gap-1 h-auto py-2"
+                    onClick={() => setCurrentSocialPlatform(platform.toLowerCase())}
+                  >
+                    {getSocialIcon(platform)}
+                    <span className="text-xs">{platform}</span>
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="handle">Username/Handle</Label>
+              <Input 
+                id="handle" 
+                value={socialHandle} 
+                onChange={(e) => setSocialHandle(e.target.value)}
+                placeholder={`Enter your ${currentSocialPlatform} handle`}
+                disabled={!currentSocialPlatform}
+              />
+            </div>
+            <div className="pt-4 flex justify-end">
+              <Button 
+                onClick={handleSaveSocialMedia}
+                disabled={!currentSocialPlatform || !socialHandle}
+              >
+                Save
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

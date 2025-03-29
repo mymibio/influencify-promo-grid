@@ -49,13 +49,12 @@ const ProfileHeader = ({ user, editable = false, onEditProfilePicture, onAddSoci
             className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-primary"
             onClick={onEditProfilePicture}
           >
-            <Pencil size={16} />
+            <Pencil size={16} className="text-white" />
           </Button>
         )}
       </div>
       
-      <h1 className="text-2xl font-bold">{user.name}</h1>
-      <p className="text-muted-foreground mt-1">@{user.username}</p>
+      <h1 className="text-2xl font-bold">@{user.username}</h1>
       
       {user.bio && (
         <p className="text-center max-w-md mt-4">{user.bio}</p>
