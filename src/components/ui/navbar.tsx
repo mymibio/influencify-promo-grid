@@ -16,7 +16,13 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, signOut } = useAuth();
   
-  // Only show the navbar if we're not on the index page
+  // Hide the navbar on login and signup pages
+  const hideNavbarPaths = ["/login", "/signup"];
+  if (hideNavbarPaths.includes(location.pathname)) {
+    return null;
+  }
+  
+  // Only show the navbar if we're not on the index page (separate logic)
   const isIndexPage = location.pathname === "/";
   
   if (!isIndexPage) {
