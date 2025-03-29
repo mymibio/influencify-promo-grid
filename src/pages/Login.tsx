@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,7 +5,6 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import Navbar from "@/components/ui/navbar";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -46,7 +44,6 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       <main className="flex-1 flex items-center justify-center py-12">
         <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-sm border">
           <div className="text-center">
