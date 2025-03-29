@@ -15,6 +15,9 @@ export interface SocialLinks {
   tiktok?: string;
   youtube?: string;
   twitter?: string;
+  facebook?: string;
+  whatsapp?: string;
+  email?: string;
 }
 
 export interface PromotionalItem {

@@ -1,10 +1,13 @@
 
-import { DashboardStats, User } from "@/types/user";
-import DashboardLayout from "@/components/dashboard/dashboard-layout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Users, MousePointerClick, TrendingUp } from "lucide-react";
+import { useState } from "react";
+import { User, PromotionalItem } from "@/types/user";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Instagram, Facebook, MessageCircle, Mail, Plus } from "lucide-react";
+import SimpleSidebar from "@/components/dashboard/simple-sidebar";
+import AddItemCard from "@/components/dashboard/add-item-card";
 
-// Mock user data for demonstration
+// Mock user data
 const sampleUser: User = {
   id: "123",
   username: "fashionista",
@@ -14,82 +17,92 @@ const sampleUser: User = {
   bio: "Fashion & lifestyle content creator. Sharing my favorite products and deals with you!",
   socialLinks: {
     instagram: "fashionista",
+    facebook: "fashionista.style",
+    whatsapp: "+1234567890",
     twitter: "fashionista",
-    youtube: "fashionistachannel"
+    email: "contact@fashionista.com"
   },
   createdAt: new Date().toISOString()
 };
 
-// Mock dashboard stats
-const sampleStats: DashboardStats = {
-  totalVisits: 1243,
-  totalClicks: 856,
-  clickRate: 68.9,
-};
+// Mock promotional items
+const sampleItems: PromotionalItem[] = [];
 
 const Dashboard = () => {
+  const [user, setUser] = useState(sampleUser);
+  const [items, setItems] = useState(sampleItems);
+  
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
+  };
+  
+  const handleAddItem = () => {
+    // This would open a modal to add a new item in a real app
+    console.log("Add new promotional item");
+  };
+  
   return (
-    <DashboardLayout user={sampleUser}>
-      <div className="space-y-6">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Total Visits</CardDescription>
-              <CardTitle className="text-2xl flex items-center gap-2">
-                {sampleStats.totalVisits.toLocaleString()}
-                <Users className="h-5 w-5 text-muted-foreground" />
-              </CardTitle>
-            </CardHeader>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Total Clicks</CardDescription>
-              <CardTitle className="text-2xl flex items-center gap-2">
-                {sampleStats.totalClicks.toLocaleString()}
-                <MousePointerClick className="h-5 w-5 text-muted-foreground" />
-              </CardTitle>
-            </CardHeader>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Click Rate</CardDescription>
-              <CardTitle className="text-2xl flex items-center gap-2">
-                {sampleStats.clickRate}%
-                <TrendingUp className="h-5 w-5 text-muted-foreground" />
-              </CardTitle>
-            </CardHeader>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Share URL</CardDescription>
-              <CardTitle className="text-lg flex items-center gap-2 overflow-hidden">
-                <span className="truncate text-brand-purple">
-                  influencify.com/{sampleUser.username}
-                </span>
-              </CardTitle>
-            </CardHeader>
-          </Card>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Visitor Insights</CardTitle>
-            <CardDescription>Your visitor analytics over time</CardDescription>
-          </CardHeader>
-          <CardContent className="h-[300px] flex items-center justify-center">
-            <div className="flex flex-col items-center text-muted-foreground">
-              <BarChart className="h-12 w-12 mb-2" />
-              <p>Analytics data will appear here</p>
+    <div className="flex min-h-screen w-full bg-gray-50">
+      <SimpleSidebar />
+      
+      <main className="flex-1">
+        <div className="container mx-auto px-4 py-8">
+          {/* User Profile Header */}
+          <div className="flex flex-col items-center mb-10 md:flex-row md:justify-start md:gap-8">
+            <Avatar className="h-24 w-24 mb-4 md:mb-0">
+              {user.profilePicture ? (
+                <AvatarImage src={user.profilePicture} alt={user.name} />
+              ) : (
+                <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+              )}
+            </Avatar>
+            
+            <div className="text-center md:text-left">
+              <h1 className="text-3xl font-bold">{user.name}</h1>
+              <p className="text-gray-600 mt-1">{user.bio || "Bio..."}</p>
+              
+              <div className="flex gap-2 mt-4 justify-center md:justify-start">
+                {user.socialLinks?.instagram && (
+                  <Button variant="outline" size="icon" className="rounded-full bg-white">
+                    <Instagram size={20} className="text-pink-500" />
+                  </Button>
+                )}
+                {user.socialLinks?.facebook && (
+                  <Button variant="outline" size="icon" className="rounded-full bg-white">
+                    <Facebook size={20} className="text-blue-600" />
+                  </Button>
+                )}
+                {user.socialLinks?.whatsapp && (
+                  <Button variant="outline" size="icon" className="rounded-full bg-white">
+                    <MessageCircle size={20} className="text-green-500" />
+                  </Button>
+                )}
+                {user.socialLinks?.email && (
+                  <Button variant="outline" size="icon" className="rounded-full bg-white">
+                    <Mail size={20} />
+                  </Button>
+                )}
+                <Button variant="outline" size="icon" className="rounded-full bg-white">
+                  <Plus size={20} />
+                </Button>
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    </DashboardLayout>
+          </div>
+          
+          {/* Promotional Items Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <AddItemCard aspectRatio="1:1" onClick={handleAddItem} />
+            <AddItemCard aspectRatio="9:16" onClick={handleAddItem} />
+            <AddItemCard aspectRatio="1:1" onClick={handleAddItem} />
+            <AddItemCard aspectRatio="9:16" onClick={handleAddItem} />
+          </div>
+        </div>
+      </main>
+    </div>
   );
 };
 
