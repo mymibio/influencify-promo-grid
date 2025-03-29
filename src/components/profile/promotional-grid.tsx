@@ -5,9 +5,19 @@ import { useEffect, useState } from "react";
 
 interface PromotionalGridProps {
   items: PromotionalItem[];
+  editable?: boolean;
+  onEdit?: (id: string) => void;
+  onDelete?: (id: string) => void;
+  onDrag?: (id: string) => void;
 }
 
-const PromotionalGrid = ({ items }: PromotionalGridProps) => {
+const PromotionalGrid = ({ 
+  items, 
+  editable = false,
+  onEdit,
+  onDelete,
+  onDrag
+}: PromotionalGridProps) => {
   const [randomizedItems, setRandomizedItems] = useState<PromotionalItem[]>([]);
 
   // Randomize items when component mounts or when items change
@@ -21,7 +31,13 @@ const PromotionalGrid = ({ items }: PromotionalGridProps) => {
       <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4">
         {randomizedItems.map((item) => (
           <div key={item.id} className="w-full">
-            <PromotionalCard item={item} />
+            <PromotionalCard 
+              item={item} 
+              editable={editable}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onDrag={onDrag}
+            />
           </div>
         ))}
       </div>
