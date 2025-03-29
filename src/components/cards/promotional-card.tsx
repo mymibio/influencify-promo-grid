@@ -4,28 +4,28 @@ import { PromotionalItem } from "@/types/user";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Copy, Trash2, Edit2, MoveIcon } from "lucide-react";
+import { Copy, Trash2, Edit2, MoveHorizontal } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { useState } from "react";
 
 interface PromotionalCardProps {
   item: PromotionalItem;
-  onEdit?: (id: string) => void;
-  onDelete?: (id: string) => void;
-  onDrag?: (id: string) => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
   editable?: boolean;
+  isSelected?: boolean;
+  onSelect?: () => void;
 }
 
 export const PromotionalCard = ({ 
   item, 
   onEdit, 
   onDelete, 
-  onDrag, 
-  editable = false 
+  editable = false,
+  isSelected = false,
+  onSelect
 }: PromotionalCardProps) => {
-  const [isSelected, setIsSelected] = useState(false);
-
-  const handleCopyCode = () => {
+  const handleCopyCode = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card selection
     if (item.couponCode) {
       navigator.clipboard.writeText(item.couponCode);
       toast.success("Coupon code copied to clipboard!");
@@ -33,50 +33,63 @@ export const PromotionalCard = ({
   };
 
   const handleCardClick = () => {
-    if (editable) {
-      setIsSelected(!isSelected);
+    if (editable && onSelect) {
+      onSelect();
     }
+  };
+
+  // These handlers prevent event bubbling to avoid triggering card selection
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onEdit) onEdit();
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onDelete) onDelete();
   };
 
   return (
     <div className="relative group">
-      {/* Edit Button - Top Right */}
+      {/* Action buttons - only show when selected */}
       {editable && isSelected && (
-        <Button
-          size="icon"
-          variant="default"
-          onClick={() => onEdit?.(item.id)}
-          className="absolute -top-3 -right-3 z-10 rounded-full w-10 h-10 bg-black text-white shadow-lg"
-        >
-          <Edit2 className="h-4 w-4" />
-          <span className="sr-only">Edit</span>
-        </Button>
+        <div className="absolute -top-3 right-0 left-0 flex justify-between z-10">
+          {/* Edit Button */}
+          <Button
+            size="icon"
+            variant="destructive"
+            onClick={handleDeleteClick}
+            className="rounded-full w-10 h-10 shadow-lg"
+          >
+            <Trash2 className="h-4 w-4" />
+            <span className="sr-only">Delete</span>
+          </Button>
+          
+          {/* Delete Button */}
+          <Button
+            size="icon"
+            variant="default"
+            onClick={handleEditClick}
+            className="rounded-full w-10 h-10 bg-black text-white shadow-lg"
+          >
+            <Edit2 className="h-4 w-4" />
+            <span className="sr-only">Edit</span>
+          </Button>
+        </div>
       )}
 
-      {/* Delete Button - Top Left */}
+      {/* Drag Handle - Bottom Center - Only when selected */}
       {editable && isSelected && (
-        <Button
-          size="icon"
-          variant="destructive"
-          onClick={() => onDelete?.(item.id)}
-          className="absolute -top-3 -left-3 z-10 rounded-full w-10 h-10 shadow-lg"
-        >
-          <Trash2 className="h-4 w-4" />
-          <span className="sr-only">Delete</span>
-        </Button>
-      )}
-
-      {/* Drag Handle - Bottom Center */}
-      {editable && isSelected && (
-        <Button
-          size="icon"
-          variant="default"
-          onClick={() => onDrag?.(item.id)}
-          className="absolute -bottom-3 left-1/2 -translate-x-1/2 z-10 rounded-full w-10 h-10 bg-black text-white shadow-lg"
-        >
-          <MoveIcon className="h-4 w-4" />
-          <span className="sr-only">Move</span>
-        </Button>
+        <div className="absolute -bottom-3 left-0 w-full flex justify-center z-10">
+          <Button
+            size="icon"
+            variant="default"
+            className="rounded-full w-10 h-10 bg-black text-white shadow-lg cursor-grab active:cursor-grabbing"
+          >
+            <MoveHorizontal className="h-4 w-4" />
+            <span className="sr-only">Drag</span>
+          </Button>
+        </div>
       )}
       
       {/* Main Card */}
@@ -124,10 +137,7 @@ export const PromotionalCard = ({
                   <Button 
                     size="sm" 
                     variant="ghost" 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCopyCode();
-                    }}
+                    onClick={handleCopyCode}
                     className="h-5 w-5 sm:h-6 sm:w-6 p-0"
                     aria-label="Copy code"
                     title="Copy code"

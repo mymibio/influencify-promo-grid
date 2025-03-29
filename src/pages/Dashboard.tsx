@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { User, PromotionalItem } from "@/types/user";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -11,7 +10,6 @@ import PromotionalGrid from "@/components/profile/promotional-grid";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 
-// Mock user data
 const sampleUser: User = {
   id: "123",
   username: "fashionista",
@@ -29,7 +27,6 @@ const sampleUser: User = {
   createdAt: new Date().toISOString()
 };
 
-// Sample promotional items
 const sampleItems: PromotionalItem[] = [
   {
     id: "1",
@@ -65,6 +62,8 @@ const Dashboard = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [editedBio, setEditedBio] = useState(user.bio || "");
+  const [currentDraggedItem, setCurrentDraggedItem] = useState<string | null>(null);
+  const [editingItem, setEditingItem] = useState<PromotionalItem | null>(null);
   
   const getInitials = (name: string) => {
     return name
@@ -106,20 +105,40 @@ const Dashboard = () => {
     toast.success("Bio updated successfully!");
   };
   
-  // New handlers for card actions
   const handleEditCard = (id: string) => {
-    toast.info(`Editing card ${id}`);
-    // Here you would typically open the edit dialog
+    const itemToEdit = items.find(item => item.id === id);
+    if (itemToEdit) {
+      setEditingItem(itemToEdit);
+      setIsDialogOpen(true);
+      toast.info("Editing your promotional item");
+    }
   };
 
   const handleDeleteCard = (id: string) => {
     setItems(prevItems => prevItems.filter(item => item.id !== id));
-    toast.success("Card deleted successfully!");
+    toast.success("Item deleted successfully");
   };
 
   const handleDragCard = (id: string) => {
-    toast.info(`Ready to drag card ${id}`);
-    // Here you would implement the drag functionality
+    setCurrentDraggedItem(id);
+    toast.info("Drag the card to reorder your items");
+  };
+  
+  const handleSaveItem = (updatedItem: PromotionalItem) => {
+    if (editingItem) {
+      setItems(prevItems => 
+        prevItems.map(item => 
+          item.id === updatedItem.id ? updatedItem : item
+        )
+      );
+      toast.success("Item updated successfully");
+    } else {
+      setItems(prevItems => [...prevItems, updatedItem]);
+      toast.success("New item added successfully");
+    }
+    
+    setEditingItem(null);
+    setIsDialogOpen(false);
   };
   
   return (
@@ -128,7 +147,6 @@ const Dashboard = () => {
       
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">
-          {/* User Profile Header */}
           <div className="flex flex-col items-center mb-10 md:flex-row md:justify-start md:gap-8">
             <Avatar className="h-24 w-24 mb-4 md:mb-0">
               {user.profilePicture ? (
@@ -190,7 +208,6 @@ const Dashboard = () => {
                 </Button>
               </div>
               
-              {/* Shareable Link */}
               <div className="mt-4 bg-white rounded-lg border p-3 shadow-sm">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
@@ -213,7 +230,6 @@ const Dashboard = () => {
             </div>
           </div>
           
-          {/* Preview Text */}
           <div className="mb-6">
             <h2 className="text-xl font-bold">Your Coupons</h2>
             <p className="text-muted-foreground">
@@ -221,7 +237,6 @@ const Dashboard = () => {
             </p>
           </div>
 
-          {/* Promotional Items Grid with edit capabilities */}
           <PromotionalGrid 
             items={items} 
             onEdit={handleEditCard}
@@ -230,17 +245,22 @@ const Dashboard = () => {
             editable={true}
           />
           
-          {/* Add Coupon Card */}
           <div className="mt-6">
             <div className="grid grid-cols-2 gap-4">
               <AddItemCard 
                 aspectRatio="9:16" 
-                onClick={handleAddItem} 
+                onClick={() => {
+                  setEditingItem(null);
+                  setIsDialogOpen(true);
+                }} 
                 label="Add Coupon" 
               />
               <AddItemCard 
                 aspectRatio="9:16" 
-                onClick={handleAddItem} 
+                onClick={() => {
+                  setEditingItem(null);
+                  setIsDialogOpen(true);
+                }}
                 label="Add Coupon" 
               />
             </div>
@@ -250,9 +270,13 @@ const Dashboard = () => {
       
       <AddItemDialog
         open={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        onAdd={handleAddNewItem}
+        onClose={() => {
+          setIsDialogOpen(false);
+          setEditingItem(null);
+        }}
+        onAdd={handleSaveItem}
         aspectRatio="9:16"
+        initialItem={editingItem}
       />
     </div>
   );
