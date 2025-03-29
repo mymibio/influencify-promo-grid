@@ -122,18 +122,7 @@ const Hero = () => {
             </div>
           </div>
           
-          <div className={`flex flex-col sm:flex-row gap-4 mt-8 transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <Link to="/signup">
-              <Button className="bg-brand-purple hover:bg-brand-dark-purple text-white px-8 py-6 rounded-lg text-lg shadow-lg hover:shadow-xl transition-all hover:scale-105">
-                Get Started — It's Free
-              </Button>
-            </Link>
-            <Link to="/examples">
-              <Button variant="outline" className="px-8 py-6 text-lg hover:bg-gray-100 transition-all hover:scale-105">
-                See Examples
-              </Button>
-            </Link>
-          </div>
+          {/* Removed the "Get Started — It's Free" and "See Examples" buttons */}
           
           {/* Social proof */}
           <div className={`mt-10 transition-all duration-1000 delay-900 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
@@ -164,4 +153,3 @@ const Hero = () => {
 };
 
 export default Hero;
-

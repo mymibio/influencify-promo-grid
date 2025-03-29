@@ -39,8 +39,8 @@ function App() {
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-          {/* Mobile Navigation that will display on all pages where the URL includes "/dashboard" */}
-          <MobileNavigation />
+          {/* Mobile Navigation that will display only on dashboard related pages */}
+          {window.location.pathname.includes('/dashboard') && <MobileNavigation />}
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
