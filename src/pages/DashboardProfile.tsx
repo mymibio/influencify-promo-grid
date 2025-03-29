@@ -9,7 +9,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Instagram, Twitter, Youtube, Video, Upload, Facebook, Mail, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
-import Textarea from "@/components/ui/textarea";
+import { Textarea } from "@/components/ui/textarea";
 import ProfilePreview from "@/components/dashboard/profile-preview";
 
 // Mock user data for demonstration
