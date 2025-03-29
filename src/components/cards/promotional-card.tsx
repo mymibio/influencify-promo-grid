@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Copy, Trash2, Edit2, MoveIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface PromotionalCardProps {
   item: PromotionalItem;
@@ -25,24 +25,7 @@ export const PromotionalCard = ({
 }: PromotionalCardProps) => {
   const [isSelected, setIsSelected] = useState(false);
 
-  useEffect(() => {
-    // Add a click handler to the document to deselect the card when clicking outside
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      // Check if the click is outside our card component
-      if (isSelected && !target.closest(`.card-${item.id}`)) {
-        setIsSelected(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isSelected, item.id]);
-
-  const handleCopyCode = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card selection
+  const handleCopyCode = () => {
     if (item.couponCode) {
       navigator.clipboard.writeText(item.couponCode);
       toast.success("Coupon code copied to clipboard!");
@@ -62,11 +45,8 @@ export const PromotionalCard = ({
         <Button
           size="icon"
           variant="default"
-          onClick={(e) => {
-            e.stopPropagation();
-            onEdit?.(item.id);
-          }}
-          className="absolute -top-3 -right-3 z-10 rounded-full w-10 h-10 bg-black text-white shadow-lg transition-transform scale-100 hover:scale-110"
+          onClick={() => onEdit?.(item.id)}
+          className="absolute -top-3 -right-3 z-10 rounded-full w-10 h-10 bg-black text-white shadow-lg"
         >
           <Edit2 className="h-4 w-4" />
           <span className="sr-only">Edit</span>
@@ -78,11 +58,8 @@ export const PromotionalCard = ({
         <Button
           size="icon"
           variant="destructive"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete?.(item.id);
-          }}
-          className="absolute -top-3 -left-3 z-10 rounded-full w-10 h-10 shadow-lg transition-transform scale-100 hover:scale-110"
+          onClick={() => onDelete?.(item.id)}
+          className="absolute -top-3 -left-3 z-10 rounded-full w-10 h-10 shadow-lg"
         >
           <Trash2 className="h-4 w-4" />
           <span className="sr-only">Delete</span>
@@ -94,11 +71,8 @@ export const PromotionalCard = ({
         <Button
           size="icon"
           variant="default"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDrag?.(item.id);
-          }}
-          className="absolute -bottom-3 left-1/2 -translate-x-1/2 z-10 rounded-full w-10 h-10 bg-black text-white shadow-lg transition-transform scale-100 hover:scale-110"
+          onClick={() => onDrag?.(item.id)}
+          className="absolute -bottom-3 left-1/2 -translate-x-1/2 z-10 rounded-full w-10 h-10 bg-black text-white shadow-lg"
         >
           <MoveIcon className="h-4 w-4" />
           <span className="sr-only">Move</span>
@@ -108,9 +82,9 @@ export const PromotionalCard = ({
       {/* Main Card */}
       <Card 
         className={cn(
-          `group overflow-hidden h-full w-full flex flex-col rounded-3xl shadow-sm border-0 card-9-16 transition-all duration-200 card-${item.id}`,
+          "group overflow-hidden h-full w-full flex flex-col rounded-3xl shadow-sm border-0 card-9-16 transition-all duration-200",
           isSelected && editable ? "ring-2 ring-primary ring-offset-2" : "",
-          editable ? "cursor-pointer hover:shadow-md" : ""
+          editable ? "cursor-pointer" : ""
         )}
         onClick={handleCardClick}
       >
@@ -150,7 +124,10 @@ export const PromotionalCard = ({
                   <Button 
                     size="sm" 
                     variant="ghost" 
-                    onClick={handleCopyCode}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCopyCode();
+                    }}
                     className="h-5 w-5 sm:h-6 sm:w-6 p-0"
                     aria-label="Copy code"
                     title="Copy code"

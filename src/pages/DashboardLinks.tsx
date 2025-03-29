@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { User, PromotionalItem } from "@/types/user";
 import DashboardLayout from "@/components/dashboard/dashboard-layout";
@@ -12,8 +13,8 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { PromotionalCard } from "@/components/cards/promotional-card";
-import PromotionalGrid from "@/components/profile/promotional-grid";
 
+// Mock user data for demonstration
 const sampleUser: User = {
   id: "123",
   username: "fashionista",
@@ -29,6 +30,7 @@ const sampleUser: User = {
   createdAt: new Date().toISOString()
 };
 
+// Mock promotional items
 const sampleItems: PromotionalItem[] = [
   {
     id: "1",
@@ -72,7 +74,7 @@ const DashboardLinks = () => {
   const [items, setItems] = useState<PromotionalItem[]>(sampleItems);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState("default");
-  const [viewMode, setViewMode] = useState<'table' | 'grid'>('grid');
+  const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
   
   const filteredItems = items.filter(item => 
     item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -90,6 +92,7 @@ const DashboardLinks = () => {
   };
   
   const handleEditItem = (id: string) => {
+    // In a real app, this would navigate to the edit page or open a modal
     toast.info("Edit functionality would open here");
   };
 
@@ -100,6 +103,7 @@ const DashboardLinks = () => {
   return (
     <DashboardLayout user={sampleUser}>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Links Management Section */}
         <div className="lg:col-span-2 order-1">
           <div className="space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -224,13 +228,16 @@ const DashboardLinks = () => {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {filteredItems.length > 0 ? (
-                      <PromotionalGrid 
-                        items={filteredItems} 
-                        editable={true}
-                        onEdit={handleEditItem}
-                        onDelete={handleDeleteItem}
-                        onDrag={handleDragItem}
-                      />
+                      filteredItems.map((item) => (
+                        <PromotionalCard
+                          key={item.id}
+                          item={item}
+                          onEdit={handleEditItem}
+                          onDelete={handleDeleteItem}
+                          onDrag={handleDragItem}
+                          editable={true}
+                        />
+                      ))
                     ) : (
                       <div className="col-span-full text-center py-10 text-muted-foreground">
                         No items found.
@@ -243,6 +250,7 @@ const DashboardLinks = () => {
           </div>
         </div>
         
+        {/* Live Preview Section - Only shows on tablet and desktop */}
         <div className="order-2 lg:order-2">
           <ProfilePreview
             user={sampleUser}
