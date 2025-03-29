@@ -119,23 +119,49 @@ const UserProfile = () => {
     : sampleItems.filter(item => item.category === selectedCategory);
     
   return (
-    <div className="min-h-screen pb-20 pt-4 px-4 md:px-8 max-w-7xl mx-auto">
-      {/* Profile Header */}
-      <div className="rounded-3xl overflow-hidden shadow-lg bg-white/70 backdrop-blur-sm border border-gray-100 transition-transform hover:shadow-xl mb-6">
-        <ProfileHeader 
-          user={sampleUser} 
-          compact={true} 
-        />
+    <div className="max-w-2xl mx-auto px-4 pt-6 pb-12">
+      {/* Compact Profile Card */}
+      <div className="bg-white rounded-2xl shadow-md mb-6 overflow-hidden">
+        <div className="flex flex-col items-center pt-8 px-4 pb-6">
+          {/* Profile Picture */}
+          <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-4 border-white shadow-sm">
+            <img 
+              src={sampleUser.profilePicture} 
+              alt={sampleUser.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          
+          {/* User Info */}
+          <h1 className="text-2xl font-bold">{sampleUser.name}</h1>
+          <p className="text-gray-500 mb-3">@{sampleUser.username}</p>
+          <p className="text-center text-sm text-gray-600 mb-5 max-w-md">
+            {sampleUser.bio}
+          </p>
+          
+          {/* Social Links */}
+          <div className="flex gap-3">
+            {sampleUser.socialLinks && Object.entries(sampleUser.socialLinks).slice(0, 6).map(([platform]) => (
+              <a 
+                key={platform}
+                href={`#${platform}`}
+                className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
+              >
+                <span className="text-sm font-bold">{platform.charAt(0).toUpperCase()}</span>
+              </a>
+            ))}
+          </div>
+        </div>
       </div>
       
-      {/* Category Badges */}
-      <div className="flex flex-wrap gap-2 mb-6">
+      {/* Category Selection */}
+      <div className="flex overflow-x-auto gap-2 pb-2 mb-4 scrollbar-hide">
         {availableCategories.map((category) => (
           <Badge
             key={category}
             variant={selectedCategory === category ? "default" : "outline"}
-            className={`rounded-full px-3 py-1.5 cursor-pointer hover:bg-accent transition-colors ${
-              selectedCategory === category ? "bg-primary text-primary-foreground" : "hover:text-accent-foreground"
+            className={`rounded-full px-3 py-1 cursor-pointer whitespace-nowrap ${
+              selectedCategory === category ? "bg-primary text-primary-foreground" : "hover:bg-accent hover:text-accent-foreground"
             }`}
             onClick={() => setSelectedCategory(category)}
           >
@@ -144,17 +170,15 @@ const UserProfile = () => {
         ))}
       </div>
       
-      {/* Promotional Content */}
-      <div className="rounded-3xl overflow-hidden bg-white/80 shadow-lg backdrop-blur-sm border border-gray-100 transition-all hover:shadow-xl">
+      {/* Promotional Grid - More compact */}
+      <div className="bg-white rounded-2xl overflow-hidden shadow-md">
         <PromotionalGrid items={filteredItems} />
       </div>
       
-      {/* Footer */}
-      <footer className="py-4 text-center text-sm text-muted-foreground mt-8">
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-md py-3 border border-gray-100">
-          Powered by <span className="font-medium text-brand-purple">Influencify</span>
-        </div>
-      </footer>
+      {/* Compact Footer */}
+      <div className="text-center text-xs text-gray-400 mt-6">
+        Powered by <span className="font-medium">Influencify</span>
+      </div>
     </div>
   );
 };
