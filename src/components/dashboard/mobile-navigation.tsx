@@ -20,50 +20,58 @@ const MobileNavigation = () => {
   };
   
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t md:hidden z-40">
-      <nav className="flex justify-around items-center h-16">
+    <div className="fixed bottom-4 left-0 right-0 z-50 flex justify-center md:hidden">
+      <nav className="flex items-center justify-around gap-2 rounded-full bg-white/90 backdrop-blur-md shadow-lg px-4 py-2 border border-gray-100" style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.05)", transform: "translateY(0)" }}>
         <Link 
           to="/dashboard" 
           className={cn(
-            "flex flex-col items-center justify-center w-full py-2",
-            isActive("/dashboard") ? "text-primary" : "text-muted-foreground"
+            "flex flex-col items-center justify-center rounded-full p-2 transition-all duration-200 hover:bg-gray-100",
+            isActive("/dashboard") 
+              ? "text-primary bg-primary/10 shadow-sm" 
+              : "text-muted-foreground hover:text-primary"
           )}
         >
-          <LayoutGrid size={24} />
-          <span className="text-xs mt-1">Home</span>
+          <LayoutGrid size={20} />
+          <span className="text-xs font-medium mt-1">Home</span>
         </Link>
         
         <Link 
           to="/dashboard/analytics" 
           className={cn(
-            "flex flex-col items-center justify-center w-full py-2",
-            isActive("/dashboard/analytics") ? "text-primary" : "text-muted-foreground"
+            "flex flex-col items-center justify-center rounded-full p-2 transition-all duration-200 hover:bg-gray-100",
+            isActive("/dashboard/analytics") 
+              ? "text-primary bg-primary/10 shadow-sm" 
+              : "text-muted-foreground hover:text-primary"
           )}
         >
-          <BarChart size={24} />
-          <span className="text-xs mt-1">Analytics</span>
+          <BarChart size={20} />
+          <span className="text-xs font-medium mt-1">Analytics</span>
         </Link>
         
         <Link 
           to="/dashboard/theme" 
           className={cn(
-            "flex flex-col items-center justify-center w-full py-2",
-            isActive("/dashboard/theme") ? "text-primary" : "text-muted-foreground"
+            "flex flex-col items-center justify-center rounded-full p-2 transition-all duration-200 hover:bg-gray-100",
+            isActive("/dashboard/theme") 
+              ? "text-primary bg-primary/10 shadow-sm" 
+              : "text-muted-foreground hover:text-primary"
           )}
         >
-          <Palette size={24} />
-          <span className="text-xs mt-1">Theme</span>
+          <Palette size={20} />
+          <span className="text-xs font-medium mt-1">Theme</span>
         </Link>
         
         <Link 
           to="/dashboard/settings" 
           className={cn(
-            "flex flex-col items-center justify-center w-full py-2",
-            isActive("/dashboard/settings") ? "text-primary" : "text-muted-foreground"
+            "flex flex-col items-center justify-center rounded-full p-2 transition-all duration-200 hover:bg-gray-100",
+            isActive("/dashboard/settings") 
+              ? "text-primary bg-primary/10 shadow-sm" 
+              : "text-muted-foreground hover:text-primary"
           )}
         >
-          <Settings size={24} />
-          <span className="text-xs mt-1">Settings</span>
+          <Settings size={20} />
+          <span className="text-xs font-medium mt-1">Settings</span>
         </Link>
       </nav>
     </div>
