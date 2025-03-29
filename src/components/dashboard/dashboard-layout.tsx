@@ -5,7 +5,7 @@ import { User } from "@/types/user";
 import { Button } from "@/components/ui/button";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { LayoutDashboard, Link as LinkIcon, UserRound, Settings, LogOut, BarChart, Palette } from "lucide-react";
+import { LayoutDashboard, Link as LinkIcon, Settings, LogOut, BarChart, Palette } from "lucide-react";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -78,14 +78,6 @@ const DashboardLayout = ({ children, user }: DashboardLayoutProps) => {
                   <Link to="/dashboard/theme">
                     <Palette size={18} />
                     <span>Theme</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link to="/dashboard/profile">
-                    <UserRound size={18} />
-                    <span>Profile</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
