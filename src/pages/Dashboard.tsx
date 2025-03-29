@@ -28,7 +28,34 @@ const sampleUser: User = {
 };
 
 // Sample promotional items
-const sampleItems: PromotionalItem[] = [];
+const sampleItems: PromotionalItem[] = [
+  {
+    id: "1",
+    userId: "123",
+    title: "Amazon Summer Sale",
+    description: "Get 20% off on all summer essentials",
+    image: "https://images.unsplash.com/photo-1607083206968-13611e3d76db?q=80&w=2340&h=1000&auto=format&fit=crop",
+    url: "https://amazon.com",
+    type: "coupon",
+    aspectRatio: "1:1",
+    couponCode: "SUMMER20",
+    discount: "20% OFF",
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "2",
+    userId: "123",
+    title: "Sephora Beauty Insider",
+    description: "Exclusive discount for beauty products",
+    image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=2340&h=1000&auto=format&fit=crop",
+    url: "https://sephora.com",
+    type: "coupon",
+    aspectRatio: "1:1",
+    couponCode: "BEAUTY15",
+    discount: "15% OFF",
+    createdAt: new Date().toISOString()
+  }
+];
 
 const Dashboard = () => {
   const [user, setUser] = useState(sampleUser);
@@ -101,6 +128,14 @@ const Dashboard = () => {
             </div>
           </div>
           
+          {/* Preview Text */}
+          <div className="mb-6">
+            <h2 className="text-xl font-bold">Your Coupons</h2>
+            <p className="text-muted-foreground">
+              This is how your coupons will appear to visitors. Add more coupons or edit existing ones.
+            </p>
+          </div>
+
           {/* Promotional Items Grid */}
           <div className="grid grid-cols-2 gap-4 sm:gap-6">
             {items.map((item) => (

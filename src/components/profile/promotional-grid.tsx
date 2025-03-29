@@ -10,7 +10,7 @@ interface PromotionalGridProps {
 const PromotionalGrid = ({ items }: PromotionalGridProps) => {
   const [randomizedItems, setRandomizedItems] = useState<PromotionalItem[]>([]);
 
-  // Randomize items when component mounts
+  // Randomize items when component mounts or when items change
   useEffect(() => {
     const shuffled = [...items].sort(() => Math.random() - 0.5);
     setRandomizedItems(shuffled);
@@ -20,7 +20,7 @@ const PromotionalGrid = ({ items }: PromotionalGridProps) => {
     <div className="container px-4 pb-16">
       <div className="grid grid-cols-2 gap-3 sm:gap-4">
         {randomizedItems.map((item) => (
-          <div key={item.id} className="flex">
+          <div key={item.id} className="w-full">
             <PromotionalCard item={item} />
           </div>
         ))}

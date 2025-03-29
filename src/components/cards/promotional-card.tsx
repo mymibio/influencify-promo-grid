@@ -44,7 +44,7 @@ export const PromotionalCard = ({ item }: PromotionalCardProps) => {
           <h3 className="font-bold text-lg sm:text-xl mb-1 line-clamp-2">{item.title}</h3>
           
           {item.description && (
-            <p className="text-muted-foreground text-xs sm:text-sm line-clamp-2">
+            <p className="text-muted-foreground text-xs sm:text-sm line-clamp-2 mb-2">
               {item.description}
             </p>
           )}
@@ -53,9 +53,9 @@ export const PromotionalCard = ({ item }: PromotionalCardProps) => {
         <div className="mt-2 sm:mt-4 space-y-2 sm:space-y-3">
           {item.couponCode && (
             <div className="relative">
-              <div className="flex items-center bg-blue-100 p-2 sm:p-3 rounded-lg">
+              <div className="flex items-center justify-between bg-blue-100 p-2 sm:p-3 rounded-lg">
                 <div className="flex-1 text-center">
-                  <p className="text-sm sm:text-lg font-medium">{item.couponCode}</p>
+                  <p className="text-sm sm:text-base font-medium tracking-wide">{item.couponCode}</p>
                   {item.discount && (
                     <p className="text-xs sm:text-sm text-blue-600 font-medium">
                       {item.discount}
@@ -66,7 +66,9 @@ export const PromotionalCard = ({ item }: PromotionalCardProps) => {
                   size="sm" 
                   variant="ghost" 
                   onClick={handleCopyCode}
-                  className="absolute right-1 top-1 sm:right-2 sm:top-2 h-6 w-6 sm:h-8 sm:w-8 p-0"
+                  className="h-6 w-6 sm:h-8 sm:w-8 p-0"
+                  aria-label="Copy code"
+                  title="Copy code"
                 >
                   <Copy className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
@@ -76,9 +78,9 @@ export const PromotionalCard = ({ item }: PromotionalCardProps) => {
           
           {item.url && (
             <div>
-              <Button asChild className="w-full bg-green-500 hover:bg-green-600 rounded-full h-8 sm:h-12 text-xs sm:text-base">
+              <Button asChild className="w-full bg-green-500 hover:bg-green-600 rounded-full h-8 sm:h-10 text-xs sm:text-sm font-medium">
                 <Link to={item.url} target="_blank" rel="noopener noreferrer">
-                  visit website
+                  Visit Website
                 </Link>
               </Button>
             </div>
