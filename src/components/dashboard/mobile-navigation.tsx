@@ -31,7 +31,7 @@ const MobileNavigation = () => {
   
   return (
     <div className="fixed bottom-4 left-0 right-0 z-50 flex justify-center md:hidden">
-      <nav className="flex items-center justify-around gap-1 rounded-full bg-white/90 backdrop-blur-md shadow-lg px-3 py-1 border border-gray-100" style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.05)", transform: "translateY(0)" }}>
+      <nav className="flex items-center justify-around gap-1 rounded-full bg-white/90 backdrop-blur-md shadow-lg px-3 py-1 border border-gray-100">
         <Link 
           to="/dashboard" 
           className={cn(
