@@ -3,12 +3,12 @@ import { useState } from "react";
 import { User, PromotionalItem } from "@/types/user";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Instagram, Facebook, MessageCircle, Mail, Plus } from "lucide-react";
+import { Instagram, Facebook, MessageCircle, Mail, Plus, Copy, Link } from "lucide-react";
 import SimpleSidebar from "@/components/dashboard/simple-sidebar";
 import AddItemCard from "@/components/dashboard/add-item-card";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
-import { PromotionalCard } from "@/components/cards/promotional-card";
 import PromotionalGrid from "@/components/profile/promotional-grid";
+import { toast } from "sonner";
 
 // Mock user data
 const sampleUser: User = {
@@ -40,7 +40,6 @@ const sampleItems: PromotionalItem[] = [
     type: "coupon",
     aspectRatio: "9:16",
     couponCode: "SUMMER20",
-    discount: "20% OFF",
     createdAt: new Date().toISOString()
   },
   {
@@ -53,7 +52,6 @@ const sampleItems: PromotionalItem[] = [
     type: "coupon",
     aspectRatio: "9:16",
     couponCode: "BEAUTY15",
-    discount: "15% OFF",
     createdAt: new Date().toISOString()
   }
 ];
@@ -77,6 +75,17 @@ const Dashboard = () => {
   
   const handleAddNewItem = (newItem: PromotionalItem) => {
     setItems((prevItems) => [...prevItems, newItem]);
+  };
+  
+  const handleCopyLink = () => {
+    const shareableLink = `linkpromo.io/${user.username}`;
+    navigator.clipboard.writeText(shareableLink)
+      .then(() => {
+        toast.success("Link copied to clipboard!");
+      })
+      .catch(() => {
+        toast.error("Failed to copy link");
+      });
   };
   
   return (
@@ -123,6 +132,27 @@ const Dashboard = () => {
                 <Button variant="outline" size="icon" className="rounded-full bg-white">
                   <Plus size={20} />
                 </Button>
+              </div>
+              
+              {/* Shareable Link */}
+              <div className="mt-4 bg-white rounded-lg border p-3 shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Link size={18} className="text-blue-500" />
+                    <span className="text-sm">
+                      Your LinkPromo is live: <span className="text-blue-500 font-medium">linkpromo.io/{user.username}</span>
+                    </span>
+                  </div>
+                  <Button 
+                    variant="primary" 
+                    size="sm" 
+                    className="bg-blue-500 hover:bg-blue-600 text-white"
+                    onClick={handleCopyLink}
+                  >
+                    <Copy size={16} className="mr-1" />
+                    Copy URL
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

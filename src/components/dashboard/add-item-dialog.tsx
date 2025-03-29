@@ -23,7 +23,6 @@ const AddItemDialog = ({ open, onClose, onAdd }: AddItemDialogProps) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [couponCode, setCouponCode] = useState("");
-  const [discount, setDiscount] = useState("");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -55,7 +54,6 @@ const AddItemDialog = ({ open, onClose, onAdd }: AddItemDialogProps) => {
       type: "coupon", // Always set to coupon as per requirements
       aspectRatio: "9:16",
       couponCode,
-      discount,
       createdAt: new Date().toISOString(),
     };
 
@@ -72,7 +70,6 @@ const AddItemDialog = ({ open, onClose, onAdd }: AddItemDialogProps) => {
     setImageFile(null);
     setImagePreview(null);
     setCouponCode("");
-    setDiscount("");
   };
 
   return (
@@ -173,19 +170,6 @@ const AddItemDialog = ({ open, onClose, onAdd }: AddItemDialogProps) => {
               value={couponCode}
               onChange={(e) => setCouponCode(e.target.value)}
               className="col-span-3"
-            />
-          </div>
-          
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="discount" className="text-right">
-              Discount
-            </Label>
-            <Input
-              id="discount"
-              value={discount}
-              onChange={(e) => setDiscount(e.target.value)}
-              className="col-span-3"
-              placeholder="e.g. 20% OFF"
             />
           </div>
           
