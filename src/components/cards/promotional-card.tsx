@@ -33,26 +33,28 @@ export const PromotionalCard = ({ item }: PromotionalCardProps) => {
             alt={item.title} 
             className={cn(
               "w-full object-cover transition-transform group-hover:scale-105",
-              item.aspectRatio === "1:1" ? "h-40" : "h-52"
+              item.aspectRatio === "1:1" ? "h-32" : "h-60"
             )}
           />
         </div>
       )}
       
-      <CardContent className="p-4 flex-1 flex flex-col">
-        <h3 className="font-medium text-lg line-clamp-2">{item.title}</h3>
+      <CardContent className="p-4 flex-1 flex flex-col justify-between">
+        <div>
+          <h3 className="font-medium text-lg line-clamp-2">{item.title}</h3>
+          
+          {item.description && (
+            <p className="text-muted-foreground text-sm mt-1 line-clamp-2">
+              {item.description}
+            </p>
+          )}
+        </div>
         
-        {item.description && (
-          <p className="text-muted-foreground text-sm mt-1 mb-auto line-clamp-2">
-            {item.description}
-          </p>
-        )}
-        
-        <div className="mt-auto space-y-3">
+        <div className="mt-3 space-y-3">
           {item.couponCode && (
-            <div className="mt-2">
+            <div>
               <div className="flex items-center gap-2 bg-gray-100 p-2 rounded border">
-                <code className="text-sm font-mono flex-1 text-center overflow-hidden text-ellipsis">
+                <code className="text-sm font-mono flex-1 text-center overflow-hidden text-ellipsis whitespace-nowrap">
                   {item.couponCode}
                 </code>
                 <Button 
@@ -73,7 +75,7 @@ export const PromotionalCard = ({ item }: PromotionalCardProps) => {
           )}
           
           {item.url && (
-            <div className="mt-2">
+            <div className={item.couponCode ? "mt-2" : ""}>
               <Button asChild className="w-full bg-brand-purple hover:bg-brand-dark-purple flex items-center justify-center gap-2">
                 <Link to={item.url} target="_blank" rel="noopener noreferrer">
                   Visit Website <ExternalLink className="h-4 w-4" />
