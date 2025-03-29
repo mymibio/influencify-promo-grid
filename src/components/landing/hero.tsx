@@ -120,9 +120,15 @@ const Hero = () => {
             <div className="text-xs text-gray-500 mt-2 text-center">
               Claim your unique link before someone else takes it!
             </div>
+            
+            {/* Add sign in link below the "Claim your unique link..." text */}
+            <div className="text-center mt-4">
+              <Link to="/login" className="text-sm text-brand-purple hover:underline font-medium inline-flex items-center gap-1 transition-all hover:gap-2">
+                Already have an account? Sign in
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
           </div>
-          
-          {/* Removed the "Get Started — It's Free" and "See Examples" buttons */}
           
           {/* Social proof */}
           <div className={`mt-10 transition-all duration-1000 delay-900 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>

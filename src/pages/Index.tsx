@@ -1,14 +1,11 @@
 
-import Navbar from "@/components/ui/navbar";
 import Hero from "@/components/landing/hero";
 import Features from "@/components/landing/features";
-import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       <main className="flex-1">
         <Hero />
         <Features />
@@ -72,7 +69,6 @@ const Index = () => {
                   Join thousands of influencers who are monetizing their social media presence.
                 </p>
               </div>
-              {/* Removed the "Get Started For Free" button */}
             </div>
           </div>
         </section>
