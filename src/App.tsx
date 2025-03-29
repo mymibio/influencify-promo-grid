@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import DashboardSettings from "./pages/DashboardSettings";
 import DashboardAnalytics from "./pages/DashboardAnalytics";
 import DashboardTheme from "./pages/DashboardTheme";
+import MobileNavigation from "./components/dashboard/mobile-navigation";
 
 // Create a client inside the component
 function App() {
@@ -38,6 +39,8 @@ function App() {
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          {/* Mobile Navigation that will display on all pages where the URL includes "/dashboard" */}
+          <MobileNavigation />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
