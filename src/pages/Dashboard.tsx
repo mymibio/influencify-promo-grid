@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Instagram, Facebook, MessageCircle, Mail, Plus } from "lucide-react";
 import SimpleSidebar from "@/components/dashboard/simple-sidebar";
 import AddItemCard from "@/components/dashboard/add-item-card";
+import AddItemDialog from "@/components/dashboard/add-item-dialog";
+import { PromotionalCard } from "@/components/cards/promotional-card";
 
 // Mock user data
 const sampleUser: User = {
@@ -25,12 +27,14 @@ const sampleUser: User = {
   createdAt: new Date().toISOString()
 };
 
-// Mock promotional items
+// Sample promotional items
 const sampleItems: PromotionalItem[] = [];
 
 const Dashboard = () => {
   const [user, setUser] = useState(sampleUser);
   const [items, setItems] = useState(sampleItems);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState<"1:1" | "9:16">("1:1");
   
   const getInitials = (name: string) => {
     return name
@@ -40,9 +44,13 @@ const Dashboard = () => {
       .toUpperCase();
   };
   
-  const handleAddItem = () => {
-    // This would open a modal to add a new item in a real app
-    console.log("Add new promotional item");
+  const handleAddItem = (aspectRatio: "1:1" | "9:16") => {
+    setSelectedAspectRatio(aspectRatio);
+    setIsDialogOpen(true);
+  };
+  
+  const handleAddNewItem = (newItem: PromotionalItem) => {
+    setItems((prevItems) => [...prevItems, newItem]);
   };
   
   return (
@@ -93,15 +101,27 @@ const Dashboard = () => {
             </div>
           </div>
           
-          {/* Promotional Items Grid - Modified to 2 columns */}
+          {/* Promotional Items Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <AddItemCard aspectRatio="1:1" onClick={handleAddItem} />
-            <AddItemCard aspectRatio="1:1" onClick={handleAddItem} />
-            <AddItemCard aspectRatio="9:16" onClick={handleAddItem} />
-            <AddItemCard aspectRatio="9:16" onClick={handleAddItem} />
+            {items.map((item) => (
+              <PromotionalCard key={item.id} item={item} />
+            ))}
+            
+            {/* Add Item Cards */}
+            <AddItemCard aspectRatio="1:1" onClick={() => handleAddItem("1:1")} />
+            <AddItemCard aspectRatio="1:1" onClick={() => handleAddItem("1:1")} />
+            <AddItemCard aspectRatio="9:16" onClick={() => handleAddItem("9:16")} />
+            <AddItemCard aspectRatio="9:16" onClick={() => handleAddItem("9:16")} />
           </div>
         </div>
       </main>
+      
+      <AddItemDialog
+        open={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onAdd={handleAddNewItem}
+        aspectRatio={selectedAspectRatio}
+      />
     </div>
   );
 };
