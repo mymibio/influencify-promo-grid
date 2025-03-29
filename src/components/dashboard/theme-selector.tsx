@@ -1,8 +1,6 @@
-
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { PhoneIcon } from "lucide-react";
 import { toast } from "sonner";
 
 export type ThemeCategory = "All" | "Basic" | "Pebble" | "Cloud";

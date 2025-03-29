@@ -8,6 +8,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlusCircle, Edit2, Trash2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import ProfilePreview from "@/components/dashboard/profile-preview";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import AddItemDialog from "@/components/dashboard/add-item-dialog";
 
 // Mock user data for demonstration
 const sampleUser: User = {
@@ -66,14 +69,22 @@ const sampleItems: PromotionalItem[] = [
 
 const DashboardLinks = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [items, setItems] = useState<PromotionalItem[]>(sampleItems);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState("default");
   
-  const filteredItems = sampleItems.filter(item => 
+  const filteredItems = items.filter(item => 
     item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
   
+  const handleAddItem = (newItem: PromotionalItem) => {
+    setItems([newItem, ...items]);
+    toast.success("Item added successfully");
+  };
+  
   const handleDeleteItem = (id: string) => {
-    // In a real app, this would handle the deletion via API
+    setItems(items.filter(item => item.id !== id));
     toast.success("Item deleted successfully");
   };
   
@@ -84,97 +95,121 @@ const DashboardLinks = () => {
   
   return (
     <DashboardLayout user={sampleUser}>
-      <div className="space-y-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <h1 className="text-3xl font-bold">Promotional Links</h1>
-          <Button>
-            <PlusCircle className="h-4 w-4 mr-2" />
-            Add New Link
-          </Button>
-        </div>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Manage Your Links</CardTitle>
-            <CardDescription>Add, edit or remove your promotional links and coupons</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center mb-6">
-              <Input
-                placeholder="Search links..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="max-w-sm"
-              />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Links Management Section */}
+        <div className="lg:col-span-2 order-1">
+          <div className="space-y-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <h1 className="text-3xl font-bold">Promotional Links</h1>
+              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <PlusCircle className="h-4 w-4 mr-2" />
+                    Add New Link
+                  </Button>
+                </DialogTrigger>
+                <AddItemDialog 
+                  open={isAddDialogOpen}
+                  onClose={() => setIsAddDialogOpen(false)}
+                  onAdd={handleAddItem}
+                  aspectRatio="9:16"
+                />
+              </Dialog>
             </div>
             
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Format</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredItems.length > 0 ? (
-                    filteredItems.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell>
-                          <div className="font-medium truncate max-w-[200px]">{item.title}</div>
-                        </TableCell>
-                        <TableCell>
-                          <span className="capitalize">{item.type}</span>
-                        </TableCell>
-                        <TableCell>{item.aspectRatio}</TableCell>
-                        <TableCell>{new Date(item.createdAt).toLocaleDateString()}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              onClick={() => handleEditItem(item.id)}
-                            >
-                              <Edit2 className="h-4 w-4" />
-                              <span className="sr-only">Edit</span>
-                            </Button>
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              onClick={() => handleDeleteItem(item.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Delete</span>
-                            </Button>
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              asChild
-                            >
-                              <a href={item.url} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="h-4 w-4" />
-                                <span className="sr-only">Visit</span>
-                              </a>
-                            </Button>
-                          </div>
-                        </TableCell>
+            <Card>
+              <CardHeader>
+                <CardTitle>Manage Your Links</CardTitle>
+                <CardDescription>Add, edit or remove your promotional links and coupons</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center mb-6">
+                  <Input
+                    placeholder="Search links..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="max-w-sm"
+                  />
+                </div>
+                
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Title</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Format</TableHead>
+                        <TableHead>Created</TableHead>
+                        <TableHead>Actions</TableHead>
                       </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center py-4 text-muted-foreground">
-                        No items found.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredItems.length > 0 ? (
+                        filteredItems.map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell>
+                              <div className="font-medium truncate max-w-[200px]">{item.title}</div>
+                            </TableCell>
+                            <TableCell>
+                              <span className="capitalize">{item.type}</span>
+                            </TableCell>
+                            <TableCell>{item.aspectRatio}</TableCell>
+                            <TableCell>{new Date(item.createdAt).toLocaleDateString()}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={() => handleEditItem(item.id)}
+                                >
+                                  <Edit2 className="h-4 w-4" />
+                                  <span className="sr-only">Edit</span>
+                                </Button>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={() => handleDeleteItem(item.id)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                  <span className="sr-only">Delete</span>
+                                </Button>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  asChild
+                                >
+                                  <a href={item.url} target="_blank" rel="noopener noreferrer">
+                                    <ExternalLink className="h-4 w-4" />
+                                    <span className="sr-only">Visit</span>
+                                  </a>
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={5} className="text-center py-4 text-muted-foreground">
+                            No items found.
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+        
+        {/* Live Preview Section */}
+        <div className="order-2 lg:order-2">
+          <ProfilePreview
+            user={sampleUser}
+            items={filteredItems.length > 0 ? filteredItems.slice(0, 4) : []}
+            selectedTheme={selectedTheme}
+          />
+        </div>
       </div>
     </DashboardLayout>
   );

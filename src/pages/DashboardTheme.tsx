@@ -164,11 +164,7 @@ const DashboardTheme = () => {
                 
                 <TabsContent value="themes">
                   <Card>
-                    <CardHeader>
-                      <CardTitle>Profile Theme</CardTitle>
-                      <CardDescription>Choose how your profile page looks to visitors</CardDescription>
-                    </CardHeader>
-                    <CardContent>
+                    <CardContent className="pt-6">
                       <ThemeSelector selectedTheme={selectedTheme} onThemeChange={handleThemeChange} />
                     </CardContent>
                   </Card>
@@ -338,11 +334,6 @@ const getThemeStyles = (themeId: string) => {
       header: "bg-purple-600",
       background: "bg-black",
       textColor: "text-green-400"
-    },
-    pastel: {
-      header: "bg-pink-300",
-      background: "bg-purple-50",
-      textColor: "text-gray-800"
     },
     dark: {
       header: "bg-gray-900",
