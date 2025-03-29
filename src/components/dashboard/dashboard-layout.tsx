@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -22,6 +23,7 @@ const DashboardLayout = ({ children, user: initialUser }: DashboardLayoutProps) 
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
   const [newUsername, setNewUsername] = useState(user.username);
   const [newProfilePicture, setNewProfilePicture] = useState<string | undefined>(user.profilePicture);
+  const [fileInput, setFileInput] = useState<HTMLInputElement | null>(null);
   
   const getInitials = (name: string) => {
     return name
@@ -48,6 +50,26 @@ const DashboardLayout = ({ children, user: initialUser }: DashboardLayoutProps) 
     }));
     setIsProfileDialogOpen(false);
     toast.success("Profile updated successfully!");
+  };
+  
+  const handleProfilePictureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        toast.error("Please select an image file");
+        return;
+      }
+      
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image size should be less than 5MB");
+        return;
+      }
+      
+      const imageUrl = URL.createObjectURL(file);
+      setNewProfilePicture(imageUrl);
+    }
   };
 
   return (
@@ -145,6 +167,31 @@ const DashboardLayout = ({ children, user: initialUser }: DashboardLayoutProps) 
             <DialogTitle>Edit Profile</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            <div className="flex justify-center mb-4">
+              <div className="relative">
+                <Avatar className="h-24 w-24">
+                  {newProfilePicture ? (
+                    <AvatarImage src={newProfilePicture} alt={user.name} />
+                  ) : (
+                    <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                  )}
+                </Avatar>
+                <Button 
+                  size="icon" 
+                  className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-primary"
+                  onClick={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.onchange = (e) => handleProfilePictureUpload(e as React.ChangeEvent<HTMLInputElement>);
+                    setFileInput(input);
+                    input.click();
+                  }}
+                >
+                  <Pencil size={16} className="text-white" />
+                </Button>
+              </div>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
               <Input 
@@ -152,15 +199,6 @@ const DashboardLayout = ({ children, user: initialUser }: DashboardLayoutProps) 
                 value={newUsername} 
                 onChange={(e) => setNewUsername(e.target.value)} 
                 placeholder="Enter your username"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="profilePicture">Profile Picture URL</Label>
-              <Input 
-                id="profilePicture" 
-                value={newProfilePicture || ''} 
-                onChange={(e) => setNewProfilePicture(e.target.value)} 
-                placeholder="Enter profile picture URL"
               />
             </div>
             <div className="pt-4 flex justify-end">
