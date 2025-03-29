@@ -105,11 +105,12 @@
   }
 }
 
-@media (min-width: 1024px) {
+/* Removed the 3-column layout for large screens */
+/* @media (min-width: 1024px) {
   .masonry-grid {
     column-count: 3;
   }
-}
+} */
 
 .masonry-item {
   break-inside: avoid;

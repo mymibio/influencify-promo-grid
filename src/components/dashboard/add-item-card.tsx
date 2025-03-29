@@ -12,7 +12,7 @@ const AddItemCard = ({ aspectRatio, onClick }: AddItemCardProps) => {
     <button
       onClick={onClick}
       className={cn(
-        "border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center hover:border-gray-400 transition-colors",
+        "border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center hover:border-gray-400 transition-colors bg-white/50 hover:bg-white/80",
         aspectRatio === "1:1" ? "aspect-square" : "aspect-[9/16]"
       )}
     >

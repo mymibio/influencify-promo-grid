@@ -93,11 +93,11 @@ const Dashboard = () => {
             </div>
           </div>
           
-          {/* Promotional Items Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Promotional Items Grid - Modified to 2 columns */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <AddItemCard aspectRatio="1:1" onClick={handleAddItem} />
             <AddItemCard aspectRatio="1:1" onClick={handleAddItem} />
             <AddItemCard aspectRatio="9:16" onClick={handleAddItem} />
-            <AddItemCard aspectRatio="1:1" onClick={handleAddItem} />
             <AddItemCard aspectRatio="9:16" onClick={handleAddItem} />
           </div>
         </div>
