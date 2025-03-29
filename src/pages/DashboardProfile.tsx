@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { User, SocialLinks } from "@/types/user";
 import DashboardLayout from "@/components/dashboard/dashboard-layout";
@@ -7,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Instagram, Twitter, Youtube, Video, Upload, Facebook, Mail, MessageSquare } from "lucide-react";
+import { Instagram, Twitter, Youtube, Video, Upload, Facebook, Mail, MessageSquare, PencilIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import ProfilePreview from "@/components/dashboard/profile-preview";
+import ProfileHeader from "@/components/profile/profile-header";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 // Mock user data for demonstration
 const sampleUser: User = {
@@ -72,6 +73,8 @@ const DashboardProfile = () => {
     email: sampleUser.socialLinks?.email || "",
   });
   
+  const [editingSocialPlatform, setEditingSocialPlatform] = useState<string | null>(null);
+  
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -112,6 +115,36 @@ const DashboardProfile = () => {
     toast.success("Profile updated successfully!");
   };
 
+  const handleEditProfilePicture = () => {
+    // In a real app, this would open a file picker dialog
+    toast("This would open a file picker to change your profile picture", {
+      description: "This functionality is not implemented in this demo",
+    });
+  };
+  
+  const handleAddSocialLink = (platform: string) => {
+    setEditingSocialPlatform(platform);
+  };
+  
+  const handleSaveSocialLink = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingSocialPlatform) return;
+    
+    // Get the value from the form
+    const value = (e.currentTarget as HTMLFormElement)[editingSocialPlatform].value;
+    
+    // Update the formData
+    setFormData(prev => ({
+      ...prev,
+      [editingSocialPlatform]: value
+    }));
+    
+    // Close the dialog
+    setEditingSocialPlatform(null);
+    
+    toast.success(`${editingSocialPlatform} link added!`);
+  };
+
   // Preview data with current form values
   const previewUser = {
     ...user,
@@ -129,11 +162,65 @@ const DashboardProfile = () => {
     }
   };
   
+  // Map platform names to their icons for the dialog
+  const platformIcons: Record<string, React.ReactNode> = {
+    instagram: <Instagram size={20} />,
+    youtube: <Youtube size={20} />,
+    twitter: <Twitter size={20} />,
+    facebook: <Facebook size={20} />,
+    whatsapp: <MessageSquare size={20} />,
+    email: <Mail size={20} />,
+  };
+  
   return (
     <DashboardLayout user={user}>
       <div className="space-y-6">
         <h1 className="text-3xl font-bold">Profile</h1>
         
+        {/* Social Platform Dialog */}
+        <Dialog open={editingSocialPlatform !== null} onOpenChange={(open) => !open && setEditingSocialPlatform(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                {editingSocialPlatform && platformIcons[editingSocialPlatform]}
+                Add {editingSocialPlatform && editingSocialPlatform.charAt(0).toUpperCase() + editingSocialPlatform.slice(1)}
+              </DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSaveSocialLink} className="space-y-4">
+              <FormItem>
+                <FormLabel>
+                  {editingSocialPlatform === 'email' ? 'Email Address' : 
+                   editingSocialPlatform === 'whatsapp' ? 'WhatsApp Number' : 
+                   `${editingSocialPlatform?.charAt(0).toUpperCase()}${editingSocialPlatform?.slice(1)} Username`}
+                </FormLabel>
+                <FormControl>
+                  <Input 
+                    name={editingSocialPlatform || ""}
+                    placeholder={
+                      editingSocialPlatform === 'email' ? 'email@example.com' : 
+                      editingSocialPlatform === 'whatsapp' ? '+123456789' : 
+                      'username'
+                    }
+                  />
+                </FormControl>
+                <FormDescription>
+                  {editingSocialPlatform === 'email' ? 'Your contact email address' : 
+                   editingSocialPlatform === 'whatsapp' ? 'Your WhatsApp number with country code' : 
+                   `Your ${editingSocialPlatform} username without the @ symbol`}
+                </FormDescription>
+              </FormItem>
+              <div className="flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={() => setEditingSocialPlatform(null)}>
+                  Cancel
+                </Button>
+                <Button type="submit">
+                  Save
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Profile Preview */}
           <div className="hidden lg:block">
@@ -147,6 +234,19 @@ const DashboardProfile = () => {
 
           {/* Center Column - Profile Form */}
           <div className="lg:col-span-2">
+            {/* Profile Header Preview */}
+            <Card className="mb-6">
+              <CardContent className="pt-6">
+                <ProfileHeader 
+                  user={previewUser} 
+                  editable={true} 
+                  onEditProfilePicture={handleEditProfilePicture}
+                  onAddSocialLink={handleAddSocialLink}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Profile Information Form */}
             <Card>
               <CardHeader>
                 <CardTitle>Profile Information</CardTitle>
@@ -155,19 +255,28 @@ const DashboardProfile = () => {
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="flex flex-col items-center sm:flex-row sm:items-start gap-6 mb-6">
-                    <Avatar className="h-24 w-24">
-                      {user.profilePicture ? (
-                        <AvatarImage src={user.profilePicture} alt={user.name} />
-                      ) : (
-                        <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
-                      )}
-                    </Avatar>
+                    <div className="relative">
+                      <Avatar className="h-24 w-24">
+                        {user.profilePicture ? (
+                          <AvatarImage src={user.profilePicture} alt={user.name} />
+                        ) : (
+                          <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                        )}
+                      </Avatar>
+                      <Button 
+                        size="icon" 
+                        className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-primary"
+                        onClick={handleEditProfilePicture}
+                      >
+                        <PencilIcon size={16} />
+                      </Button>
+                    </div>
                     <div className="flex flex-col gap-2 items-center sm:items-start">
                       <h3 className="text-lg font-medium">Profile Picture</h3>
                       <p className="text-sm text-muted-foreground mb-2">
                         Upload a new profile picture. JPG, PNG or GIF. 1:1 aspect ratio recommended.
                       </p>
-                      <Button type="button" variant="outline" size="sm">
+                      <Button type="button" variant="outline" size="sm" onClick={handleEditProfilePicture}>
                         <Upload className="h-4 w-4 mr-2" />
                         Upload Image
                       </Button>
@@ -228,20 +337,6 @@ const DashboardProfile = () => {
                           id="instagram"
                           name="instagram"
                           value={formData.instagram}
-                          onChange={handleInputChange}
-                          placeholder="username"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <FormLabel className="flex items-center gap-2" htmlFor="tiktok">
-                          <Video size={18} />
-                          TikTok
-                        </FormLabel>
-                        <Input
-                          id="tiktok"
-                          name="tiktok"
-                          value={formData.tiktok}
                           onChange={handleInputChange}
                           placeholder="username"
                         />
