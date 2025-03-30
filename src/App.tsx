@@ -15,6 +15,8 @@ import DashboardTheme from "./pages/DashboardTheme";
 import MobileNavigation from "./components/dashboard/mobile-navigation";
 import { AuthProvider } from "./contexts/AuthContext";
 import { MobilePopoverProvider } from "./components/ui/popover";
+import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
 
 // Add Google Fonts (injected in head)
 const fontLink = document.createElement("link");
@@ -57,10 +59,12 @@ function App() {
             <BrowserRouter>
               <ScrollToTop />
               <Routes>
-                {/* Public routes - all routes are now public */}
+                {/* Public routes */}
                 <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<SignUp />} />
                 
-                {/* Dashboard routes - no longer protected */}
+                {/* Dashboard routes */}
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/dashboard/settings" element={<DashboardSettings />} />
                 <Route path="/dashboard/analytics" element={<DashboardAnalytics />} />

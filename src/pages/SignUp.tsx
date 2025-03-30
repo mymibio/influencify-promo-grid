@@ -6,14 +6,23 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "@/components/ui/navbar";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SignUp = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { profile } = useAuth();
   const [username, setUsername] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // If already logged in, redirect to dashboard
+  if (profile) {
+    navigate("/dashboard");
+    return null;
+  }
 
   // Get username from URL if available
   useEffect(() => {
@@ -27,7 +36,7 @@ const SignUp = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!username || !name || !email) {
+    if (!username || !name || !email || !password) {
       toast.error("Please fill in all fields");
       return;
     }
@@ -35,14 +44,43 @@ const SignUp = () => {
     setIsSubmitting(true);
     
     try {
-      // In demo mode, just simulate a successful signup
+      // First sign up the user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username,
+            name,
+          }
+        }
+      });
+      
+      if (authError) throw authError;
+      
+      if (!authData.user) {
+        throw new Error("Failed to create user");
+      }
+
+      // Create the user profile
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .insert({
+          id: authData.user.id,
+          username,
+          name,
+          email,
+          bio: '',
+          social_links: {}
+        });
+      
+      if (profileError) throw profileError;
+      
       toast.success("Account created! Redirecting to dashboard...");
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 1500);
-    } catch (error) {
+      navigate("/dashboard");
+    } catch (error: any) {
       console.error("Error during signup:", error);
-      toast.error("Failed to create account");
+      toast.error(error.message || "Failed to create account");
     } finally {
       setIsSubmitting(false);
     }
@@ -104,6 +142,21 @@ const SignUp = () => {
                   placeholder="you@example.com"
                   className="w-full"
                 />
+              </div>
+              
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  Password
+                </label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full"
+                />
+                <p className="text-xs text-gray-500 mt-1">Password must be at least 6 characters</p>
               </div>
             </div>
             

@@ -5,31 +5,45 @@ import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/ui/navbar";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { profile } = useAuth();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // If already logged in, redirect to dashboard
+  if (profile) {
+    navigate("/dashboard");
+    return null;
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!email) {
-      toast.error("Please enter your email");
+    if (!email || !password) {
+      toast.error("Please enter both email and password");
       return;
     }
 
     setIsSubmitting(true);
     
     try {
-      // In demo mode, just simulate a successful login
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) throw error;
+      
       toast.success("Logged in successfully! Redirecting to dashboard...");
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 1500);
-    } catch (error) {
+      navigate("/dashboard");
+    } catch (error: any) {
       console.error("Error during login:", error);
-      toast.error("Failed to log in");
+      toast.error(error.message || "Failed to log in");
     } finally {
       setIsSubmitting(false);
     }
@@ -58,6 +72,20 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
+                className="w-full"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
                 className="w-full"
               />
             </div>

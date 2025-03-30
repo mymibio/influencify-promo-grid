@@ -1,7 +1,8 @@
 
-import { createContext, useContext, ReactNode, useState } from 'react';
+import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
-// Create a simplified context without authentication but with profile data
+// Create a context with authentication and profile data
 interface AuthContextType {
   isLoading: boolean;
   profile: {
@@ -19,30 +20,97 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  // Use demo profile data since we're in demo mode
-  const [profile, setProfile] = useState({
-    id: 'demo-user-id',
-    username: 'demo',
-    name: 'Demo User',
-    email: 'demo@example.com',
-    bio: 'This is a demo account',
-    socialLinks: {
-      instagram: 'demouser',
-      twitter: 'demouser',
-    }
-  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [profile, setProfile] = useState<AuthContextType['profile']>(null);
 
-  // Simulate refreshing profile
+  useEffect(() => {
+    // Check for existing session on mount
+    const checkSession = async () => {
+      setIsLoading(true);
+      try {
+        // Get current session
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user) {
+          // If we have a session, fetch the user profile
+          await fetchUserProfile(session.user.id);
+        } else {
+          setProfile(null);
+        }
+      } catch (error) {
+        console.error("Error checking session:", error);
+        setProfile(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Set up auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setIsLoading(true);
+        if (event === 'SIGNED_IN' && session?.user) {
+          await fetchUserProfile(session.user.id);
+        } else if (event === 'SIGNED_OUT') {
+          setProfile(null);
+        }
+        setIsLoading(false);
+      }
+    );
+
+    checkSession();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      
+      if (error) {
+        throw error;
+      }
+
+      if (data) {
+        setProfile({
+          id: data.id,
+          username: data.username,
+          name: data.name,
+          email: data.email,
+          bio: data.bio,
+          profilePicture: data.profile_picture,
+          socialLinks: data.social_links
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      setProfile(null);
+    }
+  };
+
+  // Function to refresh profile data
   const refreshProfile = async () => {
-    // In demo mode, this doesn't do anything but is needed by components
-    console.log('Refreshing profile in demo mode');
-    return Promise.resolve();
+    if (!profile?.id) return Promise.resolve();
+    
+    try {
+      await fetchUserProfile(profile.id);
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Error refreshing profile:", error);
+      return Promise.reject(error);
+    }
   };
 
   return (
     <AuthContext.Provider 
       value={{ 
-        isLoading: false,
+        isLoading,
         profile,
         refreshProfile
       }}
