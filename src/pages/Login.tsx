@@ -4,136 +4,98 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Navbar from "@/components/ui/navbar";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
-  const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
-    password: ""
+    password: "",
   });
-  const [errors, setErrors] = useState({
-    email: "",
-    password: ""
-  });
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    
-    // Clear error when user starts typing
-    if (errors[name as keyof typeof errors]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
-
-  const validateForm = () => {
-    let valid = true;
-    const newErrors = { ...errors };
-
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-      valid = false;
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-      valid = false;
-    }
-
-    setErrors(newErrors);
-    return valid;
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
-    if (!validateForm()) return;
+    // In a real app, we would send this data to an API
+    // For now, let's simulate a successful login
     
-    try {
-      setIsLoading(true);
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      toast.success("Logged in successfully!");
-      
-      // Redirect to dashboard
-      navigate('/dashboard');
-    } catch (error: any) {
-      console.error("Login error:", error);
-      toast.error(error.message || "Failed to sign in");
-    } finally {
+    setTimeout(() => {
       setIsLoading(false);
-    }
+      toast.success("Logged in successfully! Redirecting to dashboard...");
+      navigate("/dashboard");
+    }, 1500);
   };
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Navbar />
       <main className="flex-1 flex items-center justify-center py-12">
         <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-sm border">
           <div className="text-center">
-            <h2 className="text-3xl font-bold">Sign In</h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Don't have an account yet?{" "}
-              <Link to="/signup" className="text-primary hover:underline">
-                Sign Up
-              </Link>
+            <h1 className="text-2xl font-bold">Welcome Back</h1>
+            <p className="text-muted-foreground mt-2">
+              Log in to manage your influencer page
             </p>
           </div>
-
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Enter your email"
-                className={errors.email ? "border-red-500" : ""}
-                autoComplete="email"
-              />
-              {errors.email && (
-                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-              )}
+          
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="Your password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+                <div className="text-right mt-1">
+                  <Link to="/forgot-password" className="text-sm text-brand-purple hover:underline">
+                    Forgot password?
+                  </Link>
+                </div>
+              </div>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Enter your password"
-                className={errors.password ? "border-red-500" : ""}
-                autoComplete="current-password"
-              />
-              {errors.password && (
-                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
-              )}
-            </div>
-
-            <div className="flex items-center justify-end">
-              <Link to="#" className="text-sm text-primary hover:underline">
-                Forgot password?
-              </Link>
-            </div>
-
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign In"}
+            
+            <Button 
+              type="submit" 
+              className="w-full bg-brand-purple hover:bg-brand-dark-purple" 
+              disabled={isLoading}
+            >
+              {isLoading ? "Logging in..." : "Log In"}
             </Button>
+            
+            <p className="text-center text-sm text-muted-foreground">
+              Don't have an account yet?{" "}
+              <Link to="/signup" className="text-brand-purple hover:underline">
+                Sign up
+              </Link>
+            </p>
           </form>
         </div>
       </main>

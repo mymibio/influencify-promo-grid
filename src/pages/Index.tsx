@@ -1,11 +1,14 @@
 
+import Navbar from "@/components/ui/navbar";
 import Hero from "@/components/landing/hero";
 import Features from "@/components/landing/features";
+import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
     <div className="min-h-screen flex flex-col">
+      <Navbar />
       <main className="flex-1">
         <Hero />
         <Features />
@@ -69,6 +72,13 @@ const Index = () => {
                   Join thousands of influencers who are monetizing their social media presence.
                 </p>
               </div>
+              <div className="flex flex-col sm:flex-row gap-4 mt-6 animate-fade-in" style={{animationDelay: "200ms"}}>
+                <Link to="/signup">
+                  <Button className="bg-white text-brand-purple hover:bg-white/90 px-8 py-2 rounded-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300">
+                    Get Started For Free
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </section>
@@ -102,3 +112,4 @@ const Index = () => {
 };
 
 export default Index;
+

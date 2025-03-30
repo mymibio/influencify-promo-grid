@@ -1,6 +1,5 @@
-
-import { useState, useEffect } from "react";
-import { User, PromotionalItem, SocialLinks } from "@/types/user";
+import { useState } from "react";
+import { User, PromotionalItem } from "@/types/user";
 import { Button } from "@/components/ui/button";
 import { Instagram, Facebook, MessageCircle, Mail, Youtube, Twitter, Plus, Copy, Link, Pencil, LayoutGrid, BarChart, Palette, Settings } from "lucide-react";
 import SimpleSidebar from "@/components/dashboard/simple-sidebar";
@@ -8,124 +7,93 @@ import AddItemCard from "@/components/dashboard/add-item-card";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
 import PromotionalGrid from "@/components/profile/promotional-grid";
 import ProfilePreview from "@/components/dashboard/profile-preview";
+import ProfileHeader from "@/components/profile/profile-header";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import MobileNavigation from "@/components/dashboard/mobile-navigation";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/context/AuthContext";
+
+const sampleUser: User = {
+  id: "123",
+  username: "fashionista",
+  email: "ashley@example.com",
+  name: "Ashley Johnson",
+  profilePicture: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&h=256&auto=format&fit=crop",
+  bio: "Fashion & lifestyle content creator. Sharing my favorite coupons and deals with you!",
+  socialLinks: {
+    instagram: "fashionista",
+    facebook: "fashionista.style",
+    whatsapp: "+1234567890",
+    twitter: "fashionista",
+    email: "contact@fashionista.com"
+  },
+  createdAt: new Date().toISOString()
+};
+
+const sampleItems: PromotionalItem[] = [
+  {
+    id: "1",
+    userId: "123",
+    title: "Amazon Summer Sale",
+    description: "Get 20% off on all summer essentials",
+    image: "https://images.unsplash.com/photo-1607083206968-13611e3d76db?q=80&w=2340&h=1000&auto=format&fit=crop",
+    url: "https://amazon.com",
+    type: "coupon",
+    aspectRatio: "9:16",
+    couponCode: "SUMMER20",
+    discount: "20% OFF",
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "2",
+    userId: "123",
+    title: "Sephora Beauty Insider",
+    description: "Exclusive discount for beauty products",
+    image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=2340&h=1000&auto=format&fit=crop",
+    url: "https://sephora.com",
+    type: "coupon",
+    aspectRatio: "9:16",
+    couponCode: "BEAUTY15",
+    discount: "15% OFF",
+    createdAt: new Date().toISOString()
+  }
+];
 
 const Dashboard = () => {
-  const { user } = useAuth();
-  const [userProfile, setUserProfile] = useState<User | null>(null);
-  const [items, setItems] = useState<PromotionalItem[]>([]);
+  const [user, setUser] = useState(sampleUser);
+  const [items, setItems] = useState(sampleItems);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
   const [isSocialDialogOpen, setIsSocialDialogOpen] = useState(false);
   const [isEditingBio, setIsEditingBio] = useState(false);
-  const [editedBio, setEditedBio] = useState("");
+  const [editedBio, setEditedBio] = useState(user.bio || "");
   const [currentDraggedItem, setCurrentDraggedItem] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<PromotionalItem | null>(null);
   const [selectedTheme, setSelectedTheme] = useState("default");
   const [currentSocialPlatform, setCurrentSocialPlatform] = useState<string>("");
   const [socialHandle, setSocialHandle] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(true);
   const isMobile = useIsMobile();
-  
-  // Fetch user profile data
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (!user) return;
-      
-      try {
-        const { data, error } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-          
-        if (error) throw error;
-        
-        if (data) {
-          // Convert social_links from JSON to SocialLinks type
-          const socialLinks: SocialLinks = data.social_links ? 
-            (data.social_links as Record<string, string>) : 
-            {};
-          
-          setUserProfile({
-            id: data.id,
-            username: data.username,
-            email: data.email,
-            name: data.name,
-            profilePicture: data.profile_picture,
-            bio: data.bio || "",
-            socialLinks: socialLinks,
-            categories: data.categories || [],
-            createdAt: data.created_at
-          });
-          setEditedBio(data.bio || "");
-        }
-        
-        // Fetch promotional items
-        const { data: itemsData, error: itemsError } = await supabase
-          .from('promotional_items')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('position');
-          
-        if (itemsError) throw itemsError;
-        
-        if (itemsData) {
-          const typedItems: PromotionalItem[] = itemsData.map(item => ({
-            id: item.id,
-            userId: item.user_id,
-            title: item.title,
-            description: item.description,
-            image: item.image,
-            url: item.url,
-            // Ensure type is always one of the allowed values
-            type: (item.type === 'product' || item.type === 'coupon') ? item.type : 'product',
-            // Ensure aspectRatio is always one of the allowed values
-            aspectRatio: (item.aspect_ratio === '1:1' || item.aspect_ratio === '9:16') ? item.aspect_ratio : '9:16',
-            couponCode: item.coupon_code,
-            discount: item.discount,
-            category: item.category,
-            createdAt: item.created_at
-          }));
-          
-          setItems(typedItems);
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        toast.error("Failed to load your profile data");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchUserProfile();
-  }, [user]);
   
   const getInitials = (name: string) => {
     return name
-      ? name
-          .split(" ")
-          .map((n) => n[0])
-          .join("")
-          .toUpperCase()
-      : "";
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
   };
   
   const handleAddItem = () => {
     setIsDialogOpen(true);
   };
   
+  const handleAddNewItem = (newItem: PromotionalItem) => {
+    setItems((prevItems) => [...prevItems, newItem]);
+  };
+  
   const handleCopyLink = () => {
-    if (!userProfile) return;
-    
-    const shareableLink = `linkpromo.io/${userProfile.username}`;
+    const shareableLink = `linkpromo.io/${user.username}`;
     navigator.clipboard.writeText(shareableLink)
       .then(() => {
         toast.success("Link copied to clipboard!");
@@ -139,29 +107,13 @@ const Dashboard = () => {
     setIsEditingBio(true);
   };
 
-  const handleSaveBio = async () => {
-    if (!user) return;
-    
-    try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({ bio: editedBio })
-        .eq('id', user.id);
-        
-      if (error) throw error;
-      
-      // Update local state
-      setUserProfile(prev => prev ? {
-        ...prev,
-        bio: editedBio
-      } : null);
-      
-      setIsEditingBio(false);
-      toast.success("Bio updated successfully!");
-    } catch (error) {
-      console.error("Error updating bio:", error);
-      toast.error("Failed to update bio");
-    }
+  const handleSaveBio = () => {
+    setUser(prev => ({
+      ...prev,
+      bio: editedBio
+    }));
+    setIsEditingBio(false);
+    toast.success("Bio updated successfully!");
   };
   
   const handleEditCard = (id: string) => {
@@ -173,21 +125,9 @@ const Dashboard = () => {
     }
   };
 
-  const handleDeleteCard = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('promotional_items')
-        .delete()
-        .eq('id', id);
-        
-      if (error) throw error;
-      
-      setItems(prevItems => prevItems.filter(item => item.id !== id));
-      toast.success("Item deleted successfully");
-    } catch (error) {
-      console.error("Error deleting item:", error);
-      toast.error("Failed to delete item");
-    }
+  const handleDeleteCard = (id: string) => {
+    setItems(prevItems => prevItems.filter(item => item.id !== id));
+    toast.success("Item deleted successfully");
   };
 
   const handleDragCard = (id: string) => {
@@ -195,202 +135,81 @@ const Dashboard = () => {
     toast.info("Drag the card to reorder your items");
   };
   
-  const handleReorderCards = async (reorderedItems: PromotionalItem[]) => {
-    try {
-      // Update positions in database
-      for (let i = 0; i < reorderedItems.length; i++) {
-        await supabase
-          .from('promotional_items')
-          .update({ position: i })
-          .eq('id', reorderedItems[i].id);
-      }
-      
-      setItems(reorderedItems);
-    } catch (error) {
-      console.error("Error reordering items:", error);
-      toast.error("Failed to save the new order");
-    }
+  const handleReorderCards = (reorderedItems: PromotionalItem[]) => {
+    setItems(reorderedItems);
   };
   
-  const handleSaveItem = async (updatedItem: PromotionalItem) => {
-    if (!user) return;
-    
-    try {
-      if (editingItem) {
-        // Update existing item
-        const { error } = await supabase
-          .from('promotional_items')
-          .update({
-            title: updatedItem.title,
-            description: updatedItem.description,
-            image: updatedItem.image,
-            url: updatedItem.url,
-            type: updatedItem.type,
-            aspect_ratio: updatedItem.aspectRatio,
-            coupon_code: updatedItem.couponCode,
-            discount: updatedItem.discount,
-            category: updatedItem.category
-          })
-          .eq('id', updatedItem.id);
-          
-        if (error) throw error;
-        
-        setItems(prevItems => 
-          prevItems.map(item => 
-            item.id === updatedItem.id ? updatedItem : item
-          )
-        );
-        toast.success("Item updated successfully");
-      } else {
-        // Create new item
-        const { data, error } = await supabase
-          .from('promotional_items')
-          .insert({
-            user_id: user.id,
-            title: updatedItem.title,
-            description: updatedItem.description,
-            image: updatedItem.image,
-            url: updatedItem.url,
-            type: updatedItem.type,
-            aspect_ratio: updatedItem.aspectRatio,
-            coupon_code: updatedItem.couponCode,
-            discount: updatedItem.discount,
-            category: updatedItem.category,
-            position: items.length
-          })
-          .select()
-          .single();
-          
-        if (error) throw error;
-        
-        if (data) {
-          const newItem: PromotionalItem = {
-            id: data.id,
-            userId: data.user_id,
-            title: data.title,
-            description: data.description,
-            image: data.image,
-            url: data.url,
-            // Ensure type is always one of the allowed values
-            type: (data.type === 'product' || data.type === 'coupon') ? data.type : 'product',
-            // Ensure aspectRatio is always one of the allowed values
-            aspectRatio: (data.aspect_ratio === '1:1' || data.aspect_ratio === '9:16') ? data.aspect_ratio : '9:16',
-            couponCode: data.coupon_code,
-            discount: data.discount,
-            category: data.category,
-            createdAt: data.created_at
-          };
-          
-          setItems(prevItems => [...prevItems, newItem]);
-          toast.success("New item added successfully");
-        }
-      }
-    } catch (error) {
-      console.error("Error saving item:", error);
-      toast.error("Failed to save item");
-    } finally {
-      setEditingItem(null);
-      setIsDialogOpen(false);
+  const handleSaveItem = (updatedItem: PromotionalItem) => {
+    if (editingItem) {
+      setItems(prevItems => 
+        prevItems.map(item => 
+          item.id === updatedItem.id ? updatedItem : item
+        )
+      );
+      toast.success("Item updated successfully");
+    } else {
+      setItems(prevItems => [...prevItems, updatedItem]);
+      toast.success("New item added successfully");
     }
+    
+    setEditingItem(null);
+    setIsDialogOpen(false);
   };
 
-  const handleEditProfilePicture = async (file: File) => {
-    if (!user) return;
+  const handleEditProfilePicture = (file: File) => {
+    const imageUrl = URL.createObjectURL(file);
     
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}-profile-${Date.now()}.${fileExt}`;
-      
-      // Upload to storage
-      const { data, error } = await supabase.storage
-        .from('profile_pictures')
-        .upload(fileName, file);
-        
-      if (error) throw error;
-      
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('profile_pictures')
-        .getPublicUrl(fileName);
-      
-      // Update profile
-      await supabase
-        .from('user_profiles')
-        .update({ profile_picture: publicUrl })
-        .eq('id', user.id);
-      
-      setUserProfile(prev => prev ? {
-        ...prev,
-        profilePicture: publicUrl
-      } : null);
-      
-      toast.success("Profile picture updated successfully!");
-    } catch (error) {
-      console.error("Error updating profile picture:", error);
-      toast.error("Failed to update profile picture");
-    }
+    setUser(prev => ({
+      ...prev,
+      profilePicture: imageUrl
+    }));
+    
+    toast.success("Profile picture updated successfully!");
   };
   
   const handleAddSocialMedia = () => {
     setIsSocialDialogOpen(true);
   };
 
-  const handleSaveSocialMedia = async () => {
-    if (!user || !userProfile) return;
-    
+  const handleSaveSocialMedia = () => {
     if (currentSocialPlatform && socialHandle) {
-      try {
-        const updatedSocialLinks = {
-          ...(userProfile.socialLinks || {}),
+      setUser(prev => ({
+        ...prev,
+        socialLinks: {
+          ...prev.socialLinks,
           [currentSocialPlatform.toLowerCase()]: socialHandle
-        };
-        
-        const { error } = await supabase
-          .from('user_profiles')
-          .update({ social_links: updatedSocialLinks })
-          .eq('id', user.id);
-          
-        if (error) throw error;
-        
-        setUserProfile(prev => prev ? {
-          ...prev,
-          socialLinks: updatedSocialLinks
-        } : null);
-        
-        setIsSocialDialogOpen(false);
-        setSocialHandle("");
-        setCurrentSocialPlatform("");
-        toast.success(`${currentSocialPlatform} link added successfully!`);
-      } catch (error) {
-        console.error("Error saving social media:", error);
-        toast.error("Failed to save social media link");
-      }
+        }
+      }));
+      setIsSocialDialogOpen(false);
+      setSocialHandle("");
+      setCurrentSocialPlatform("");
+      toast.success(`${currentSocialPlatform} link added successfully!`);
     }
   };
 
-  const handleDeleteSocialLink = async (platform: string) => {
-    if (!user || !userProfile || !userProfile.socialLinks) return;
-    
-    try {
-      const updatedSocialLinks = { ...userProfile.socialLinks };
-      delete updatedSocialLinks[platform as keyof typeof userProfile.socialLinks];
+  const handleDeleteSocialLink = (platform: string) => {
+    if (user.socialLinks) {
+      const updatedSocialLinks = { ...user.socialLinks };
+      delete updatedSocialLinks[platform as keyof typeof user.socialLinks];
       
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({ social_links: updatedSocialLinks })
-        .eq('id', user.id);
-        
-      if (error) throw error;
-      
-      setUserProfile(prev => prev ? {
+      setUser(prev => ({
         ...prev,
         socialLinks: updatedSocialLinks
-      } : null);
+      }));
       
       toast.success(`${platform} link removed successfully!`);
-    } catch (error) {
-      console.error("Error removing social link:", error);
-      toast.error("Failed to remove social media link");
+    }
+  };
+
+  const handleEditSocialLink = (platform: string, handle: string) => {
+    if (user.socialLinks) {
+      setUser(prev => ({
+        ...prev,
+        socialLinks: {
+          ...prev.socialLinks,
+          [platform]: handle
+        }
+      }));
     }
   };
 
@@ -413,27 +232,6 @@ const Dashboard = () => {
     }
   };
   
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
-      </div>
-    );
-  }
-  
-  // If no user profile found, show placeholder
-  if (!userProfile) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <h2 className="text-2xl font-bold mb-4">Welcome to Your Dashboard</h2>
-        <p className="text-center text-gray-600 mb-6">
-          We're setting up your profile. Please refresh the page in a moment.
-        </p>
-        <Button onClick={() => window.location.reload()}>Refresh Page</Button>
-      </div>
-    );
-  }
-  
   return (
     <div className="flex min-h-screen w-full bg-gray-50 pb-16 md:pb-0">
       <SimpleSidebar />
@@ -450,7 +248,7 @@ const Dashboard = () => {
             {!isMobile && (
               <div className="hidden lg:block">
                 <ProfilePreview 
-                  user={userProfile}
+                  user={user}
                   items={items}
                   selectedTheme={selectedTheme}
                   className="w-full"
@@ -463,15 +261,15 @@ const Dashboard = () => {
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-6 p-4 sm:p-6">
                   <div className="relative">
                     <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden flex-shrink-0 border-2 border-white shadow-md">
-                      {userProfile.profilePicture ? (
+                      {user.profilePicture ? (
                         <img 
-                          src={userProfile.profilePicture} 
-                          alt={userProfile.name}
+                          src={user.profilePicture} 
+                          alt={user.name}
                           className="w-full h-full object-cover"
                         />
                       ) : (
                         <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                          <span className="text-xl font-semibold">{getInitials(userProfile.name)}</span>
+                          <span className="text-xl font-semibold">{user.name.charAt(0)}</span>
                         </div>
                       )}
                     </div>
@@ -485,10 +283,10 @@ const Dashboard = () => {
                   </div>
                   
                   <div className="flex-1 flex flex-col text-center md:text-left">
-                    <h1 className="text-2xl sm:text-3xl font-bold">{userProfile.name}</h1>
+                    <h1 className="text-2xl sm:text-3xl font-bold">{user.name}</h1>
                     
                     <div className="text-muted-foreground text-sm mb-2">
-                      @{userProfile.username}
+                      @{user.username}
                     </div>
                     
                     {isEditingBio ? (
@@ -517,7 +315,7 @@ const Dashboard = () => {
                     ) : (
                       <div className="relative group">
                         <p className="text-sm sm:text-base text-gray-600 max-w-lg">
-                          {userProfile.bio || "Add a bio to tell people about yourself..."}
+                          {user.bio}
                         </p>
                         <Button 
                           variant="ghost" 
@@ -533,7 +331,7 @@ const Dashboard = () => {
                 </div>
                 
                 <div className="flex flex-wrap gap-2 justify-center pb-6">
-                  {userProfile.socialLinks && Object.entries(userProfile.socialLinks).map(([platform, handle]) => (
+                  {user.socialLinks && Object.entries(user.socialLinks).map(([platform, handle]) => (
                     <div 
                       key={platform} 
                       className="relative group"
@@ -544,7 +342,7 @@ const Dashboard = () => {
                         className="h-10 w-10 rounded-full"
                         onClick={() => {
                           setCurrentSocialPlatform(platform);
-                          setSocialHandle(handle as string);
+                          setSocialHandle(handle);
                           setIsSocialDialogOpen(true);
                         }}
                       >
@@ -573,7 +371,7 @@ const Dashboard = () => {
                   <div className="flex items-center gap-2">
                     <Link size={18} className="text-blue-500" />
                     <span className="text-sm">
-                      Your LinkPromo is live: <span className="text-blue-500 font-medium">linkpromo.io/{userProfile.username}</span>
+                      Your LinkPromo is live: <span className="text-blue-500 font-medium">linkpromo.io/{user.username}</span>
                     </span>
                   </div>
                   <Button 
@@ -657,8 +455,8 @@ const Dashboard = () => {
               <Label htmlFor="username">Username</Label>
               <Input 
                 id="username" 
-                value={userProfile.username} 
-                onChange={(e) => setUserProfile(prev => prev ? ({ ...prev, username: e.target.value }) : null)} 
+                value={user.username} 
+                onChange={(e) => setUser(prev => ({ ...prev, username: e.target.value }))} 
                 placeholder="Enter your username"
               />
             </div>

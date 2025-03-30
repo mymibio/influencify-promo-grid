@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -37,31 +38,19 @@ const Hero = () => {
     setIsChecking(true);
     
     try {
-      // Check if the username is already taken in the database
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('username')
-        .eq('username', username);
+      // Here we would check if the username is available
+      // For this demo, we'll simulate a check with a timeout
+      // In a real implementation, you'd query your database
       
-      if (error) {
-        throw error;
-      }
-      
-      // If data exists and has length > 0, username is taken
-      if (data && data.length > 0) {
-        toast.error("Username is already taken. Please choose another one.");
+      // Simulated check - replace with actual Supabase query in the future
+      setTimeout(() => {
+        toast.success("Username is available! Continue to sign up.");
+        navigate(`/signup?username=${username}`);
         setIsChecking(false);
-        return;
-      }
-      
-      // Username is available, redirect to signup page with username as parameter
-      toast.success("Username is available! Continue to sign up.");
-      navigate(`/signup?username=${username}`);
+      }, 1000);
       
     } catch (error) {
-      console.error("Error checking username:", error);
-      toast.error("Error checking username availability");
-    } finally {
+      toast.error("Error checking username");
       setIsChecking(false);
     }
   };
@@ -131,14 +120,19 @@ const Hero = () => {
             <div className="text-xs text-gray-500 mt-2 text-center">
               Claim your unique link before someone else takes it!
             </div>
-            
-            {/* Add sign in link below the "Claim your unique link..." text */}
-            <div className="text-center mt-4">
-              <Link to="/login" className="text-sm text-brand-purple hover:underline font-medium inline-flex items-center gap-1 transition-all hover:gap-2">
-                Already have an account? Sign in
-                <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
+          </div>
+          
+          <div className={`flex flex-col sm:flex-row gap-4 mt-8 transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <Link to="/signup">
+              <Button className="bg-brand-purple hover:bg-brand-dark-purple text-white px-8 py-6 rounded-lg text-lg shadow-lg hover:shadow-xl transition-all hover:scale-105">
+                Get Started — It's Free
+              </Button>
+            </Link>
+            <Link to="/examples">
+              <Button variant="outline" className="px-8 py-6 text-lg hover:bg-gray-100 transition-all hover:scale-105">
+                See Examples
+              </Button>
+            </Link>
           </div>
           
           {/* Social proof */}
@@ -170,3 +164,4 @@ const Hero = () => {
 };
 
 export default Hero;
+
