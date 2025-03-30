@@ -32,10 +32,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return null;
       }
 
-      // Convert the jsonb social_links to a SocialLinks object
+      // Map from snake_case DB fields to camelCase User type
       const profileData: AppUser = {
-        ...data,
+        id: data.id,
+        username: data.username,
+        email: data.email,
+        name: data.name,
+        profilePicture: data.profile_picture,
+        bio: data.bio,
         socialLinks: data.social_links as AppUser['socialLinks'] || {},
+        categories: data.categories,
+        createdAt: data.created_at,
       };
 
       return profileData;
