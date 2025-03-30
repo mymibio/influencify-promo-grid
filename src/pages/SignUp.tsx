@@ -61,6 +61,30 @@ const SignUp = () => {
     }
   };
 
+  // Check if email already exists in auth system
+  const checkEmailExists = async (email: string) => {
+    try {
+      // We can only indirectly check if an email exists by attempting to sign in with 
+      // an invalid password and checking the error message
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: "deliberately-wrong-password-for-check"
+      });
+      
+      // If the error message mentions "Invalid login credentials", the email exists
+      // If it mentions "Email not confirmed", the email exists but needs verification
+      if (error && (error.message.includes("Invalid login credentials") || 
+                     error.message.includes("Email not confirmed"))) {
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error("Error checking email:", error);
+      return false; // Assume email doesn't exist if check fails
+    }
+  };
+
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
@@ -119,6 +143,14 @@ const SignUp = () => {
         return;
       }
       
+      // Check if email already exists
+      const emailExists = await checkEmailExists(formData.email);
+      if (emailExists) {
+        setFormError("This email is already registered. Please log in instead.");
+        setIsLoading(false);
+        return;
+      }
+      
       // Register user with Supabase Auth
       const { data, error } = await supabase.auth.signUp({
         email: formData.email,
@@ -136,6 +168,20 @@ const SignUp = () => {
       
       if (data && data.user) {
         try {
+          // Check if profile already exists before inserting
+          const { data: existingProfile } = await supabase
+            .from('user_profiles')
+            .select('id')
+            .eq('id', data.user.id)
+            .maybeSingle();
+          
+          if (existingProfile) {
+            console.log("Profile already exists for this user, skipping creation");
+            toast.success("Account created successfully! Redirecting to dashboard...");
+            navigate("/dashboard");
+            return;
+          }
+          
           // Insert a record in user_profiles table
           const { error: profileError } = await supabase
             .from('user_profiles')
@@ -150,7 +196,14 @@ const SignUp = () => {
             
           if (profileError) {
             console.error("Error creating user profile:", profileError);
-            throw profileError;
+            
+            if (profileError.message.includes("user_profiles_pkey")) {
+              // If the error is a duplicate key constraint, the user profile already exists
+              // This is not really an error for the user, so we can continue
+              console.log("Profile already exists, continuing with login");
+            } else {
+              throw profileError;
+            }
           }
           
           toast.success("Account created successfully! Redirecting to dashboard...");
@@ -170,7 +223,7 @@ const SignUp = () => {
         if (error.message.includes("user_profiles_username_key")) {
           setFormError("Username already taken. Please choose another one.");
         } else if (error.message.includes("user_profiles_pkey")) {
-          setFormError("An account with this email already exists.");
+          setFormError("An account with this email already exists. Please log in instead.");
         } else {
           setFormError(error.message || "Failed to create account. Please try again.");
         }

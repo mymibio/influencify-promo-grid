@@ -69,6 +69,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .single();
       
       if (error) {
+        // If we get a duplicate key error, it means the profile already exists but we missed it
+        if (error.message.includes("user_profiles_pkey")) {
+          console.log("Duplicate profile creation attempted, fetching existing profile instead");
+          
+          const { data: existingData, error: fetchError } = await supabase
+            .from('user_profiles')
+            .select('*')
+            .eq('id', userId)
+            .single();
+            
+          if (fetchError) {
+            console.error("Error fetching existing user profile:", fetchError);
+            return null;
+          }
+          
+          return {
+            id: existingData.id,
+            username: existingData.username,
+            email: existingData.email,
+            name: existingData.name,
+            profilePicture: existingData.profile_picture,
+            bio: existingData.bio,
+            socialLinks: existingData.social_links as AppUser['socialLinks'] || {},
+            categories: existingData.categories,
+            createdAt: existingData.created_at,
+          };
+        }
+        
         console.error("Error creating user profile:", error);
         return null;
       }
