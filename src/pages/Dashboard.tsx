@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { PromotionalItem } from "@/types/user";
 import { Button } from "@/components/ui/button";
-import { Plus, Copy, Link, Pencil } from "lucide-react";
+import { Plus, Copy, Link, Pencil, X, Check } from "lucide-react";
 import SimpleSidebar from "@/components/dashboard/simple-sidebar";
 import AddItemCard from "@/components/dashboard/add-item-card";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { v4 as uuidv4 } from "uuid";
 import SocialMediaSelector from "@/components/social/SocialMediaSelector";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
 
 const Dashboard = () => {
   const { profile, refreshProfile } = useAuth();
@@ -26,6 +27,7 @@ const Dashboard = () => {
   const [isSocialSelectorOpen, setIsSocialSelectorOpen] = useState(false);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [editedBio, setEditedBio] = useState(profile?.bio || "");
+  const bioInputRef = useRef<HTMLTextAreaElement>(null);
   const [currentDraggedItem, setCurrentDraggedItem] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<PromotionalItem | null>(null);
   const [selectedTheme, setSelectedTheme] = useState("default");
@@ -40,6 +42,33 @@ const Dashboard = () => {
       fetchUserItems();
     }
   }, [profile]);
+
+  useEffect(() => {
+    // Focus on the bio input when editing starts
+    if (isEditingBio && bioInputRef.current) {
+      bioInputRef.current.focus();
+    }
+  }, [isEditingBio]);
+
+  // Handle clicks outside the bio edit area to save
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (isEditingBio && 
+          bioInputRef.current && 
+          !bioInputRef.current.contains(e.target as Node) &&
+          !(e.target as HTMLElement).closest('.edit-bio-controls')) {
+        handleSaveBio();
+      }
+    };
+
+    if (isEditingBio) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isEditingBio, editedBio]);
 
   const fetchUserItems = async () => {
     if (!profile) return;
@@ -132,6 +161,13 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Error updating bio:", error);
       toast.error("Failed to update bio");
+    }
+  };
+
+  const handleBioInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSaveBio();
     }
   };
   
@@ -405,34 +441,53 @@ const Dashboard = () => {
                   <div className="flex-1 flex flex-col text-center md:text-left">
                     <h1 className="text-2xl font-bold">{profile?.name}</h1>
                     
-                    {!isEditingBio ? (
-                      <p className="text-gray-600 mb-3">
-                        {profile.bio || "Add bio"}
-                      </p>
-                    ) : (
-                      <div className="flex flex-col gap-2 mb-3">
-                        <Input
-                          value={editedBio}
-                          onChange={(e) => setEditedBio(e.target.value)}
-                          className="text-sm"
-                        />
-                        <div className="flex gap-2 justify-end">
+                    <div className="relative mb-3">
+                      {!isEditingBio ? (
+                        <div className="group flex items-start">
+                          <p className="text-gray-600 pr-6">
+                            {profile.bio || "Add bio"}
+                          </p>
                           <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => setIsEditingBio(false)}
+                            size="icon" 
+                            variant="ghost" 
+                            className="h-6 w-6 absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={handleEditBio}
                           >
-                            Cancel
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            onClick={handleSaveBio}
-                          >
-                            Save
+                            <Pencil size={14} />
                           </Button>
                         </div>
-                      </div>
-                    )}
+                      ) : (
+                        <div className="flex flex-col gap-2">
+                          <Textarea
+                            ref={bioInputRef}
+                            value={editedBio}
+                            onChange={(e) => setEditedBio(e.target.value)}
+                            onKeyDown={handleBioInputKeyDown}
+                            placeholder="Write your bio..."
+                            className="text-sm resize-none min-h-[60px]"
+                            rows={3}
+                          />
+                          <div className="flex gap-2 justify-end edit-bio-controls">
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => {
+                                setIsEditingBio(false);
+                                setEditedBio(profile.bio || "");
+                              }}
+                            >
+                              <X size={14} className="mr-1" /> Cancel
+                            </Button>
+                            <Button 
+                              size="sm"
+                              onClick={handleSaveBio}
+                            >
+                              <Check size={14} className="mr-1" /> Save
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                     
                     <Button
                       onClick={openSocialSelector}
@@ -474,37 +529,19 @@ const Dashboard = () => {
                   <p className="text-white">Loading your promotional items...</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-4">
-                  {items.length > 0 ? (
-                    <PromotionalGrid 
-                      items={items} 
-                      onEdit={handleEditCard}
-                      onDelete={handleDeleteCard}
-                      onDrag={handleDragCard}
-                      onReorder={handleReorderCards}
-                      editable={true}
-                    />
-                  ) : (
-                    <div className="col-span-2 flex items-center justify-center bg-white/20 rounded-xl border-2 border-white/30 border-dashed p-8 h-64">
-                      <div className="text-center">
-                        <div className="text-white text-4xl mb-2">+</div>
-                        <p className="text-white mb-2">Add your first coupon</p>
-                        <Button 
-                          onClick={() => {
-                            setEditingItem(null);
-                            setIsDialogOpen(true);
-                          }}
-                          variant="secondary"
-                        >
-                          Add Coupon
-                        </Button>
-                      </div>
-                    </div>
-                  )}
+                <div className="grid grid-cols-1 gap-4">
+                  <PromotionalGrid 
+                    items={items} 
+                    onEdit={handleEditCard}
+                    onDelete={handleDeleteCard}
+                    onDrag={handleDragCard}
+                    onReorder={handleReorderCards}
+                    editable={true}
+                  />
                   
                   {/* Add new coupon card */}
                   <div 
-                    className="flex items-center justify-center bg-white/20 rounded-xl border-2 border-white/30 border-dashed p-8 cursor-pointer hover:bg-white/30 transition-colors"
+                    className="flex items-center justify-center bg-white/20 rounded-xl border-2 border-white/30 border-dashed p-8 cursor-pointer hover:bg-white/30 transition-colors h-[200px]"
                     onClick={() => {
                       setEditingItem(null);
                       setIsDialogOpen(true);
@@ -624,10 +661,11 @@ const Dashboard = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="bio">Bio</Label>
-                <Input 
+                <Textarea 
                   id="bio" 
                   value={editedBio}
                   onChange={(e) => setEditedBio(e.target.value)}
+                  rows={4}
                 />
               </div>
               <div className="pt-4 flex justify-end">

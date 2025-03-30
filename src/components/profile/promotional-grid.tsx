@@ -1,7 +1,9 @@
+
 import { PromotionalItem } from "@/types/user";
 import { PromotionalCard } from "@/components/cards/promotional-card";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Plus } from "lucide-react";
 
 interface PromotionalGridProps {
   items: PromotionalItem[];
@@ -109,9 +111,21 @@ const PromotionalGrid = ({
     handleDragEnd();
   };
 
+  // Calculate the grid layout based on the number of items
+  const getGridClass = () => {
+    if (displayItems.length === 0) {
+      return "grid-cols-2"; // Show 2 empty placeholders when no items
+    } else if (displayItems.length === 1) {
+      return "grid-cols-2"; // Show the item and one placeholder
+    } else {
+      return "grid-cols-2"; // Always maintain 2 columns 
+    }
+  };
+
   return (
     <div className="w-full">
-      <div className="grid grid-cols-2 gap-3 sm:gap-4">
+      <div className={`grid ${getGridClass()} gap-3 sm:gap-4`}>
+        {/* Render existing items */}
         {displayItems.map((item) => (
           <div 
             key={item.id} 

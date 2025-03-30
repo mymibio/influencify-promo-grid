@@ -5,6 +5,7 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from "@/components/ui/drawer"
 
 import { cn } from "@/lib/utils"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 const Popover = PopoverPrimitive.Root
 
@@ -66,9 +67,11 @@ const PopoverContent = React.forwardRef<
             <DrawerTitle>{mobileTitle || "Options"}</DrawerTitle>
             <DrawerClose />
           </DrawerHeader>
-          <div className="px-4 pb-6 overflow-y-auto max-h-[calc(85vh-4rem)]">
-            {children}
-          </div>
+          <ScrollArea className="px-4 pb-6 max-h-[calc(85vh-4rem)]">
+            <div className="p-1">
+              {children}
+            </div>
+          </ScrollArea>
         </DrawerContent>
       </Drawer>
     );
@@ -82,14 +85,16 @@ const PopoverContent = React.forwardRef<
         sideOffset={sideOffset}
         className={cn(
           "z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-          "max-w-[calc(100vw-2rem)] max-h-[85vh] overflow-auto sm:max-w-md",
+          "max-w-[calc(100vw-2rem)] max-h-[85vh] sm:max-w-md",
           className
         )}
         {...props}
       >
-        <div className="overflow-y-auto max-h-[60vh]">
-          {children}
-        </div>
+        <ScrollArea viewportClassName="max-h-[60vh]">
+          <div className="p-1">
+            {children}
+          </div>
+        </ScrollArea>
       </PopoverPrimitive.Content>
     </PopoverPrimitive.Portal>
   );
