@@ -403,26 +403,24 @@ const SocialMediaSelector = ({
         </div>
         
         <div className="overflow-auto max-h-[60vh]">
-          <Command>
-            <CommandGroup>
-              {filteredPlatforms.length === 0 && (
-                <CommandEmpty className="py-6 text-center">No results found</CommandEmpty>
-              )}
-              {filteredPlatforms.map(platform => (
-                <CommandItem
-                  key={platform.key}
-                  onSelect={() => handleSelect(platform)}
-                  className="flex items-center gap-3 p-3 cursor-pointer rounded-lg hover:bg-accent"
-                >
-                  <div className={`flex items-center justify-center p-2 rounded-full bg-gray-100 ${platform.color}`}>
-                    <platform.icon className="h-5 w-5" />
-                  </div>
-                  <span className="font-medium">{platform.name}</span>
-                  <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </Command>
+          <div className="space-y-1">
+            {filteredPlatforms.length === 0 && (
+              <div className="py-6 text-center text-sm text-muted-foreground">No results found</div>
+            )}
+            {filteredPlatforms.map((platform) => (
+              <div
+                key={platform.key}
+                onClick={() => handleSelect(platform)}
+                className="flex items-center gap-3 p-3 cursor-pointer rounded-lg hover:bg-accent"
+              >
+                <div className={`flex items-center justify-center p-2 rounded-full bg-gray-100 ${platform.color}`}>
+                  <platform.icon className="h-5 w-5" />
+                </div>
+                <span className="font-medium">{platform.name}</span>
+                <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
