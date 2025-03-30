@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle, Sparkles } from "lucide-react";
 
 const Hero = () => {
   const [username, setUsername] = useState("");
@@ -84,39 +84,36 @@ const Hero = () => {
   };
 
   return (
-    <section className="py-20 md:py-28 overflow-hidden relative">
-      {/* Decorative elements */}
-      <div className="absolute top-10 right-10 animate-spin-slow">
-        <div className="h-20 w-20 rounded-full bg-gradient-to-r from-pink-500 to-brand-purple opacity-30 blur-xl"></div>
-      </div>
-      <div className="absolute bottom-10 left-10">
-        <div className="h-32 w-32 rounded-full bg-gradient-to-r from-brand-light-purple to-blue-400 opacity-20 blur-xl"></div>
-      </div>
+    <section className="relative pt-24 pb-20 md:pt-32 md:pb-28 overflow-hidden">
+      {/* Background elements */}
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white via-gray-50 to-blue-50 opacity-80"></div>
+      <div className="absolute top-20 right-10 w-72 h-72 bg-gradient-to-r from-brand-light-purple/20 to-blue-300/20 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-10 left-10 w-64 h-64 bg-gradient-to-r from-brand-purple/10 to-pink-300/10 rounded-full blur-3xl"></div>
       
       <div className="container px-4 md:px-6 relative">
-        <div className="flex flex-col items-center space-y-4 text-center">
-          <div className="space-y-2 max-w-5xl">
-            <div className={`inline-block mb-4 rounded-full bg-brand-purple/10 px-3 py-1 text-sm font-semibold text-brand-purple transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col items-center text-center mb-16">
+            <div className={`inline-block mb-6 rounded-full bg-brand-purple/10 px-3 py-1 text-sm font-semibold text-brand-purple transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
               <span className="inline-flex items-center gap-1">
                 <Sparkles className="h-3.5 w-3.5" />
-                <span>Introducing Influencify — The best link for Instagram bios</span>
+                <span>Introducing Influencify — Monetize your Instagram bio</span>
                 <Sparkles className="h-3.5 w-3.5" />
               </span>
             </div>
             
-            <h1 className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <h1 className={`text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-tight transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
               Turn Your Instagram Bio Into a
-              <div className="text-transparent bg-clip-text bg-gradient-to-r from-brand-purple via-brand-light-purple to-brand-purple animate-gradient-x inline-block"> Money-Making Machine</div>
+              <div className="text-transparent bg-clip-text bg-gradient-to-r from-brand-purple via-brand-light-purple to-pink-500 inline-block ml-2">Money-Making Machine</div>
             </h1>
             
-            <p className={`mx-auto max-w-[800px] text-gray-500 md:text-xl dark:text-gray-400 mt-6 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <p className={`mx-auto max-w-[700px] text-gray-600 text-lg md:text-xl mt-6 transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
               Create a beautiful product showcase that converts your followers into customers.
-              Share exclusive discounts and promotions in one stunning link.
+              Share exclusive discounts in one stunning link.
             </p>
           </div>
           
-          {/* Username claim section */}
-          <div className={`w-full max-w-md mt-8 bg-white p-4 md:p-6 rounded-xl shadow-xl border border-gray-100 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+          {/* Signup form */}
+          <div className={`w-full max-w-md mx-auto mt-12 bg-white p-4 md:p-6 rounded-xl shadow-xl border border-gray-100 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
             <div className="flex gap-2 flex-col sm:flex-row">
               <div className="relative flex-1">
                 <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
@@ -157,22 +154,22 @@ const Hero = () => {
             </div>
           </div>
           
-          <div className={`flex flex-col sm:flex-row gap-4 mt-8 transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <Link to="/signup">
-              <Button className="bg-brand-purple hover:bg-brand-dark-purple text-white px-8 py-6 rounded-lg text-lg shadow-lg hover:shadow-xl transition-all hover:scale-105">
+          <div className={`flex flex-col sm:flex-row gap-4 max-w-md mx-auto mt-8 transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <Link to="/signup" className="flex-1">
+              <Button className="bg-brand-purple hover:bg-brand-dark-purple text-white py-6 rounded-lg text-lg w-full shadow-lg hover:shadow-brand-purple/30 transition-all hover:scale-105">
                 Get Started — It's Free
               </Button>
             </Link>
-            <Link to="/examples">
-              <Button variant="outline" className="px-8 py-6 text-lg hover:bg-gray-100 transition-all hover:scale-105">
+            <Link to="/examples" className="flex-1">
+              <Button variant="outline" className="py-6 text-lg w-full hover:bg-gray-100 transition-all hover:scale-105">
                 See Examples
               </Button>
             </Link>
           </div>
           
           {/* Social proof */}
-          <div className={`mt-10 transition-all duration-1000 delay-900 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <p className="text-sm text-gray-500">Trusted by over 10,000+ creators and influencers</p>
+          <div className={`mt-16 transition-all duration-1000 delay-900 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <p className="text-sm text-center text-gray-500 font-medium">TRUSTED BY 10,000+ CREATORS</p>
             <div className="flex justify-center gap-8 mt-4 grayscale opacity-60">
               <div className="h-8">
                 <span className="font-bold text-xl">instagram</span>
@@ -185,13 +182,46 @@ const Hero = () => {
               </div>
             </div>
           </div>
+          
+          {/* Browser frame with screenshot */}
+          <div className={`mt-20 mb-10 relative transition-all duration-1000 delay-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}>
+            <div className="max-w-5xl mx-auto p-4 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
+              <div className="w-full h-12 bg-gray-100 rounded-t-lg flex items-center px-4 gap-2 border-b">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                  <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                  <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                </div>
+                <div className="ml-4 bg-white px-3 py-1 rounded-md text-xs text-gray-500 flex-1 text-center">
+                  influencify.com/yourname
+                </div>
+              </div>
+              <div className="relative bg-gray-50 aspect-[16/9] overflow-hidden rounded-b-lg">
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-white"></div>
+                <div className="flex justify-center items-center h-full">
+                  <div className="grid grid-cols-2 gap-4 p-6 max-w-3xl">
+                    <div className="bg-white p-4 rounded-lg shadow-md aspect-[9/16] flex flex-col items-center justify-center">
+                      <div className="w-full h-2/3 bg-gradient-to-br from-pink-100 to-purple-100 rounded-lg mb-3"></div>
+                      <div className="w-3/4 h-2 bg-gray-200 rounded-full mb-2"></div>
+                      <div className="w-1/2 h-2 bg-gray-200 rounded-full"></div>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg shadow-md aspect-[9/16] flex flex-col items-center justify-center">
+                      <div className="w-full h-2/3 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg mb-3"></div>
+                      <div className="w-3/4 h-2 bg-gray-200 rounded-full mb-2"></div>
+                      <div className="w-1/2 h-2 bg-gray-200 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Decorative wave */}
+      {/* Subtle wave divider */}
       <div className="absolute bottom-0 left-0 right-0">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" className="w-full">
-          <path fill="#f8f9fa" fillOpacity="1" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,224C672,213,768,171,864,165.3C960,160,1056,192,1152,202.7C1248,213,1344,203,1392,197.3L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" className="w-full">
+          <path fill="#ffffff" fillOpacity="1" d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,100L1360,100C1280,100,1120,100,960,100C800,100,640,100,480,100C320,100,160,100,80,100L0,100Z"></path>
         </svg>
       </div>
     </section>
