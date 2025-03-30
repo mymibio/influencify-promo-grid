@@ -5,9 +5,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, ChevronRight, Search, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, X, Pencil, Check, Plus } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import * as Icons from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { SocialLinks } from "@/types/user";
 
 // Social platform definitions
 export const socialPlatforms = [
@@ -143,16 +145,20 @@ interface SocialMediaSelectorProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (platform: string, handle: string) => void;
+  onDelete?: (platform: string) => void;
   initialPlatform?: string;
   initialHandle?: string;
+  userSocialLinks?: SocialLinks;
 }
 
 const SocialMediaSelector = ({
   isOpen,
   onClose,
   onSave,
+  onDelete,
   initialPlatform = "",
-  initialHandle = ""
+  initialHandle = "",
+  userSocialLinks = {}
 }: SocialMediaSelectorProps) => {
   const isMobile = useIsMobile();
   const [selectedPlatform, setSelectedPlatform] = useState<typeof socialPlatforms[0] | null>(
@@ -160,6 +166,11 @@ const SocialMediaSelector = ({
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [handle, setHandle] = useState(initialHandle);
+  const [isEditingExisting, setIsEditingExisting] = useState(Boolean(initialPlatform && userSocialLinks && initialPlatform in userSocialLinks));
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [activeTab, setActiveTab] = useState<'existing' | 'add'>(
+    Object.keys(userSocialLinks || {}).length > 0 ? 'existing' : 'add'
+  );
   
   useEffect(() => {
     // Update the handle when the initialHandle changes
@@ -172,9 +183,13 @@ const SocialMediaSelector = ({
       const platform = socialPlatforms.find(p => p.key === initialPlatform);
       if (platform) {
         setSelectedPlatform(platform);
+        setIsEditingExisting(Boolean(userSocialLinks && initialPlatform in userSocialLinks));
       }
     }
-  }, [initialPlatform, initialHandle]);
+    
+    // Set the active tab based on whether the user has social links
+    setActiveTab(Object.keys(userSocialLinks || {}).length > 0 ? 'existing' : 'add');
+  }, [initialPlatform, initialHandle, userSocialLinks]);
   
   // Reset state when dialog closes
   useEffect(() => {
@@ -185,6 +200,7 @@ const SocialMediaSelector = ({
         setHandle("");
       }
       setSearchQuery("");
+      setIsAddingNew(false);
     }
   }, [isOpen]);
 
@@ -194,60 +210,134 @@ const SocialMediaSelector = ({
       )
     : socialPlatforms;
   
+  const userPlatforms = Object.entries(userSocialLinks || {}).map(([key, value]) => {
+    const platform = socialPlatforms.find(p => p.key === key);
+    return {
+      key,
+      handle: value,
+      platform
+    };
+  });
+  
   const handleSelect = (platform: typeof socialPlatforms[0]) => {
     setSelectedPlatform(platform);
     setSearchQuery("");
+    // If editing an existing platform, pre-fill the handle
+    if (userSocialLinks && userSocialLinks[platform.key]) {
+      setHandle(userSocialLinks[platform.key] || "");
+      setIsEditingExisting(true);
+    } else {
+      setHandle("");
+      setIsEditingExisting(false);
+    }
   };
   
   const handleSave = () => {
     if (selectedPlatform && handle.trim()) {
       onSave(selectedPlatform.key, handle.trim());
+      setIsAddingNew(false);
+      setSelectedPlatform(null);
+      setHandle("");
     }
   };
   
   const handleBack = () => {
+    if (isAddingNew) {
+      setIsAddingNew(false);
+      setSelectedPlatform(null);
+    } else {
+      setSelectedPlatform(null);
+    }
+  };
+
+  const handleAddNewClick = () => {
+    setIsAddingNew(true);
     setSelectedPlatform(null);
+    setHandle("");
   };
   
-  const content = (
-    <>
-      {!selectedPlatform ? (
-        <div className="space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search platforms..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="pl-9"
-              autoFocus={!isMobile}
-            />
-          </div>
-          
-          <div className="overflow-auto max-h-[60vh]">
-            <Command>
-              <CommandGroup>
-                {filteredPlatforms.length === 0 && (
-                  <CommandEmpty className="py-6 text-center">No results found</CommandEmpty>
-                )}
-                {filteredPlatforms.map(platform => (
-                  <CommandItem
-                    key={platform.key}
-                    onSelect={() => handleSelect(platform)}
-                    className="flex items-center gap-3 p-3 cursor-pointer rounded-lg hover:bg-accent"
-                  >
-                    <div className={`flex items-center justify-center p-2 rounded-full bg-gray-100 ${platform.color}`}>
-                      <platform.icon className="h-5 w-5" />
-                    </div>
-                    <span className="font-medium">{platform.name}</span>
-                    <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </Command>
-          </div>
+  const handleEditExisting = (platformKey: string) => {
+    const platform = socialPlatforms.find(p => p.key === platformKey);
+    if (platform) {
+      setSelectedPlatform(platform);
+      setHandle(userSocialLinks?.[platformKey] || "");
+      setIsEditingExisting(true);
+    }
+  };
+
+  const handleDeletePlatform = (platformKey: string) => {
+    if (onDelete) {
+      onDelete(platformKey);
+    }
+  };
+  
+  const renderExistingSocials = () => {
+    if (userPlatforms.length === 0) {
+      return (
+        <div className="text-center py-6 text-muted-foreground">
+          <p>No social links added yet</p>
+          <Button onClick={() => setActiveTab('add')} variant="outline" className="mt-4">
+            Add your first link
+          </Button>
         </div>
-      ) : (
+      );
+    }
+    
+    return (
+      <div className="space-y-2">
+        {userPlatforms.map(({ key, handle, platform }) => (
+          <div 
+            key={key}
+            className="flex items-center justify-between p-3 rounded-lg border border-gray-200"
+          >
+            <div className="flex items-center gap-3">
+              <div className={`flex items-center justify-center p-2 rounded-full bg-gray-100 ${platform?.color || ''}`}>
+                {platform ? <platform.icon className="h-5 w-5" /> : <Icons.Link className="h-5 w-5" />}
+              </div>
+              <div>
+                <div className="font-medium">{platform?.name || key}</div>
+                <div className="text-sm text-muted-foreground">{handle}</div>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-1">
+              <Button 
+                size="icon" 
+                variant="ghost"
+                onClick={() => handleEditExisting(key)}
+              >
+                <Pencil size={16} />
+              </Button>
+              
+              {onDelete && (
+                <Button 
+                  size="icon" 
+                  variant="ghost" 
+                  className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                  onClick={() => handleDeletePlatform(key)}
+                >
+                  <X size={16} />
+                </Button>
+              )}
+            </div>
+          </div>
+        ))}
+        
+        <Button 
+          onClick={handleAddNewClick} 
+          variant="outline" 
+          className="w-full mt-4 gap-2"
+        >
+          <Plus size={16} />
+          Add new social link
+        </Button>
+      </div>
+    );
+  };
+  
+  const renderAddSocial = () => {
+    if (selectedPlatform) {
+      return (
         <div className="space-y-6">
           <button
             onClick={handleBack}
@@ -296,6 +386,83 @@ const SocialMediaSelector = ({
             Save
           </Button>
         </div>
+      );
+    }
+    
+    return (
+      <div className="space-y-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search platforms..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="pl-9"
+            autoFocus={!isMobile}
+          />
+        </div>
+        
+        <div className="overflow-auto max-h-[60vh]">
+          <Command>
+            <CommandGroup>
+              {filteredPlatforms.length === 0 && (
+                <CommandEmpty className="py-6 text-center">No results found</CommandEmpty>
+              )}
+              {filteredPlatforms.map(platform => (
+                <CommandItem
+                  key={platform.key}
+                  onSelect={() => handleSelect(platform)}
+                  className="flex items-center gap-3 p-3 cursor-pointer rounded-lg hover:bg-accent"
+                >
+                  <div className={`flex items-center justify-center p-2 rounded-full bg-gray-100 ${platform.color}`}>
+                    <platform.icon className="h-5 w-5" />
+                  </div>
+                  <span className="font-medium">{platform.name}</span>
+                  <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </Command>
+        </div>
+      </div>
+    );
+  };
+  
+  const content = (
+    <>
+      {/* Tabs for existing vs add new (only shown when there are existing links) */}
+      {Object.keys(userSocialLinks || {}).length > 0 && !selectedPlatform && !isAddingNew && (
+        <div className="flex border-b mb-4">
+          <button
+            onClick={() => setActiveTab('existing')}
+            className={`px-4 py-2 text-sm font-medium ${
+              activeTab === 'existing' 
+                ? 'border-b-2 border-primary text-primary' 
+                : 'text-muted-foreground'
+            }`}
+          >
+            Your links
+          </button>
+          <button
+            onClick={() => setActiveTab('add')}
+            className={`px-4 py-2 text-sm font-medium ${
+              activeTab === 'add' 
+                ? 'border-b-2 border-primary text-primary' 
+                : 'text-muted-foreground'
+            }`}
+          >
+            Add new
+          </button>
+        </div>
+      )}
+      
+      {/* Main content based on state */}
+      {selectedPlatform ? (
+        renderAddSocial()
+      ) : isAddingNew ? (
+        renderAddSocial()
+      ) : (
+        activeTab === 'existing' ? renderExistingSocials() : renderAddSocial()
       )}
     </>
   );
@@ -305,7 +472,11 @@ const SocialMediaSelector = ({
       <Drawer open={isOpen} onOpenChange={onClose}>
         <DrawerContent>
           <DrawerHeader>
-            <DrawerTitle>{selectedPlatform ? `Add ${selectedPlatform.name}` : "Add social platform"}</DrawerTitle>
+            <DrawerTitle>
+              {selectedPlatform 
+                ? `${isEditingExisting ? 'Edit' : 'Add'} ${selectedPlatform.name}` 
+                : 'Social links'}
+            </DrawerTitle>
             <DrawerClose />
           </DrawerHeader>
           <div className="p-4">
@@ -320,7 +491,11 @@ const SocialMediaSelector = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{selectedPlatform ? `Add ${selectedPlatform.name}` : "Add social platform"}</DialogTitle>
+          <DialogTitle>
+            {selectedPlatform 
+              ? `${isEditingExisting ? 'Edit' : 'Add'} ${selectedPlatform.name}` 
+              : 'Social links'}
+          </DialogTitle>
           <Button 
             size="icon" 
             variant="ghost" 

@@ -69,6 +69,12 @@ const ProfileHeader = ({
     setIsSocialSelectorOpen(false);
   };
   
+  const handleOpenSocialSelector = (platform: string = "", handle: string = "") => {
+    setEditingPlatform(platform);
+    setEditingHandle(handle);
+    setIsSocialSelectorOpen(true);
+  };
+  
   const getSocialIcon = (platformKey: string) => {
     const platform = socialPlatforms.find(p => p.key === platformKey);
     if (platform) {
@@ -137,11 +143,7 @@ const ProfileHeader = ({
                       variant="outline"
                       size="icon"
                       className="h-10 w-10 rounded-full"
-                      onClick={() => {
-                        setEditingPlatform(platform);
-                        setEditingHandle(handle);
-                        setIsSocialSelectorOpen(true);
-                      }}
+                      onClick={() => handleOpenSocialSelector(platform, handle || "")}
                     >
                       {getSocialIcon(platform)}
                     </Button>
@@ -174,11 +176,7 @@ const ProfileHeader = ({
                   variant="outline"
                   size="icon"
                   className="h-10 w-10 rounded-full"
-                  onClick={() => {
-                    setEditingPlatform("");
-                    setEditingHandle("");
-                    setIsSocialSelectorOpen(true);
-                  }}
+                  onClick={() => handleOpenSocialSelector()}
                 >
                   <Plus size={16} />
                 </Button>
@@ -193,8 +191,10 @@ const ProfileHeader = ({
         isOpen={isSocialSelectorOpen}
         onClose={() => setIsSocialSelectorOpen(false)}
         onSave={handleSocialLinkAction}
+        onDelete={onDeleteSocialLink}
         initialPlatform={editingPlatform}
         initialHandle={editingHandle}
+        userSocialLinks={user.socialLinks}
       />
     </>
   );

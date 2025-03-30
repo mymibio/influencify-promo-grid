@@ -17,6 +17,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { v4 as uuidv4 } from "uuid";
 import SocialMediaSelector from "@/components/social/SocialMediaSelector";
+import ProfileHeader from "@/components/profile/profile-header";
 
 const Dashboard = () => {
   const { profile, refreshProfile } = useAuth();
@@ -314,20 +315,12 @@ const Dashboard = () => {
     }
   };
 
-  const handleEditSocialMedia = (platform: string) => {
-    if (!profile || !profile.socialLinks) return;
-    
-    setCurrentSocialPlatform(platform);
-    setSocialHandle(profile.socialLinks[platform] || "");
-    setIsSocialSelectorOpen(true);
-  };
-
   const handleDeleteSocialLink = async (platform: string) => {
     if (!profile || !profile.socialLinks) return;
     
     try {
       const updatedSocialLinks = { ...profile.socialLinks };
-      delete updatedSocialLinks[platform as keyof typeof profile.socialLinks];
+      delete updatedSocialLinks[platform];
       
       const { error } = await supabase
         .from('user_profiles')
@@ -346,35 +339,7 @@ const Dashboard = () => {
     }
   };
 
-  const getSocialIcon = (platform: string) => {
-    switch (platform.toLowerCase()) {
-      case 'instagram':
-        return <Instagram size={20} className="text-pink-500" />;
-      case 'facebook':
-        return <Facebook size={20} className="text-blue-600" />;
-      case 'whatsapp':
-        return <MessageCircle size={20} className="text-green-500" />;
-      case 'twitter':
-        return <Twitter size={20} className="text-blue-400" />;
-      case 'youtube':
-        return <Youtube size={20} className="text-red-500" />;
-      case 'email':
-        return <Mail size={20} />;
-      default:
-        return <Link size={20} />;
-    }
-  };
-
-  const socialPlatforms = [
-    { name: "Instagram", key: "instagram", icon: Instagram, color: "text-pink-500" },
-    { name: "TikTok", key: "tiktok", icon: MessageCircle, color: "text-black" },
-    { name: "YouTube", key: "youtube", icon: Youtube, color: "text-red-500" },
-    { name: "Email", key: "email", icon: Mail, color: "text-blue-500" },
-  ];
-
-  const handleSocialClick = (platform: string) => {
-    setCurrentSocialPlatform(platform);
-    setSocialHandle(profile?.socialLinks?.[platform] || "");
+  const openSocialSelector = () => {
     setIsSocialSelectorOpen(true);
   };
 
@@ -486,37 +451,14 @@ const Dashboard = () => {
                     )}
                     
                     <div className="flex flex-wrap gap-3 justify-center md:justify-start mt-4">
-                      {socialPlatforms.map((platform) => (
-                        <button
-                          key={platform.key}
-                          onClick={() => {
-                            setCurrentSocialPlatform(platform.key);
-                            setSocialHandle(profile?.socialLinks?.[platform.key] || "");
-                            setIsSocialSelectorOpen(true);
-                          }}
-                          className="relative group"
-                        >
-                          <div className={`w-10 h-10 flex items-center justify-center rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors ${
-                            profile?.socialLinks?.[platform.key] ? "bg-gray-100" : ""
-                          }`}>
-                            <platform.icon size={22} className={platform.color} />
-                            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-gray-100 border border-gray-200 text-xs">
-                              {profile?.socialLinks?.[platform.key] ? "✓" : "+"}
-                            </span>
-                          </div>
-                        </button>
-                      ))}
-                      
-                      <button
-                        onClick={() => {
-                          setCurrentSocialPlatform("");
-                          setSocialHandle("");
-                          setIsSocialSelectorOpen(true);
-                        }}
-                        className="w-10 h-10 flex items-center justify-center rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors"
+                      <Button
+                        onClick={openSocialSelector}
+                        variant="outline"
+                        className="flex items-center gap-2"
                       >
-                        <Plus size={22} />
-                      </button>
+                        <Plus size={16} />
+                        Manage social links
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -676,80 +618,12 @@ const Dashboard = () => {
         </DialogContent>
       </Dialog>
       
-      <Dialog open={isSocialSelectorOpen} onOpenChange={setIsSocialSelectorOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{currentSocialPlatform ? `Add ${currentSocialPlatform}` : 'Add Social Media'}</DialogTitle>
-            <DialogDescription>
-              Connect your social media accounts to your profile
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            {!currentSocialPlatform ? (
-              <div className="space-y-2">
-                <Label htmlFor="platform">Platform</Label>
-                <div className="grid grid-cols-3 gap-2">
-                  {socialPlatforms.map(platform => (
-                    <Button 
-                      key={platform.key}
-                      variant="outline"
-                      className="flex flex-col gap-1 h-auto py-2"
-                      onClick={() => {
-                        setCurrentSocialPlatform(platform.key);
-                        setSocialHandle(profile.socialLinks?.[platform.key] || "");
-                      }}
-                    >
-                      <platform.icon size={20} className={platform.color} />
-                      <span className="text-xs">{platform.name}</span>
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <Label htmlFor="handle">
-                  {currentSocialPlatform === "email" ? "Email Address" : "Username/Handle"}
-                </Label>
-                <Input 
-                  id="handle" 
-                  value={socialHandle} 
-                  onChange={(e) => setSocialHandle(e.target.value)}
-                  placeholder={currentSocialPlatform === "email" ? "you@example.com" : `Enter your ${currentSocialPlatform} username`}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {currentSocialPlatform === "email" 
-                    ? "Enter your email address" 
-                    : `Enter your ${currentSocialPlatform} username without the @ symbol`}
-                </p>
-              </div>
-            )}
-            <div className="pt-4 flex justify-between">
-              {currentSocialPlatform && (
-                <Button 
-                  variant="outline"
-                  onClick={() => setCurrentSocialPlatform("")}
-                >
-                  Back
-                </Button>
-              )}
-              <Button 
-                onClick={handleAddSocialMedia}
-                disabled={!currentSocialPlatform || !socialHandle}
-                className="ml-auto"
-              >
-                Save
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-      
       <SocialMediaSelector
         isOpen={isSocialSelectorOpen}
         onClose={() => setIsSocialSelectorOpen(false)}
         onSave={handleAddSocialMedia}
-        initialPlatform={currentSocialPlatform}
-        initialHandle={socialHandle}
+        onDelete={handleDeleteSocialLink}
+        userSocialLinks={profile.socialLinks}
       />
     </div>
   );
