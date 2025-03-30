@@ -6,7 +6,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  // No longer checks for authentication
+  // No longer checks for authentication in demo mode
   return <>{children}</>;
 };
 
