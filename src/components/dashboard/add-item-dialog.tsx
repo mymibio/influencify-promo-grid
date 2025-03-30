@@ -11,6 +11,7 @@ import { ImagePlus, ChevronDown } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose, DrawerFooter } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { compressImage } from "@/lib/imageCompression";
 
 interface AddItemDialogProps {
   open: boolean;
@@ -28,6 +29,7 @@ const AddItemDialog = ({ open, onClose, onAdd, editItem }: AddItemDialogProps) =
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState("");
+  const [isProcessingImage, setIsProcessingImage] = useState(false);
   const isMobile = useIsMobile();
   const [showScrollIndicator, setShowScrollIndicator] = useState(true);
 
@@ -43,15 +45,28 @@ const AddItemDialog = ({ open, onClose, onAdd, editItem }: AddItemDialogProps) =
     }
   }, [editItem]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      try {
+        setIsProcessingImage(true);
+        
+        // Compress the image before storing it
+        const compressedFile = await compressImage(file);
+        setImageFile(compressedFile);
+        
+        // Create preview
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string);
+          setIsProcessingImage(false);
+        };
+        reader.readAsDataURL(compressedFile);
+      } catch (error) {
+        console.error("Error compressing image:", error);
+        toast.error("Failed to process image");
+        setIsProcessingImage(false);
+      }
     }
   };
 
@@ -151,7 +166,9 @@ const AddItemDialog = ({ open, onClose, onAdd, editItem }: AddItemDialogProps) =
                 accept="image/*"
                 className="hidden"
                 onChange={handleFileChange}
+                disabled={isProcessingImage}
               />
+              {isProcessingImage && <span className="text-xs text-gray-500 mt-2">Compressing image...</span>}
             </label>
           )}
         </div>
@@ -227,7 +244,7 @@ const AddItemDialog = ({ open, onClose, onAdd, editItem }: AddItemDialogProps) =
       <Drawer open={open} onOpenChange={onClose}>
         <DrawerContent className="max-h-[90vh]">
           <DrawerHeader className="py-3 px-4 border-b">
-            <DrawerTitle className="text-center">{editItem ? "Edit coupon" : "Add coupon"}</DrawerTitle>
+            <DrawerTitle className="text-center">{editItem ? "Edit coupon" : "New coupon"}</DrawerTitle>
             <DrawerClose />
           </DrawerHeader>
           
@@ -249,7 +266,7 @@ const AddItemDialog = ({ open, onClose, onAdd, editItem }: AddItemDialogProps) =
           
           <DrawerFooter className="pt-2 border-t mt-0 bg-white">
             <Button onClick={handleSubmit} className="w-full">
-              {editItem ? "Update" : "Save"} Coupon
+              {editItem ? "Update" : "Save"}
             </Button>
             <Button variant="outline" onClick={onClose} className="w-full">
               Cancel
@@ -264,7 +281,7 @@ const AddItemDialog = ({ open, onClose, onAdd, editItem }: AddItemDialogProps) =
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px] max-h-[85vh] flex flex-col">
         <DialogHeader className="pb-2 border-b">
-          <DialogTitle>{editItem ? "Edit coupon" : "Add coupon"}</DialogTitle>
+          <DialogTitle>{editItem ? "Edit coupon" : "New coupon"}</DialogTitle>
         </DialogHeader>
         
         <div className="relative flex-grow overflow-hidden">
@@ -287,7 +304,7 @@ const AddItemDialog = ({ open, onClose, onAdd, editItem }: AddItemDialogProps) =
           <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="button" onClick={handleSubmit}>{editItem ? "Update" : "Save"} Coupon</Button>
+          <Button type="button" onClick={handleSubmit}>{editItem ? "Update" : "Save"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

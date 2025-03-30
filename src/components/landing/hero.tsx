@@ -166,55 +166,6 @@ const Hero = () => {
               </Button>
             </Link>
           </div>
-          
-          {/* Social proof */}
-          <div className={`mt-16 transition-all duration-1000 delay-900 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <p className="text-sm text-center text-gray-500 font-medium">TRUSTED BY 10,000+ CREATORS</p>
-            <div className="flex justify-center gap-8 mt-4 grayscale opacity-60">
-              <div className="h-8">
-                <span className="font-bold text-xl">instagram</span>
-              </div>
-              <div className="h-8">
-                <span className="font-bold text-xl">youtube</span>
-              </div>
-              <div className="h-8">
-                <span className="font-bold text-xl">tiktok</span>
-              </div>
-            </div>
-          </div>
-          
-          {/* Browser frame with screenshot */}
-          <div className={`mt-20 mb-10 relative transition-all duration-1000 delay-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}>
-            <div className="max-w-5xl mx-auto p-4 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
-              <div className="w-full h-12 bg-gray-100 rounded-t-lg flex items-center px-4 gap-2 border-b">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-                  <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                  <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                </div>
-                <div className="ml-4 bg-white px-3 py-1 rounded-md text-xs text-gray-500 flex-1 text-center">
-                  influencify.com/yourname
-                </div>
-              </div>
-              <div className="relative bg-gray-50 aspect-[16/9] overflow-hidden rounded-b-lg">
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-white"></div>
-                <div className="flex justify-center items-center h-full">
-                  <div className="grid grid-cols-2 gap-4 p-6 max-w-3xl">
-                    <div className="bg-white p-4 rounded-lg shadow-md aspect-[9/16] flex flex-col items-center justify-center">
-                      <div className="w-full h-2/3 bg-gradient-to-br from-pink-100 to-purple-100 rounded-lg mb-3"></div>
-                      <div className="w-3/4 h-2 bg-gray-200 rounded-full mb-2"></div>
-                      <div className="w-1/2 h-2 bg-gray-200 rounded-full"></div>
-                    </div>
-                    <div className="bg-white p-4 rounded-lg shadow-md aspect-[9/16] flex flex-col items-center justify-center">
-                      <div className="w-full h-2/3 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg mb-3"></div>
-                      <div className="w-3/4 h-2 bg-gray-200 rounded-full mb-2"></div>
-                      <div className="w-1/2 h-2 bg-gray-200 rounded-full"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
