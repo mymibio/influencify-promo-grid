@@ -16,13 +16,14 @@ import MobileNavigation from "@/components/dashboard/mobile-navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { v4 as uuidv4 } from "uuid";
+import SocialMediaSelector from "@/components/social/SocialMediaSelector";
 
 const Dashboard = () => {
   const { profile, refreshProfile } = useAuth();
   const [items, setItems] = useState<PromotionalItem[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
-  const [isSocialDialogOpen, setIsSocialDialogOpen] = useState(false);
+  const [isSocialSelectorOpen, setIsSocialSelectorOpen] = useState(false);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [editedBio, setEditedBio] = useState(profile?.bio || "");
   const [currentDraggedItem, setCurrentDraggedItem] = useState<string | null>(null);
@@ -284,13 +285,13 @@ const Dashboard = () => {
     }
   };
   
-  const handleAddSocialMedia = async () => {
-    if (!profile || !currentSocialPlatform || !socialHandle) return;
+  const handleAddSocialMedia = async (platform: string, handle: string) => {
+    if (!profile) return;
     
     try {
       const updatedSocialLinks = {
         ...(profile.socialLinks || {}),
-        [currentSocialPlatform.toLowerCase()]: socialHandle
+        [platform]: handle
       };
       
       const { error } = await supabase
@@ -303,14 +304,22 @@ const Dashboard = () => {
       }
       
       await refreshProfile();
-      setIsSocialDialogOpen(false);
-      setSocialHandle("");
+      setIsSocialSelectorOpen(false);
       setCurrentSocialPlatform("");
-      toast.success(`${currentSocialPlatform} link added successfully!`);
+      setSocialHandle("");
+      toast.success(`${platform} link added successfully!`);
     } catch (error) {
       console.error("Error updating social links:", error);
       toast.error("Failed to update social media");
     }
+  };
+
+  const handleEditSocialMedia = (platform: string) => {
+    if (!profile || !profile.socialLinks) return;
+    
+    setCurrentSocialPlatform(platform);
+    setSocialHandle(profile.socialLinks[platform] || "");
+    setIsSocialSelectorOpen(true);
   };
 
   const handleDeleteSocialLink = async (platform: string) => {
@@ -366,7 +375,7 @@ const Dashboard = () => {
   const handleSocialClick = (platform: string) => {
     setCurrentSocialPlatform(platform);
     setSocialHandle(profile?.socialLinks?.[platform] || "");
-    setIsSocialDialogOpen(true);
+    setIsSocialSelectorOpen(true);
   };
 
   if (!profile) {
@@ -431,10 +440,10 @@ const Dashboard = () => {
                   </div>
                   
                   <div className="flex-1 flex flex-col text-center md:text-left">
-                    <h1 className="text-2xl sm:text-3xl font-bold">{profile.name}</h1>
+                    <h1 className="text-2xl sm:text-3xl font-bold">{profile?.name}</h1>
                     
                     <div className="text-muted-foreground text-sm mb-2">
-                      @{profile.username}
+                      @{profile?.username}
                     </div>
                     
                     {isEditingBio ? (
@@ -480,15 +489,19 @@ const Dashboard = () => {
                       {socialPlatforms.map((platform) => (
                         <button
                           key={platform.key}
-                          onClick={() => handleSocialClick(platform.key)}
+                          onClick={() => {
+                            setCurrentSocialPlatform(platform.key);
+                            setSocialHandle(profile?.socialLinks?.[platform.key] || "");
+                            setIsSocialSelectorOpen(true);
+                          }}
                           className="relative group"
                         >
                           <div className={`w-10 h-10 flex items-center justify-center rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors ${
-                            profile.socialLinks?.[platform.key] ? "bg-gray-100" : ""
+                            profile?.socialLinks?.[platform.key] ? "bg-gray-100" : ""
                           }`}>
                             <platform.icon size={22} className={platform.color} />
                             <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-gray-100 border border-gray-200 text-xs">
-                              {profile.socialLinks?.[platform.key] ? "✓" : "+"}
+                              {profile?.socialLinks?.[platform.key] ? "✓" : "+"}
                             </span>
                           </div>
                         </button>
@@ -498,7 +511,7 @@ const Dashboard = () => {
                         onClick={() => {
                           setCurrentSocialPlatform("");
                           setSocialHandle("");
-                          setIsSocialDialogOpen(true);
+                          setIsSocialSelectorOpen(true);
                         }}
                         className="w-10 h-10 flex items-center justify-center rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors"
                       >
@@ -663,7 +676,7 @@ const Dashboard = () => {
         </DialogContent>
       </Dialog>
       
-      <Dialog open={isSocialDialogOpen} onOpenChange={setIsSocialDialogOpen}>
+      <Dialog open={isSocialSelectorOpen} onOpenChange={setIsSocialSelectorOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{currentSocialPlatform ? `Add ${currentSocialPlatform}` : 'Add Social Media'}</DialogTitle>
@@ -730,6 +743,14 @@ const Dashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
+      
+      <SocialMediaSelector
+        isOpen={isSocialSelectorOpen}
+        onClose={() => setIsSocialSelectorOpen(false)}
+        onSave={handleAddSocialMedia}
+        initialPlatform={currentSocialPlatform}
+        initialHandle={socialHandle}
+      />
     </div>
   );
 };

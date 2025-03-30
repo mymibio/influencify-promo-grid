@@ -55,7 +55,7 @@ const DashboardSettings = () => {
             name: data.name,
             profilePicture: data.profile_picture,
             bio: data.bio || "",
-            socialLinks: data.social_links || {},
+            socialLinks: data.social_links as User['socialLinks'] || {}, // Fix the type cast here
             createdAt: data.created_at
           };
           

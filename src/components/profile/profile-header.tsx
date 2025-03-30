@@ -1,114 +1,17 @@
 
 import { User } from "@/types/user";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Instagram, Youtube, Twitter, Facebook, Mail, MessageSquare, Plus, Pencil, X, ChevronLeft, Search, Linkedin, Pin, MessageCircle, FileText, ArrowRight, Ghost } from "lucide-react";
+import { Instagram, Youtube, Twitter, Facebook, Mail, MessageSquare, Plus, Pencil, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
-
-// Available social platforms with their icons
-const socialPlatforms = [
-  { 
-    name: "Instagram", 
-    key: "instagram", 
-    icon: Instagram,
-    placeholder: "Enter Instagram Username",
-    example: "Example: @username (without the @)"
-  },
-  { 
-    name: "Twitter", 
-    key: "twitter", 
-    icon: Twitter,
-    placeholder: "Enter Twitter Username",
-    example: "Example: @username (without the @)"
-  },
-  { 
-    name: "Facebook", 
-    key: "facebook", 
-    icon: Facebook,
-    placeholder: "Enter Facebook Page Name",
-    example: "Example: yourpagename"
-  },
-  { 
-    name: "YouTube", 
-    key: "youtube", 
-    icon: Youtube,
-    placeholder: "Enter YouTube Channel",
-    example: "Example: @channelname"
-  },
-  { 
-    name: "LinkedIn", 
-    key: "linkedin", 
-    icon: Linkedin,
-    placeholder: "Enter LinkedIn Username",
-    example: "Example: username or custom URL"
-  },
-  { 
-    name: "Pinterest", 
-    key: "pinterest", 
-    icon: Pin,
-    placeholder: "Enter Pinterest Username",
-    example: "Example: username"
-  },
-  { 
-    name: "WhatsApp", 
-    key: "whatsapp", 
-    icon: MessageCircle,
-    placeholder: "Enter WhatsApp Number",
-    example: "Example: +1234567890 (with country code)"
-  },
-  { 
-    name: "Email", 
-    key: "email", 
-    icon: Mail,
-    placeholder: "Enter Email Address",
-    example: "Example: you@example.com"
-  },
-  { 
-    name: "Telegram", 
-    key: "telegram", 
-    icon: MessageSquare,
-    placeholder: "Enter Telegram Username",
-    example: "Example: @username (without the @)"
-  },
-  { 
-    name: "Discord", 
-    key: "discord", 
-    icon: MessageSquare,
-    placeholder: "Enter Discord Username or Server",
-    example: "Example: username#1234 or invite link"
-  },
-  { 
-    name: "Reddit", 
-    key: "reddit", 
-    icon: FileText,
-    placeholder: "Enter Reddit Username",
-    example: "Example: u/username (without the u/)"
-  },
-  { 
-    name: "Threads", 
-    key: "threads", 
-    icon: MessageSquare,
-    placeholder: "Enter Threads Username",
-    example: "Example: @username (without the @)"
-  },
-  { 
-    name: "Snapchat", 
-    key: "snapchat", 
-    icon: Ghost, // Using Ghost icon for Snapchat
-    placeholder: "Enter Snapchat Username",
-    example: "Example: @snapchatusername"
-  },
-];
+import SocialMediaSelector, { socialPlatforms } from "@/components/social/SocialMediaSelector";
 
 interface ProfileHeaderProps {
   user: User;
   editable?: boolean;
   onEditProfilePicture?: (file: File) => void;
-  onAddSocialLink?: (platform: string) => void;
+  onAddSocialLink?: (platform: string, handle: string) => void;
   onDeleteSocialLink?: (platform: string) => void;
   onEditSocialLink?: (platform: string, handle: string) => void;
   compact?: boolean;
@@ -123,21 +26,9 @@ const ProfileHeader = ({
   onEditSocialLink,
   compact = false
 }: ProfileHeaderProps) => {
-  const [isAddSocialDialogOpen, setIsAddSocialDialogOpen] = useState(false);
-  const [isEditSocialDialogOpen, setIsEditSocialDialogOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedPlatform, setSelectedPlatform] = useState<typeof socialPlatforms[0] | null>(null);
-  const [socialHandle, setSocialHandle] = useState("");
+  const [isSocialSelectorOpen, setIsSocialSelectorOpen] = useState(false);
   const [editingPlatform, setEditingPlatform] = useState<string>("");
   const [editingHandle, setEditingHandle] = useState<string>("");
-  const [socialPlatformStep, setSocialPlatformStep] = useState<"select" | "input">("select");
-
-  // Filter platforms based on search term
-  const filteredPlatforms = searchTerm 
-    ? socialPlatforms.filter(platform => 
-        platform.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : socialPlatforms;
   
   const getInitials = (name: string) => {
     return name
@@ -166,42 +57,25 @@ const ProfileHeader = ({
     }
   };
   
-  const handleSelectPlatform = (platform: typeof socialPlatforms[0]) => {
-    setSelectedPlatform(platform);
-    setSocialPlatformStep("input");
-  };
-  
-  const handleAddSocial = () => {
-    if (onAddSocialLink && selectedPlatform) {
-      onAddSocialLink(selectedPlatform.key);
-      
-      // Reset state
-      setSelectedPlatform(null);
-      setSocialHandle("");
-      setSocialPlatformStep("select");
-      setIsAddSocialDialogOpen(false);
+  const handleSocialLinkAction = (platform: string, handle: string) => {
+    if (editingPlatform && onEditSocialLink) {
+      onEditSocialLink(editingPlatform, handle);
+    } else if (onAddSocialLink) {
+      onAddSocialLink(platform, handle);
     }
-  };
-  
-  const handleEditSocialLink = () => {
-    if (onEditSocialLink && editingPlatform && editingHandle) {
-      onEditSocialLink(editingPlatform, editingHandle);
-      setIsEditSocialDialogOpen(false);
-    }
+    
+    setEditingPlatform("");
+    setEditingHandle("");
+    setIsSocialSelectorOpen(false);
   };
   
   const getSocialIcon = (platformKey: string) => {
     const platform = socialPlatforms.find(p => p.key === platformKey);
     if (platform) {
       const IconComponent = platform.icon;
-      return <IconComponent size={20} />;
+      return <IconComponent size={20} className={platform.color} />;
     }
     return null;
-  };
-  
-  const getPlatformName = (platformKey: string) => {
-    const platform = socialPlatforms.find(p => p.key === platformKey);
-    return platform ? platform.name : platformKey;
   };
 
   return (
@@ -266,15 +140,15 @@ const ProfileHeader = ({
                       onClick={() => {
                         setEditingPlatform(platform);
                         setEditingHandle(handle);
-                        setIsEditSocialDialogOpen(true);
+                        setIsSocialSelectorOpen(true);
                       }}
                     >
                       {getSocialIcon(platform)}
                     </Button>
                   ) : (
                     <a 
-                      href={`#${platform}/${handle}`} 
-                      target="_blank" 
+                      href={platform === "email" ? `mailto:${handle}` : `https://${platform}.com/${handle}`}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
                     >
@@ -300,7 +174,11 @@ const ProfileHeader = ({
                   variant="outline"
                   size="icon"
                   className="h-10 w-10 rounded-full"
-                  onClick={() => setIsAddSocialDialogOpen(true)}
+                  onClick={() => {
+                    setEditingPlatform("");
+                    setEditingHandle("");
+                    setIsSocialSelectorOpen(true);
+                  }}
                 >
                   <Plus size={16} />
                 </Button>
@@ -310,132 +188,14 @@ const ProfileHeader = ({
         </div>
       </div>
       
-      {/* Add Social Platform Dialog */}
-      <Sheet 
-        open={isAddSocialDialogOpen} 
-        onOpenChange={(open) => {
-          setIsAddSocialDialogOpen(open);
-          if (!open) {
-            setSocialPlatformStep("select");
-            setSelectedPlatform(null);
-            setSearchTerm("");
-          }
-        }}
-      >
-        <SheetContent className="sm:max-w-md">
-          <SheetHeader>
-            <SheetTitle>
-              {socialPlatformStep === "select" ? "Add Social Media" : (
-                <Button 
-                  variant="ghost" 
-                  className="p-0 hover:bg-transparent flex items-center gap-1"
-                  onClick={() => {
-                    setSocialPlatformStep("select");
-                    setSelectedPlatform(null);
-                  }}
-                >
-                  <ChevronLeft size={16} />
-                  <span>Back to platforms</span>
-                </Button>
-              )}
-            </SheetTitle>
-          </SheetHeader>
-          
-          {socialPlatformStep === "select" ? (
-            <>
-              <div className="relative my-4">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search social platforms..."
-                  className="pl-8"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-4">
-                {filteredPlatforms.map(platform => (
-                  <Button 
-                    key={platform.key}
-                    variant="outline"
-                    className="flex flex-col items-center gap-2 h-auto py-4"
-                    onClick={() => handleSelectPlatform(platform)}
-                  >
-                    <platform.icon size={24} />
-                    <span className="text-xs">{platform.name}</span>
-                  </Button>
-                ))}
-              </div>
-            </>
-          ) : selectedPlatform ? (
-            <div className="py-6 space-y-6">
-              <div className="flex flex-col items-center gap-2">
-                <div className="p-4 bg-gray-100 rounded-full">
-                  <selectedPlatform.icon size={32} />
-                </div>
-                <h3 className="font-medium text-lg">{selectedPlatform.name}</h3>
-                <p className="text-sm text-center text-muted-foreground">
-                  Add your {selectedPlatform.name} profile link
-                </p>
-              </div>
-              
-              <div className="space-y-1">
-                <Input
-                  placeholder={selectedPlatform.placeholder}
-                  value={socialHandle}
-                  onChange={(e) => setSocialHandle(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {selectedPlatform.example}
-                </p>
-              </div>
-              
-              <Button 
-                className="w-full"
-                onClick={handleAddSocial}
-                disabled={!socialHandle.trim()}
-              >
-                <span>Add {selectedPlatform.name}</span>
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          ) : null}
-        </SheetContent>
-      </Sheet>
-      
-      {/* Edit Social Dialog */}
-      <Dialog open={isEditSocialDialogOpen} onOpenChange={setIsEditSocialDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit {getPlatformName(editingPlatform)}</DialogTitle>
-          </DialogHeader>
-          <div className="py-4 space-y-4">
-            <div className="flex items-center gap-2">
-              {getSocialIcon(editingPlatform)}
-              <Input
-                value={editingHandle}
-                onChange={(e) => setEditingHandle(e.target.value)}
-                placeholder={`Enter your ${getPlatformName(editingPlatform)} handle`}
-              />
-            </div>
-            
-            <div className="flex justify-end gap-2">
-              <Button 
-                variant="outline"
-                onClick={() => setIsEditSocialDialogOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button 
-                onClick={handleEditSocialLink}
-                disabled={!editingHandle.trim()}
-              >
-                Save
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Social Media Selector */}
+      <SocialMediaSelector
+        isOpen={isSocialSelectorOpen}
+        onClose={() => setIsSocialSelectorOpen(false)}
+        onSave={handleSocialLinkAction}
+        initialPlatform={editingPlatform}
+        initialHandle={editingHandle}
+      />
     </>
   );
 };
