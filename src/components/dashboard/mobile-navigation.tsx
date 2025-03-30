@@ -51,14 +51,14 @@ const MobileNavigation = () => {
   
   return (
     <div className="fixed bottom-4 left-0 right-0 z-50 flex justify-center md:hidden">
-      <nav className="flex items-center justify-around gap-1 rounded-full bg-white/90 backdrop-blur-md px-3 py-1 border border-gray-100">
+      <nav className="flex items-center justify-around rounded-full bg-white/90 backdrop-blur-md px-4 py-2 border border-gray-100 shadow-md">
         <Link 
           to="/dashboard" 
           className={cn(
-            "flex flex-col items-center justify-center rounded-full p-2 transition-all duration-200 hover:bg-gray-100",
+            "flex flex-col items-center justify-center px-4",
             isActive("/dashboard") 
-              ? "text-primary bg-primary/10" 
-              : "text-muted-foreground hover:text-primary"
+              ? "text-primary" 
+              : "text-muted-foreground"
           )}
         >
           <LayoutGrid size={20} />
@@ -68,37 +68,37 @@ const MobileNavigation = () => {
         <Link 
           to="/dashboard/analytics" 
           className={cn(
-            "flex flex-col items-center justify-center rounded-full p-2 transition-all duration-200 hover:bg-gray-100",
+            "flex flex-col items-center justify-center px-4",
             isActive("/dashboard/analytics") 
-              ? "text-primary bg-primary/10" 
-              : "text-muted-foreground hover:text-primary"
+              ? "text-primary" 
+              : "text-muted-foreground"
           )}
         >
           <BarChart size={20} />
           <span className="text-xs font-medium mt-1">Analytics</span>
         </Link>
         
-        {/* Add Link Button in Middle */}
-        <div className="relative flex flex-col items-center justify-center">
+        {/* Add Button in Middle */}
+        <div className="relative flex flex-col items-center justify-center px-4">
           <button 
             onClick={() => setIsAddDialogOpen(true)}
-            className="absolute -top-6 rounded-full p-3 bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
-            aria-label="Add new coupon"
+            className="rounded-full p-4 bg-primary text-white shadow-lg hover:shadow-xl transition-all duration-300 -mt-6"
+            aria-label="Add new item"
           >
-            <Plus size={22} className="text-white" />
+            <Plus size={24} />
           </button>
-          <div className="mt-6">
-            {/* Removed the text "Add" */}
+          <div className="mt-8">
+            {/* Empty space to maintain layout */}
           </div>
         </div>
         
         <Link 
           to="/dashboard/theme" 
           className={cn(
-            "flex flex-col items-center justify-center rounded-full p-2 transition-all duration-200 hover:bg-gray-100",
+            "flex flex-col items-center justify-center px-4",
             isActive("/dashboard/theme") 
-              ? "text-primary bg-primary/10" 
-              : "text-muted-foreground hover:text-primary"
+              ? "text-primary" 
+              : "text-muted-foreground"
           )}
         >
           <Palette size={20} />
@@ -108,10 +108,10 @@ const MobileNavigation = () => {
         <Link 
           to="/dashboard/settings" 
           className={cn(
-            "flex flex-col items-center justify-center rounded-full p-2 transition-all duration-200 hover:bg-gray-100",
+            "flex flex-col items-center justify-center px-4",
             isActive("/dashboard/settings") 
-              ? "text-primary bg-primary/10" 
-              : "text-muted-foreground hover:text-primary"
+              ? "text-primary" 
+              : "text-muted-foreground"
           )}
         >
           <Settings size={20} />
