@@ -1,26 +1,21 @@
+
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { LayoutGrid, BarChart, Palette, Settings, Plus, Link2, Instagram, YoutubeIcon, Mail } from "lucide-react";
+import { LayoutGrid, BarChart, Palette, Settings, Plus, Link2 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
 import { PromotionalItem } from "@/types/user";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Input } from "@/components/ui/input";
-import { supabase } from "@/integrations/supabase/client";
 
 const MobileNavigation = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isSocialSheetOpen, setIsSocialSheetOpen] = useState(false);
-  const [currentSocialPlatform, setCurrentSocialPlatform] = useState<string>("");
-  const [socialHandle, setSocialHandle] = useState<string>("");
-  const { profile, refreshProfile } = useAuth();
+  const { profile } = useAuth();
   
+  // Don't render navigation if not on dashboard routes
   if (!currentPath.includes('/dashboard')) {
     return null;
   }
@@ -36,6 +31,7 @@ const MobileNavigation = () => {
   };
 
   const handleAddItem = (newItem: PromotionalItem) => {
+    // In a real app, you would save this to your backend
     toast.success("Item added successfully!");
     setIsAddDialogOpen(false);
   };
@@ -53,75 +49,8 @@ const MobileNavigation = () => {
       });
   };
   
-  const handleSaveSocialMedia = async () => {
-    if (!profile || !currentSocialPlatform || !socialHandle) return;
-    
-    try {
-      const updatedSocialLinks = {
-        ...(profile.socialLinks || {}),
-        [currentSocialPlatform.toLowerCase()]: socialHandle
-      };
-      
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({ social_links: updatedSocialLinks })
-        .eq('id', profile.id);
-      
-      if (error) {
-        throw error;
-      }
-      
-      await refreshProfile();
-      setIsSocialSheetOpen(false);
-      setSocialHandle("");
-      setCurrentSocialPlatform("");
-      toast.success(`${currentSocialPlatform} link added successfully!`);
-    } catch (error) {
-      console.error("Error updating social links:", error);
-      toast.error("Failed to update social media");
-    }
-  };
-
-  const socialPlatforms = [
-    { name: "Instagram", icon: Instagram, key: "instagram" },
-    { name: "TikTok", icon: TikTok, key: "tiktok" },
-    { name: "YouTube", icon: YoutubeIcon, key: "youtube" },
-    { name: "Email", icon: Mail, key: "email" },
-  ];
-  
   return (
     <div className="fixed bottom-4 left-0 right-0 z-50 flex justify-center md:hidden">
-      <div className="fixed bottom-20 left-0 right-0 flex justify-center mb-4">
-        <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md rounded-full px-4 py-2 border border-gray-100 shadow-sm">
-          {socialPlatforms.map((platform) => (
-            <Button
-              key={platform.key}
-              variant="outline"
-              size="icon"
-              className="h-10 w-10 rounded-full border-dashed"
-              onClick={() => {
-                setCurrentSocialPlatform(platform.key);
-                setIsSocialSheetOpen(true);
-              }}
-            >
-              <platform.icon size={18} className="text-muted-foreground" />
-              <Plus size={12} className="absolute top-1 right-1 text-primary" />
-            </Button>
-          ))}
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-10 w-10 rounded-full bg-gray-50"
-            onClick={() => {
-              setCurrentSocialPlatform("");
-              setIsSocialSheetOpen(true);
-            }}
-          >
-            <Plus size={16} />
-          </Button>
-        </div>
-      </div>
-      
       <nav className="flex items-center justify-around gap-1 rounded-full bg-white/90 backdrop-blur-md px-3 py-1 border border-gray-100">
         <Link 
           to="/dashboard" 
@@ -149,6 +78,7 @@ const MobileNavigation = () => {
           <span className="text-xs font-medium mt-1">Analytics</span>
         </Link>
         
+        {/* Add Link Button in Middle */}
         <div className="relative flex flex-col items-center justify-center">
           <button 
             onClick={() => setIsAddDialogOpen(true)}
@@ -187,6 +117,7 @@ const MobileNavigation = () => {
           <span className="text-xs font-medium mt-1">Settings</span>
         </Link>
 
+        {/* Add Item Dialog */}
         <AddItemDialog
           open={isAddDialogOpen}
           onClose={() => setIsAddDialogOpen(false)}
@@ -195,65 +126,6 @@ const MobileNavigation = () => {
           editItem={null}
         />
       </nav>
-      
-      <Sheet open={isSocialSheetOpen} onOpenChange={setIsSocialSheetOpen}>
-        <SheetContent className="sm:max-w-md">
-          <SheetHeader>
-            <SheetTitle>Add Social Media</SheetTitle>
-          </SheetHeader>
-          <div className="py-6">
-            {currentSocialPlatform ? (
-              <div className="space-y-4">
-                <div className="flex flex-col items-center gap-2">
-                  {(() => {
-                    const platform = socialPlatforms.find(p => p.key === currentSocialPlatform);
-                    if (platform) {
-                      const Icon = platform.icon;
-                      return (
-                        <>
-                          <div className="p-4 bg-gray-100 rounded-full">
-                            <Icon size={32} />
-                          </div>
-                          <h3 className="font-medium text-lg">{platform.name}</h3>
-                        </>
-                      );
-                    }
-                    return null;
-                  })()}
-                </div>
-                <div className="space-y-2">
-                  <Input 
-                    value={socialHandle}
-                    onChange={(e) => setSocialHandle(e.target.value)}
-                    placeholder={`Enter your ${currentSocialPlatform} handle`}
-                  />
-                </div>
-                <Button 
-                  className="w-full" 
-                  onClick={handleSaveSocialMedia}
-                  disabled={!socialHandle.trim()}
-                >
-                  Save
-                </Button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-4">
-                {socialPlatforms.map((platform) => (
-                  <Button
-                    key={platform.key}
-                    variant="outline"
-                    className="flex flex-col items-center gap-2 h-auto py-4"
-                    onClick={() => setCurrentSocialPlatform(platform.key)}
-                  >
-                    <platform.icon size={24} />
-                    <span className="text-xs">{platform.name}</span>
-                  </Button>
-                ))}
-              </div>
-            )}
-          </div>
-        </SheetContent>
-      </Sheet>
     </div>
   );
 };
