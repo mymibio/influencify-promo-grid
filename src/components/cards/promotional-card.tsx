@@ -50,7 +50,7 @@ export const PromotionalCard = ({
   };
 
   return (
-    <div className="relative group">
+    <div className="relative group w-full">
       {/* Action buttons - only show when selected */}
       {editable && isSelected && (
         <div className="absolute -top-3 right-0 left-0 flex justify-between z-10">
@@ -95,8 +95,8 @@ export const PromotionalCard = ({
       {/* Main Card */}
       <Card 
         className={cn(
-          "group overflow-hidden h-full w-full flex flex-col rounded-3xl shadow-sm border-0 transition-all duration-200",
-          isSelected && editable ? "ring-2 ring-primary ring-offset-2" : "",
+          "group overflow-hidden h-full w-full flex flex-col rounded-3xl shadow-sm border-2 transition-all duration-200",
+          isSelected && editable ? "ring-2 ring-primary ring-offset-2 border-pink-500" : "border-pink-300",
           editable ? "cursor-pointer" : ""
         )}
         onClick={handleCardClick}
@@ -106,12 +106,12 @@ export const PromotionalCard = ({
             <img 
               src={item.image} 
               alt={item.title} 
-              className="w-full object-cover transition-transform group-hover:scale-105 h-36 sm:h-52 md:h-64"
+              className="w-full object-cover transition-transform group-hover:scale-105 h-40 sm:h-52"
             />
           </div>
         )}
         
-        <CardContent className="p-2 sm:p-4 flex-1 flex flex-col">
+        <CardContent className="p-3 sm:p-4 flex-1 flex flex-col">
           <div className="flex-1">
             <h3 className="font-bold text-sm sm:text-lg mb-0.5 sm:mb-1 line-clamp-2">{item.title}</h3>
             

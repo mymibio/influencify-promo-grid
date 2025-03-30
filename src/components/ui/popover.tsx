@@ -3,7 +3,6 @@ import * as React from "react"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from "@/components/ui/drawer"
-import { ScrollArea } from "@/components/ui/scroll-area"
 
 import { cn } from "@/lib/utils"
 
@@ -67,9 +66,9 @@ const PopoverContent = React.forwardRef<
             <DrawerTitle>{mobileTitle || "Options"}</DrawerTitle>
             <DrawerClose />
           </DrawerHeader>
-          <ScrollArea className="px-4 pb-6 max-h-[calc(85vh-4rem)]">
+          <div className="px-4 pb-6 overflow-y-auto max-h-[calc(85vh-4rem)]">
             {children}
-          </ScrollArea>
+          </div>
         </DrawerContent>
       </Drawer>
     );
@@ -88,9 +87,9 @@ const PopoverContent = React.forwardRef<
         )}
         {...props}
       >
-        <ScrollArea className="max-h-[60vh]">
+        <div className="overflow-y-auto max-h-[60vh]">
           {children}
-        </ScrollArea>
+        </div>
       </PopoverPrimitive.Content>
     </PopoverPrimitive.Portal>
   );

@@ -1,4 +1,3 @@
-
 import { PromotionalItem } from "@/types/user";
 import { PromotionalCard } from "@/components/cards/promotional-card";
 import { useEffect, useState } from "react";
@@ -111,8 +110,8 @@ const PromotionalGrid = ({
   };
 
   return (
-    <div className="container px-0 sm:px-2 pb-8">
-      <div className="grid grid-cols-2 sm:grid-cols-2 gap-1 sm:gap-3 md:gap-4">
+    <div className="w-full">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
         {displayItems.map((item) => (
           <div 
             key={item.id} 
