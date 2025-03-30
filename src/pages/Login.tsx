@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/ui/navbar";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { LogIn } from "lucide-react";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -98,9 +99,10 @@ const Login = () => {
             
             <Button 
               type="submit" 
-              className="w-full bg-brand-purple hover:bg-brand-dark-purple" 
+              className="w-full" 
               disabled={isLoading}
             >
+              <LogIn className="mr-2 h-4 w-4" />
               {isLoading ? "Logging in..." : "Log In"}
             </Button>
             

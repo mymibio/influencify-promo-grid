@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,6 +6,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "@/components/ui/navbar";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { UserPlus } from "lucide-react";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -20,7 +20,6 @@ const SignUp = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Get username from URL query parameter if available
     const queryParams = new URLSearchParams(location.search);
     const usernameParam = queryParams.get('username');
     
@@ -32,7 +31,6 @@ const SignUp = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
-    // Special handling for username to enforce valid format
     if (name === 'username') {
       const sanitizedValue = value.toLowerCase().replace(/[^a-z0-9_]/g, "");
       setFormData({ ...formData, [name]: sanitizedValue });
@@ -46,7 +44,6 @@ const SignUp = () => {
     setIsLoading(true);
     
     try {
-      // Check if username is already taken
       const { data: existingUsers, error: checkError } = await supabase
         .from('user_profiles')
         .select('username')
@@ -62,7 +59,6 @@ const SignUp = () => {
         return;
       }
       
-      // Sign up the user with Supabase auth
       const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -78,7 +74,6 @@ const SignUp = () => {
       }
       
       if (data && data.user) {
-        // Create user profile
         const { error: profileError } = await supabase
           .from('user_profiles')
           .insert({
@@ -179,9 +174,10 @@ const SignUp = () => {
             
             <Button 
               type="submit" 
-              className="w-full bg-brand-purple hover:bg-brand-dark-purple" 
+              className="w-full" 
               disabled={isLoading}
             >
+              <UserPlus className="mr-2 h-4 w-4" />
               {isLoading ? "Creating Account..." : "Create Account"}
             </Button>
             
