@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { User } from "@/types/user";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,33 +10,68 @@ import { toast } from "sonner";
 import SimpleSidebar from "@/components/dashboard/simple-sidebar";
 import { Pencil, Check, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-
-// Mock user data
-const sampleUser: User = {
-  id: "123",
-  username: "fashionista",
-  email: "ashley@example.com",
-  name: "Ashley Johnson",
-  profilePicture: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&h=256&auto=format&fit=crop",
-  bio: "Fashion & lifestyle content creator. Sharing my favorite products and deals with you!",
-  socialLinks: {
-    instagram: "fashionista",
-    twitter: "fashionista",
-    youtube: "fashionistachannel"
-  },
-  createdAt: new Date().toISOString()
-};
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const DashboardSettings = () => {
-  const [user, setUser] = useState(sampleUser);
+  const [user, setUser] = useState<User | null>(null);
   const [settings, setSettings] = useState({
     notifications: true,
     publicProfile: true,
     darkMode: false
   });
   const [editingBio, setEditingBio] = useState(false);
-  const [bioText, setBioText] = useState(sampleUser.bio);
+  const [bioText, setBioText] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const isMobile = useIsMobile();
+  const { profile } = useAuth();
+  
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!profile) return;
+      
+      try {
+        setIsLoading(true);
+        
+        // Fetch user profile from Supabase
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', profile.id)
+          .single();
+        
+        if (error) {
+          console.error("Error fetching user data:", error);
+          toast.error("Failed to load user data");
+          return;
+        }
+        
+        if (data) {
+          const userData: User = {
+            id: data.id,
+            username: data.username,
+            email: data.email,
+            name: data.name,
+            profilePicture: data.profile_picture,
+            bio: data.bio || "",
+            socialLinks: data.social_links || {},
+            createdAt: data.created_at
+          };
+          
+          setUser(userData);
+          setBioText(userData.bio || "");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        toast.error("Something went wrong");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchUserData();
+  }, [profile]);
   
   const handleSettingChange = (setting: string, value: boolean) => {
     setSettings(prev => ({
@@ -44,7 +79,6 @@ const DashboardSettings = () => {
       [setting]: value
     }));
 
-    // Show success toast immediately
     toast.success(`${setting.charAt(0).toUpperCase() + setting.slice(1)} ${value ? 'enabled' : 'disabled'}`);
   };
   
@@ -56,19 +90,77 @@ const DashboardSettings = () => {
     setEditingBio(true);
   };
 
-  const handleSaveBio = () => {
-    setUser(prev => ({
-      ...prev,
-      bio: bioText
-    }));
-    setEditingBio(false);
-    toast.success("Bio updated successfully!");
+  const handleSaveBio = async () => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ bio: bioText })
+        .eq('id', user.id);
+      
+      if (error) {
+        console.error("Error updating bio:", error);
+        toast.error("Failed to update bio");
+        return;
+      }
+      
+      setUser(prev => prev ? {
+        ...prev,
+        bio: bioText
+      } : null);
+      
+      setEditingBio(false);
+      toast.success("Bio updated successfully!");
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Something went wrong");
+    }
   };
 
   const handleCancelEditBio = () => {
-    setBioText(user.bio);
+    setBioText(user?.bio || "");
     setEditingBio(false);
   };
+  
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen w-full bg-gray-50">
+        <SimpleSidebar />
+        
+        <main className="flex-1">
+          <div className="container mx-auto px-4 py-8">
+            <h1 className="text-3xl font-bold mb-6">Settings</h1>
+            
+            {/* User Bio Section Skeleton */}
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle>Bio</CardTitle>
+                <CardDescription>Your profile description seen by visitors</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-20 w-full" />
+              </CardContent>
+            </Card>
+            
+            {/* Settings Skeleton */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Account Settings</CardTitle>
+                <CardDescription>Manage your account preferences</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-10 w-32" />
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      </div>
+    );
+  }
   
   return (
     <div className="flex min-h-screen w-full bg-gray-50">
@@ -106,7 +198,7 @@ const DashboardSettings = () => {
                 </div>
               ) : (
                 <div className="flex justify-between items-start">
-                  <p className="text-gray-600">{user.bio}</p>
+                  <p className="text-gray-600">{user?.bio || "No bio added yet."}</p>
                   <Button variant="ghost" size="sm" onClick={handleEditBio}>
                     <Pencil className="h-4 w-4" />
                   </Button>

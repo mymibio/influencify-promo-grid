@@ -1,25 +1,134 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SimpleSidebar from "@/components/dashboard/simple-sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, BarChart2, ArrowUp, ArrowDown, Users } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
-// Mock analytics data
-const analyticsData = {
-  totalVisits: 1482,
-  totalClicks: 643,
-  clickRate: 43.4,
-  visitGrowth: 12.5,
-  clickGrowth: 8.2,
-  topSource: "Instagram",
-  avgTimeOnPage: "1m 45s",
-  newUsers: 324,
+// Default analytics data structure
+const defaultAnalyticsData = {
+  totalVisits: 0,
+  totalClicks: 0,
+  clickRate: 0,
+  visitGrowth: 0,
+  clickGrowth: 0,
+  topSource: "",
+  avgTimeOnPage: "0s",
+  newUsers: 0,
   lastUpdated: new Date().toISOString()
 };
 
 const DashboardAnalytics = () => {
   const [analyticsTimeframe, setAnalyticsTimeframe] = useState("7d");
+  const [analyticsData, setAnalyticsData] = useState(defaultAnalyticsData);
+  const [isLoading, setIsLoading] = useState(true);
+  const { profile } = useAuth();
+  
+  useEffect(() => {
+    const fetchAnalyticsData = async () => {
+      if (!profile) return;
+      
+      setIsLoading(true);
+      
+      try {
+        // In a real app, you would fetch analytics data from your backend
+        // For now, we'll generate some random data based on the user's promotional items
+        
+        const { data: items, error } = await supabase
+          .from('promotional_items')
+          .select('*')
+          .eq('user_id', profile.id);
+          
+        if (error) {
+          console.error("Error fetching promotional items:", error);
+          toast.error("Failed to load analytics data");
+          return;
+        }
+        
+        // Generate mock analytics based on the number of promotional items
+        const itemCount = items?.length || 0;
+        const baseVisits = itemCount * 100 + Math.floor(Math.random() * 500);
+        const baseClicks = Math.floor(baseVisits * (0.3 + Math.random() * 0.3));
+        const visitGrowth = Math.round((Math.random() * 20 - 5) * 10) / 10; // -5 to +15
+        const clickGrowth = Math.round((Math.random() * 20 - 5) * 10) / 10; // -5 to +15
+        
+        setAnalyticsData({
+          totalVisits: baseVisits,
+          totalClicks: baseClicks,
+          clickRate: Math.round((baseClicks / baseVisits) * 100 * 10) / 10 || 0,
+          visitGrowth: visitGrowth,
+          clickGrowth: clickGrowth,
+          topSource: ["Instagram", "Direct", "Twitter"][Math.floor(Math.random() * 3)],
+          avgTimeOnPage: `${Math.floor(Math.random() * 2 + 1)}m ${Math.floor(Math.random() * 60)}s`,
+          newUsers: Math.floor(baseVisits * 0.2 + Math.random() * 50),
+          lastUpdated: new Date().toISOString()
+        });
+      } catch (error) {
+        console.error("Error:", error);
+        toast.error("Something went wrong");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchAnalyticsData();
+  }, [profile, analyticsTimeframe]);
+  
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen w-full bg-gray-50">
+        <SimpleSidebar />
+        
+        <main className="flex-1">
+          <div className="container mx-auto px-4 py-8">
+            <h1 className="text-3xl font-bold mb-6">Analytics</h1>
+            
+            {/* Loading state */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold">Traffic Overview</h2>
+                <Skeleton className="h-10 w-32" />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                {[1, 2, 3, 4].map((i) => (
+                  <Card key={i}>
+                    <CardContent className="pt-6">
+                      <Skeleton className="h-16 w-full" />
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="md:col-span-2">
+                  <CardHeader>
+                    <CardTitle>Traffic Overview</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-[200px] w-full" />
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Traffic Sources</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-[200px] w-full" />
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
   
   return (
     <div className="flex min-h-screen w-full bg-gray-50">
@@ -105,7 +214,7 @@ const DashboardAnalytics = () => {
                   <div className="h-[200px] flex items-center justify-center bg-gray-100 rounded-md">
                     <div className="text-center text-muted-foreground">
                       <BarChart size={48} className="mx-auto mb-2" />
-                      <p>Traffic visualization would appear here</p>
+                      <p>Traffic data will be available soon</p>
                     </div>
                   </div>
                 </CardContent>
