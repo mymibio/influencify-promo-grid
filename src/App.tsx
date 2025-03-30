@@ -29,11 +29,12 @@ function App() {
           <Sonner />
           <BrowserRouter>
             <Routes>
+              {/* Public routes */}
               <Route path="/" element={<Index />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/login" element={<Login />} />
               
-              {/* Protected routes */}
+              {/* Protected dashboard routes with nested routes */}
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/dashboard/settings" element={<ProtectedRoute><DashboardSettings /></ProtectedRoute>} />
               <Route path="/dashboard/analytics" element={<ProtectedRoute><DashboardAnalytics /></ProtectedRoute>} />
@@ -42,9 +43,10 @@ function App() {
               {/* User profile route - should be below dashboard routes */}
               <Route path="/:username" element={<UserProfile />} />
               
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              {/* Catch-all route for 404s */}
               <Route path="*" element={<NotFound />} />
             </Routes>
+            
             {/* Mobile Navigation that will display on all pages where the URL includes "/dashboard" */}
             <MobileNavigation />
           </BrowserRouter>
