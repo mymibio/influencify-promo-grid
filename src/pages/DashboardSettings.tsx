@@ -13,6 +13,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
 
 const DashboardSettings = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -55,7 +56,7 @@ const DashboardSettings = () => {
             name: data.name,
             profilePicture: data.profile_picture,
             bio: data.bio || "",
-            socialLinks: data.social_links as User['socialLinks'] || {}, // Fix the type cast here
+            socialLinks: data.social_links as User['socialLinks'] || {},
             createdAt: data.created_at
           };
           
@@ -122,6 +123,17 @@ const DashboardSettings = () => {
     setBioText(user?.bio || "");
     setEditingBio(false);
   };
+
+  const handleBioKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSaveBio();
+    }
+  };
+
+  const handleBioBlur = () => {
+    handleSaveBio();
+  };
   
   if (isLoading) {
     return (
@@ -163,7 +175,7 @@ const DashboardSettings = () => {
   }
   
   return (
-    <div className="flex min-h-screen w-full bg-gray-50">
+    <div className="flex min-h-screen w-full bg-[#5271ff]/5">
       <SimpleSidebar />
       
       <main className="flex-1">
@@ -171,7 +183,7 @@ const DashboardSettings = () => {
           <h1 className="text-3xl font-bold mb-6">Settings</h1>
           
           {/* User Bio Section */}
-          <Card className="mb-6">
+          <Card className="mb-6 shadow-sm border-0">
             <CardHeader>
               <CardTitle>Bio</CardTitle>
               <CardDescription>Your profile description seen by visitors</CardDescription>
@@ -179,14 +191,17 @@ const DashboardSettings = () => {
             <CardContent>
               {editingBio ? (
                 <div className="space-y-4">
-                  <Input 
+                  <Textarea 
                     value={bioText} 
-                    onChange={(e) => setBioText(e.target.value)} 
+                    onChange={(e) => setBioText(e.target.value)}
+                    onKeyDown={handleBioKeyDown}
+                    onBlur={handleBioBlur}
                     placeholder="Enter your bio" 
-                    className="min-h-[80px]"
+                    className="min-h-[80px] resize-none"
+                    autoFocus
                   />
                   <div className="flex space-x-2">
-                    <Button onClick={handleSaveBio} size="sm">
+                    <Button onClick={handleSaveBio} size="sm" className="bg-[#5271ff]">
                       <Check className="h-4 w-4 mr-2" />
                       Save
                     </Button>
@@ -208,7 +223,7 @@ const DashboardSettings = () => {
           </Card>
           
           {/* Settings */}
-          <Card>
+          <Card className="shadow-sm border-0">
             <CardHeader>
               <CardTitle>Account Settings</CardTitle>
               <CardDescription>Manage your account preferences</CardDescription>
@@ -251,7 +266,7 @@ const DashboardSettings = () => {
               </div>
               
               <div className="pt-4">
-                <Button onClick={handleSaveSettings}>Save Settings</Button>
+                <Button onClick={handleSaveSettings} className="bg-[#5271ff]">Save Settings</Button>
               </div>
             </CardContent>
           </Card>

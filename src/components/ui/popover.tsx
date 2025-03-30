@@ -67,8 +67,8 @@ const PopoverContent = React.forwardRef<
             <DrawerTitle>{mobileTitle || "Options"}</DrawerTitle>
             <DrawerClose />
           </DrawerHeader>
-          <ScrollArea className="px-4 pb-6 max-h-[calc(85vh-4rem)]">
-            <div className="p-1">
+          <ScrollArea className="px-4 pb-6 max-h-[calc(85vh-4rem)]" orientation="vertical" hideScrollbar={false}>
+            <div className="p-1 pb-12">
               {children}
             </div>
           </ScrollArea>
@@ -90,8 +90,8 @@ const PopoverContent = React.forwardRef<
         )}
         {...props}
       >
-        <ScrollArea viewportClassName="max-h-[60vh]">
-          <div className="p-1">
+        <ScrollArea className="h-full" viewportClassName="max-h-[60vh]" orientation="vertical" hideScrollbar={false}>
+          <div className="p-1 pb-6">
             {children}
           </div>
         </ScrollArea>

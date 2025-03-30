@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -23,7 +22,7 @@ const themes: ThemeStyle[] = [
     id: "default",
     name: "Default",
     category: ["All", "Basic"],
-    header: "bg-blue-500",
+    header: "bg-[#5271ff]",
     background: "bg-white",
     textColor: "text-gray-800",
     headerTextColor: "text-white",
@@ -180,8 +179,8 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ selectedTheme, onThemeCha
                 .map(theme => (
                   <Card 
                     key={theme.id}
-                    className={`p-4 cursor-pointer transition-all hover:ring-2 hover:ring-primary hover:ring-opacity-50 ${
-                      selectedTheme === theme.id ? "ring-2 ring-primary" : ""
+                    className={`p-4 border-0 cursor-pointer transition-all hover:ring-2 hover:ring-[#5271ff] hover:ring-opacity-50 ${
+                      selectedTheme === theme.id ? "ring-2 ring-[#5271ff]" : ""
                     }`}
                     onClick={() => handleThemeSelect(theme.id)}
                   >
@@ -190,7 +189,7 @@ const ThemeSelector: React.FC<ThemeSelectorProps> = ({ selectedTheme, onThemeCha
                 ))}
                 
               {category === "All" && (
-                <Card className="p-4 border-dashed cursor-pointer flex flex-col items-center justify-center h-full">
+                <Card className="p-4 border-dashed border-0 cursor-pointer flex flex-col items-center justify-center h-full">
                   <div className="h-[400px] flex items-center justify-center">
                     <div className="text-center">
                       <p className="text-lg font-medium text-gray-500 mb-2">CREATE YOUR OWN</p>

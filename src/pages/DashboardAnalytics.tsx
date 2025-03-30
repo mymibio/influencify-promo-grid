@@ -121,7 +121,7 @@ const DashboardAnalytics = () => {
   
   if (isLoading) {
     return (
-      <div className="flex min-h-screen w-full bg-gray-50">
+      <div className="flex min-h-screen w-full bg-[#5271ff]/5">
         <SimpleSidebar />
         
         <main className="flex-1">
@@ -172,7 +172,7 @@ const DashboardAnalytics = () => {
   }
   
   return (
-    <div className="flex min-h-screen w-full bg-gray-50">
+    <div className="flex min-h-screen w-full bg-[#5271ff]/5">
       <SimpleSidebar />
       
       <main className="flex-1">
@@ -256,11 +256,11 @@ const DashboardAnalytics = () => {
                     config={{
                       visits: {
                         label: "Page Views",
-                        color: "#8B5CF6", // Purple color
+                        color: "#5271ff",
                       },
                       clicks: {
                         label: "Clicks",
-                        color: "#D946EF", // Pink color
+                        color: "#5271ff",
                       }
                     }}
                     className="aspect-auto h-[300px]"
@@ -303,19 +303,19 @@ const DashboardAnalytics = () => {
                         />
                         <defs>
                           <linearGradient id="colorVisits" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0} />
+                            <stop offset="5%" stopColor="#5271ff" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="#5271ff" stopOpacity={0} />
                           </linearGradient>
                           <linearGradient id="colorClicks" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#D946EF" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="#D946EF" stopOpacity={0} />
+                            <stop offset="5%" stopColor="#5271ff" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="#5271ff" stopOpacity={0} />
                           </linearGradient>
                         </defs>
                         <Area
                           type="monotone"
                           name="Page Views"
                           dataKey="visits"
-                          stroke="#8B5CF6"
+                          stroke="#5271ff"
                           strokeWidth={2}
                           fill="url(#colorVisits)"
                           activeDot={{ r: 6, strokeWidth: 0 }}
@@ -324,7 +324,7 @@ const DashboardAnalytics = () => {
                           type="monotone"
                           name="Clicks"
                           dataKey="clicks"
-                          stroke="#D946EF"
+                          stroke="#5271ff"
                           strokeWidth={2}
                           fill="url(#colorClicks)"
                           activeDot={{ r: 6, strokeWidth: 0 }}
@@ -349,7 +349,7 @@ const DashboardAnalytics = () => {
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
                           <div 
-                            className="bg-primary h-2 rounded-full" 
+                            className="bg-[#5271ff] h-2 rounded-full" 
                             style={{ width: `${source.percentage}%` }}
                           ></div>
                         </div>
