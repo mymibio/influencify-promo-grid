@@ -3,6 +3,7 @@ import * as React from "react"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from "@/components/ui/drawer"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 import { cn } from "@/lib/utils"
 
@@ -46,7 +47,6 @@ const PopoverContent = React.forwardRef<
 >(({ className, align = "center", sideOffset = 4, mobileTitle, children, ...props }, ref) => {
   const isMobile = useIsMobile();
   const { setTitle } = React.useContext(MobilePopoverContext);
-  const [open, setOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (mobileTitle) {
@@ -62,12 +62,14 @@ const PopoverContent = React.forwardRef<
           window.dispatchEvent(closeEvent);
         }
       }}>
-        <DrawerContent className="max-h-[85vh] px-4 pb-6">
-          <DrawerHeader className="px-0">
+        <DrawerContent className="max-h-[85vh]">
+          <DrawerHeader className="px-4">
             <DrawerTitle>{mobileTitle || "Options"}</DrawerTitle>
             <DrawerClose />
           </DrawerHeader>
-          <div className="px-0">{children}</div>
+          <ScrollArea className="px-4 pb-6 max-h-[calc(85vh-4rem)]">
+            {children}
+          </ScrollArea>
         </DrawerContent>
       </Drawer>
     );
@@ -81,11 +83,15 @@ const PopoverContent = React.forwardRef<
         sideOffset={sideOffset}
         className={cn(
           "z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-          "max-w-[calc(100vw-2rem)] sm:max-w-md",
+          "max-w-[calc(100vw-2rem)] max-h-[85vh] overflow-auto sm:max-w-md",
           className
         )}
         {...props}
-      />
+      >
+        <ScrollArea className="max-h-[60vh]">
+          {children}
+        </ScrollArea>
+      </PopoverPrimitive.Content>
     </PopoverPrimitive.Portal>
   );
 });

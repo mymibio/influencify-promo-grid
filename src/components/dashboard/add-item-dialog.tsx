@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PromotionalItem } from "@/types/user";
 import { toast } from "sonner";
-import { ImagePlus, ChevronDown } from "lucide-react";
+import { ImagePlus } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose, DrawerFooter } from "@/components/ui/drawer";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -31,7 +31,6 @@ const AddItemDialog = ({ open, onClose, onAdd, editItem }: AddItemDialogProps) =
   const [discount, setDiscount] = useState("");
   const [isProcessingImage, setIsProcessingImage] = useState(false);
   const isMobile = useIsMobile();
-  const [showScrollIndicator, setShowScrollIndicator] = useState(true);
 
   // Populate form when editing an existing item
   useEffect(() => {
@@ -114,18 +113,6 @@ const AddItemDialog = ({ open, onClose, onAdd, editItem }: AddItemDialogProps) =
       resetForm();
     }
   }, [open]);
-
-  // Handle scroll indicator
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const bottom = Math.floor(e.currentTarget.scrollHeight - e.currentTarget.scrollTop) <= 
-      Math.ceil(e.currentTarget.clientHeight) + 20;
-    
-    if (bottom) {
-      setShowScrollIndicator(false);
-    } else {
-      setShowScrollIndicator(true);
-    }
-  };
 
   const renderFormContent = () => (
     <form onSubmit={handleSubmit} className="grid gap-4 py-2">
@@ -248,21 +235,9 @@ const AddItemDialog = ({ open, onClose, onAdd, editItem }: AddItemDialogProps) =
             <DrawerClose />
           </DrawerHeader>
           
-          <div className="relative">
-            <ScrollArea className="px-4 pb-24 max-h-[65vh]" onScroll={handleScroll}>
-              {renderFormContent()}
-            </ScrollArea>
-            
-            {/* Scroll indicator */}
-            {showScrollIndicator && (
-              <div className="absolute bottom-0 left-0 right-0 flex justify-center pb-2 pt-4 bg-gradient-to-t from-white via-white">
-                <div className="flex flex-col items-center text-xs text-gray-500">
-                  <span>Scroll for more</span>
-                  <ChevronDown className="h-4 w-4 animate-bounce" />
-                </div>
-              </div>
-            )}
-          </div>
+          <ScrollArea className="px-4 pb-24 max-h-[calc(90vh-10rem)]" orientation="vertical">
+            {renderFormContent()}
+          </ScrollArea>
           
           <DrawerFooter className="pt-2 border-t mt-0 bg-white">
             <Button onClick={handleSubmit} className="w-full">
@@ -279,28 +254,16 @@ const AddItemDialog = ({ open, onClose, onAdd, editItem }: AddItemDialogProps) =
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] max-h-[85vh] flex flex-col">
-        <DialogHeader className="pb-2 border-b">
+      <DialogContent className="sm:max-w-[500px] p-0">
+        <DialogHeader className="p-6 pb-2 border-b">
           <DialogTitle>{editItem ? "Edit coupon" : "New coupon"}</DialogTitle>
         </DialogHeader>
         
-        <div className="relative flex-grow overflow-hidden">
-          <ScrollArea className="h-full max-h-[50vh] py-3" onScroll={handleScroll}>
-            {renderFormContent()}
-          </ScrollArea>
-          
-          {/* Scroll indicator */}
-          {showScrollIndicator && (
-            <div className="absolute bottom-0 left-0 right-0 flex justify-center pb-2 pt-4 bg-gradient-to-t from-white via-white">
-              <div className="flex flex-col items-center text-xs text-gray-500">
-                <span>Scroll for more</span>
-                <ChevronDown className="h-4 w-4 animate-bounce" />
-              </div>
-            </div>
-          )}
-        </div>
+        <ScrollArea className="max-h-[60vh] p-6">
+          {renderFormContent()}
+        </ScrollArea>
         
-        <DialogFooter className="pt-2 border-t">
+        <DialogFooter className="p-6 pt-2 border-t">
           <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>

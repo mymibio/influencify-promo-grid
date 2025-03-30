@@ -51,7 +51,7 @@ const MobileNavigation = () => {
   
   return (
     <div className="fixed bottom-4 left-0 right-0 z-50 flex justify-center md:hidden">
-      <nav className="flex items-center justify-around rounded-full bg-white/90 backdrop-blur-md px-6 py-3 border border-gray-100 shadow-md">
+      <nav className="flex items-center justify-around rounded-full bg-white/90 backdrop-blur-md px-6 py-2 border border-gray-100 shadow-md">
         <Link 
           to="/dashboard" 
           className={cn(
@@ -60,6 +60,7 @@ const MobileNavigation = () => {
               ? "text-primary" 
               : "text-muted-foreground"
           )}
+          aria-label="Dashboard"
         >
           <LayoutGrid size={24} />
         </Link>
@@ -72,6 +73,7 @@ const MobileNavigation = () => {
               ? "text-primary" 
               : "text-muted-foreground"
           )}
+          aria-label="Analytics"
         >
           <BarChart size={24} />
         </Link>
@@ -95,6 +97,7 @@ const MobileNavigation = () => {
               ? "text-primary" 
               : "text-muted-foreground"
           )}
+          aria-label="Theme"
         >
           <Palette size={24} />
         </Link>
@@ -107,6 +110,7 @@ const MobileNavigation = () => {
               ? "text-primary" 
               : "text-muted-foreground"
           )}
+          aria-label="Settings"
         >
           <Settings size={24} />
         </Link>
