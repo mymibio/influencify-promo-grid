@@ -514,7 +514,7 @@ const Dashboard = () => {
                   <div className="flex items-center gap-2">
                     <Link size={18} className="text-blue-500" />
                     <span className="text-sm">
-                      Your LinkPromo is live: <span className="text-blue-500 font-medium">{window.location.origin}/{profile.username}</span>
+                      Your LinkPromo is live: <a href={`/${profile.username}`} className="text-blue-500 font-medium hover:underline">{window.location.origin}/{profile.username}</a>
                     </span>
                   </div>
                   <Button 
