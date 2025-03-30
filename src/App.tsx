@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,15 +8,12 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigationType 
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import UserProfile from "./pages/UserProfile";
-import SignUp from "./pages/SignUp";
-import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import DashboardSettings from "./pages/DashboardSettings";
 import DashboardAnalytics from "./pages/DashboardAnalytics";
 import DashboardTheme from "./pages/DashboardTheme";
 import MobileNavigation from "./components/dashboard/mobile-navigation";
 import { AuthProvider } from "./contexts/AuthContext";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { MobilePopoverProvider } from "./components/ui/popover";
 
 // Add Google Fonts (injected in head)
@@ -30,7 +27,7 @@ function ScrollToTop() {
   const { pathname } = useLocation();
   const navigationType = useNavigationType();
   
-  useEffect(() => {
+  React.useEffect(() => {
     // Only scroll to top on initial load or PUSH navigation, not on POP (back button)
     if (navigationType !== 'POP') {
       window.scrollTo(0, 0);
@@ -60,19 +57,17 @@ function App() {
             <BrowserRouter>
               <ScrollToTop />
               <Routes>
-                {/* Public routes */}
+                {/* Public routes - all routes are now public */}
                 <Route path="/" element={<Index />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/login" element={<Login />} />
                 
-                {/* Protected dashboard routes */}
-                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                <Route path="/dashboard/settings" element={<ProtectedRoute><DashboardSettings /></ProtectedRoute>} />
-                <Route path="/dashboard/analytics" element={<ProtectedRoute><DashboardAnalytics /></ProtectedRoute>} />
-                <Route path="/dashboard/theme" element={<ProtectedRoute><DashboardTheme /></ProtectedRoute>} />
-                <Route path="/dashboard/links" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                {/* Dashboard routes - no longer protected */}
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/dashboard/settings" element={<DashboardSettings />} />
+                <Route path="/dashboard/analytics" element={<DashboardAnalytics />} />
+                <Route path="/dashboard/theme" element={<DashboardTheme />} />
+                <Route path="/dashboard/links" element={<Dashboard />} />
                 
-                {/* User profile route - must be before the catch-all but after dashboard routes to avoid conflicts */}
+                {/* User profile route */}
                 <Route path="/:username" element={<UserProfile />} />
                 
                 {/* Catch-all route for 404s */}

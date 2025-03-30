@@ -43,14 +43,9 @@ const Navbar = () => {
           <Link to="#pricing" className="text-sm font-medium hover:text-brand-blue transition-colors">
             Pricing
           </Link>
-          <Link to="/login">
-            <Button variant="outline" className="ml-2">
-              Login
-            </Button>
-          </Link>
-          <Link to="/signup">
+          <Link to="/dashboard">
             <Button className="bg-brand-blue hover:bg-opacity-90 text-white rounded-full">
-              Start Creating
+              Go to Dashboard
             </Button>
           </Link>
         </nav>
@@ -89,14 +84,9 @@ const Navbar = () => {
               >
                 Pricing
               </Link>
-              <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                <Button variant="outline" className="w-full">
-                  Login
-                </Button>
-              </Link>
-              <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
+              <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
                 <Button className="w-full bg-brand-blue hover:bg-opacity-90 text-white rounded-full">
-                  Start Creating
+                  Go to Dashboard
                 </Button>
               </Link>
             </nav>
