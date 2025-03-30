@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -143,7 +144,7 @@ const SignUp = () => {
                 <Label htmlFor="username">Username</Label>
                 <div className="relative">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
-                    influencify.com/
+                    mymi.bio/
                   </span>
                   <Input
                     id="username"
@@ -151,7 +152,7 @@ const SignUp = () => {
                     placeholder="yourname"
                     value={formData.username}
                     onChange={handleChange}
-                    className="pl-32"
+                    className="pl-24"
                     required
                     disabled={!!new URLSearchParams(location.search).get('username')}
                   />
@@ -174,7 +175,7 @@ const SignUp = () => {
             
             <Button 
               type="submit" 
-              className="w-full" 
+              className="w-full bg-[#FF66B3] hover:bg-[#E54C9A] text-white" 
               disabled={isLoading}
             >
               <UserPlus className="mr-2 h-4 w-4" />
@@ -183,7 +184,7 @@ const SignUp = () => {
             
             <p className="text-center text-sm text-muted-foreground">
               Already have an account?{" "}
-              <Link to="/login" className="text-brand-purple hover:underline">
+              <Link to="/login" className="text-[#FF66B3] hover:underline">
                 Log in
               </Link>
             </p>

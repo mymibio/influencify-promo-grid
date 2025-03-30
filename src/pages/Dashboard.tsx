@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { PromotionalItem } from "@/types/user";
 import { Button } from "@/components/ui/button";
-import { Instagram, Facebook, MessageCircle, Mail, Youtube, Twitter, Plus, Copy, Link, Pencil } from "lucide-react";
+import { Plus, Copy, Link, Pencil } from "lucide-react";
 import SimpleSidebar from "@/components/dashboard/simple-sidebar";
 import AddItemCard from "@/components/dashboard/add-item-card";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
@@ -10,14 +10,13 @@ import ProfilePreview from "@/components/dashboard/profile-preview";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import MobileNavigation from "@/components/dashboard/mobile-navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { v4 as uuidv4 } from "uuid";
 import SocialMediaSelector from "@/components/social/SocialMediaSelector";
-import ProfileHeader from "@/components/profile/profile-header";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Dashboard = () => {
   const { profile, refreshProfile } = useAuth();
@@ -355,28 +354,33 @@ const Dashboard = () => {
   }
   
   return (
-    <div className="flex min-h-screen w-full bg-gray-50 pb-16 md:pb-0">
-      <SimpleSidebar />
+    <div className="flex min-h-screen w-full bg-[#6B81F3] pb-16 md:pb-0">
+      {/* Sidebar with yellow top background */}
+      <div className="flex-shrink-0 w-[250px] hidden lg:block">
+        <div className="h-20 bg-[#FFE26B] flex items-center px-4">
+          <h1 className="text-2xl font-bold text-blue-600">MYMI.BIO</h1>
+        </div>
+        <SimpleSidebar />
+      </div>
       
       <main className="flex-1">
-        <div className="container mx-auto px-4 py-8">
+        {/* Yellow header on mobile */}
+        <div className="h-16 bg-[#FFE26B] lg:hidden flex items-center px-4">
+          <h1 className="text-2xl font-bold text-blue-600">MYMI.BIO</h1>
+          <div className="ml-auto px-4 py-1 border-2 border-blue-800 rounded-lg font-bold text-blue-800">
+            FREE
+          </div>
+        </div>
+        
+        <div className="container mx-auto px-4 py-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {!isMobile && (
-              <div className="hidden lg:block">
-                <ProfilePreview 
-                  user={profile}
-                  items={items}
-                  selectedTheme={selectedTheme}
-                  className="w-full"
-                />
-              </div>
-            )}
-            
+            {/* Main content area */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg shadow-sm border">
-                <div className="flex flex-col md:flex-row items-center md:items-start gap-6 p-4 sm:p-6">
+              {/* User profile card */}
+              <div className="bg-white rounded-xl shadow-sm p-6 mb-4">
+                <div className="flex flex-col md:flex-row items-center gap-6">
                   <div className="relative">
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden flex-shrink-0 border-2 border-white shadow-md">
+                    <div className="w-24 h-24 rounded-full overflow-hidden flex-shrink-0 bg-[#5E9BF7] border-4 border-white shadow-md">
                       {profile.profilePicture ? (
                         <img 
                           src={profile.profilePicture} 
@@ -384,14 +388,14 @@ const Dashboard = () => {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                          <span className="text-xl font-semibold">{profile.name.charAt(0)}</span>
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="text-2xl font-semibold text-white">{profile.name.charAt(0)}</span>
                         </div>
                       )}
                     </div>
                     <Button 
                       size="icon" 
-                      className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-1.5 cursor-pointer shadow-md hover:bg-primary/90 h-8 w-8"
+                      className="absolute bottom-0 right-0 bg-black text-white rounded-full p-1.5 cursor-pointer shadow-md hover:bg-gray-800 h-8 w-8"
                       onClick={() => setIsProfileDialogOpen(true)}
                     >
                       <Pencil size={16} />
@@ -399,14 +403,14 @@ const Dashboard = () => {
                   </div>
                   
                   <div className="flex-1 flex flex-col text-center md:text-left">
-                    <h1 className="text-2xl sm:text-3xl font-bold">{profile?.name}</h1>
+                    <h1 className="text-2xl font-bold">{profile?.name}</h1>
                     
-                    <div className="text-muted-foreground text-sm mb-2">
-                      @{profile?.username}
-                    </div>
-                    
-                    {isEditingBio ? (
-                      <div className="flex flex-col gap-2">
+                    {!isEditingBio ? (
+                      <p className="text-gray-600 mb-3">
+                        {profile.bio || "Add bio"}
+                      </p>
+                    ) : (
+                      <div className="flex flex-col gap-2 mb-3">
                         <Input
                           value={editedBio}
                           onChange={(e) => setEditedBio(e.target.value)}
@@ -428,118 +432,135 @@ const Dashboard = () => {
                           </Button>
                         </div>
                       </div>
-                    ) : (
-                      <div className="relative group">
-                        <p className="text-sm sm:text-base text-gray-600 max-w-lg">
-                          {profile.bio || "Add a bio to tell people about yourself"}
-                        </p>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 h-6 w-6"
-                          onClick={handleEditBio}
-                        >
-                          <Pencil size={12} />
-                        </Button>
-                      </div>
                     )}
                     
-                    <div className="flex flex-wrap gap-3 justify-center md:justify-start mt-4">
-                      <Button
-                        onClick={openSocialSelector}
-                        variant="outline"
-                        className="flex items-center gap-2"
-                      >
-                        <Plus size={16} />
-                        Manage social links
-                      </Button>
-                    </div>
+                    <Button
+                      onClick={openSocialSelector}
+                      variant="outline"
+                      className="bg-[#E6E6FA] text-blue-600 hover:bg-blue-100 rounded-full px-4 py-1 h-auto w-fit self-center md:self-start font-medium"
+                    >
+                      + add socials
+                    </Button>
                   </div>
                 </div>
               </div>
               
-              <div className="mt-4 bg-white rounded-lg border p-3 shadow-sm">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <Link size={18} className="text-blue-500" />
-                    <span className="text-sm">
-                      Your LinkPromo is live: <a href={`/${profile.username}`} className="text-blue-500 font-medium hover:underline">{window.location.origin}/{profile.username}</a>
-                    </span>
+              {/* URL/link card */}
+              <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+                <div className="flex items-center gap-2">
+                  <div className="bg-green-500 text-white px-2 py-1 rounded-md text-sm font-bold">
+                    LIVE
                   </div>
+                  <span className="flex-1 text-lg">
+                    Mymi.bio/{profile.username}
+                  </span>
                   <Button 
-                    variant="default" 
-                    size="sm" 
-                    className="bg-blue-500 hover:bg-blue-600 text-white"
+                    variant="ghost" 
+                    size="icon"
+                    className="text-gray-600"
                     onClick={handleCopyLink}
                   >
-                    <Copy size={16} className="mr-1" />
-                    Copy URL
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M8 5H6C4.89543 5 4 5.89543 4 7V19C4 20.1046 4.89543 21 6 21H16C17.1046 21 18 20.1046 18 19V18M8 5C8 6.10457 8.89543 7 10 7H12C13.1046 7 14 6.10457 14 5M8 5C8 3.89543 8.89543 3 10 3H12C13.1046 3 14 3.89543 14 5M14 5H16C17.1046 5 18 5.89543 18 7V10M20 14H10M10 14L13 11M10 14L13 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
                   </Button>
                 </div>
               </div>
               
+              {/* Coupon grid */}
               {isLoading ? (
                 <div className="text-center py-12">
                   <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-brand-purple mx-auto mb-4"></div>
-                  <p>Loading your promotional items...</p>
+                  <p className="text-white">Loading your promotional items...</p>
                 </div>
               ) : (
-                <>
+                <div className="grid grid-cols-2 gap-4">
                   {items.length > 0 ? (
-                    <div className="mt-8">
-                      <PromotionalGrid 
-                        items={items} 
-                        onEdit={handleEditCard}
-                        onDelete={handleDeleteCard}
-                        onDrag={handleDragCard}
-                        onReorder={handleReorderCards}
-                        editable={true}
-                      />
-                    </div>
+                    <PromotionalGrid 
+                      items={items} 
+                      onEdit={handleEditCard}
+                      onDelete={handleDeleteCard}
+                      onDrag={handleDragCard}
+                      onReorder={handleReorderCards}
+                      editable={true}
+                    />
                   ) : (
-                    <div className="text-center py-8 bg-gray-50 border border-dashed border-gray-300 rounded-lg mt-8">
-                      <p className="text-gray-500 mb-4">You don't have any promotional items yet.</p>
-                      <Button 
-                        onClick={() => {
-                          setEditingItem(null);
-                          setIsDialogOpen(true);
-                        }}
-                      >
-                        <Plus size={16} className="mr-1" />
-                        Add Your First Item
-                      </Button>
+                    <div className="col-span-2 flex items-center justify-center bg-white/20 rounded-xl border-2 border-white/30 border-dashed p-8 h-64">
+                      <div className="text-center">
+                        <div className="text-white text-4xl mb-2">+</div>
+                        <p className="text-white mb-2">Add your first coupon</p>
+                        <Button 
+                          onClick={() => {
+                            setEditingItem(null);
+                            setIsDialogOpen(true);
+                          }}
+                          variant="secondary"
+                        >
+                          Add Coupon
+                        </Button>
+                      </div>
                     </div>
                   )}
-                </>
-              )}
-              
-              <div className="mt-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <AddItemCard 
-                    aspectRatio="9:16" 
-                    onClick={() => {
-                      setEditingItem(null);
-                      setIsDialogOpen(true);
-                    }} 
-                    label="Add Coupon" 
-                  />
-                  <AddItemCard 
-                    aspectRatio="9:16" 
+                  
+                  {/* Add new coupon card */}
+                  <div 
+                    className="flex items-center justify-center bg-white/20 rounded-xl border-2 border-white/30 border-dashed p-8 cursor-pointer hover:bg-white/30 transition-colors"
                     onClick={() => {
                       setEditingItem(null);
                       setIsDialogOpen(true);
                     }}
-                    label="Add Coupon" 
-                  />
+                  >
+                    <div className="text-center">
+                      <div className="text-white text-4xl mb-2">+</div>
+                      <p className="text-white">Add coupon</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Phone preview */}
+            <div className="hidden lg:block">
+              <div className="bg-black rounded-3xl overflow-hidden shadow-xl p-3 mx-auto max-w-xs">
+                <div className="bg-white rounded-2xl overflow-hidden h-[600px]">
+                  <div className="bg-[#5E9BF7] h-[180px] relative">
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                      <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-2xl font-bold">
+                        {profile?.name?.charAt(0).toLowerCase() || "u"}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4 text-center">
+                    <div className="h-4 w-12 bg-gray-200 rounded-full mx-auto mb-8"></div>
+                    
+                    {/* Coupon preview */}
+                    {items.length > 0 ? (
+                      <div>
+                        {items.slice(0, 1).map(item => (
+                          <div key={item.id} className="mb-4">
+                            <img 
+                              src={item.image || "/placeholder.svg"} 
+                              alt={item.title} 
+                              className="w-full h-48 object-cover rounded-xl mb-2"
+                            />
+                            <p className="font-medium">{item.title}</p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center text-gray-400 text-sm">
+                        No coupons yet
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </main>
-      
-      {isMobile && <MobileNavigation />}
-      
+
+      {/* Dialogs and popovers */}
       <AddItemDialog
         open={isDialogOpen}
         onClose={() => {
@@ -556,54 +577,67 @@ const Dashboard = () => {
           <DialogHeader>
             <DialogTitle>Edit Profile</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="flex justify-center mb-4">
-              <div className="relative">
-                <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-gray-200 flex items-center justify-center bg-gray-100">
-                  {profile.profilePicture ? (
-                    <img 
-                      src={profile.profilePicture} 
-                      alt={profile.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-3xl font-semibold">{getInitials(profile.name)}</span>
-                  )}
+          <ScrollArea className="max-h-[60vh]">
+            <div className="space-y-4 py-4">
+              <div className="flex justify-center mb-4">
+                <div className="relative">
+                  <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-gray-200 flex items-center justify-center bg-[#5E9BF7]">
+                    {profile.profilePicture ? (
+                      <img 
+                        src={profile.profilePicture} 
+                        alt={profile.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-3xl font-semibold text-white">{getInitials(profile.name)}</span>
+                    )}
+                  </div>
+                  <Button 
+                    size="icon" 
+                    className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-primary"
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'image/*';
+                      input.onchange = (e) => {
+                        const files = (e.target as HTMLInputElement).files;
+                        if (files && files[0]) {
+                          handleEditProfilePicture(files[0]);
+                        }
+                      };
+                      input.click();
+                    }}
+                  >
+                    <Pencil size={16} className="text-white" />
+                  </Button>
                 </div>
-                <Button 
-                  size="icon" 
-                  className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-primary"
-                  onClick={() => {
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = 'image/*';
-                    input.onchange = (e) => {
-                      const files = (e.target as HTMLInputElement).files;
-                      if (files && files[0]) {
-                        handleEditProfilePicture(files[0]);
-                      }
-                    };
-                    input.click();
-                  }}
-                >
-                  <Pencil size={16} className="text-white" />
-                </Button>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="username">Username</Label>
+                <Input 
+                  id="username" 
+                  value={profile.username} 
+                  disabled
+                  className="bg-gray-50"
+                />
+                <p className="text-xs text-muted-foreground">Username cannot be changed</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="bio">Bio</Label>
+                <Input 
+                  id="bio" 
+                  value={editedBio}
+                  onChange={(e) => setEditedBio(e.target.value)}
+                />
+              </div>
+              <div className="pt-4 flex justify-end">
+                <Button onClick={() => {
+                  handleSaveBio();
+                  setIsProfileDialogOpen(false);
+                }}>Save</Button>
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input 
-                id="username" 
-                value={profile.username} 
-                disabled
-                className="bg-gray-50"
-              />
-              <p className="text-xs text-muted-foreground">Username cannot be changed</p>
-            </div>
-            <div className="pt-4 flex justify-end">
-              <Button onClick={() => setIsProfileDialogOpen(false)}>Close</Button>
-            </div>
-          </div>
+          </ScrollArea>
         </DialogContent>
       </Dialog>
       

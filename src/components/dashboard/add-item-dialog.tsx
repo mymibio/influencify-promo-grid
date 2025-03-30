@@ -235,12 +235,12 @@ const AddItemDialog = ({ open, onClose, onAdd, editItem }: AddItemDialogProps) =
             <DrawerClose />
           </DrawerHeader>
           
-          <ScrollArea className="px-4 pb-24 max-h-[calc(90vh-10rem)]" orientation="vertical">
+          <ScrollArea className="p-4 max-h-[calc(90vh-10rem)]" orientation="vertical" hideScrollbar={false}>
             {renderFormContent()}
           </ScrollArea>
           
           <DrawerFooter className="pt-2 border-t mt-0 bg-white">
-            <Button onClick={handleSubmit} className="w-full">
+            <Button onClick={handleSubmit} className="w-full bg-[#FF66B3] hover:bg-[#E54C9A] text-white">
               {editItem ? "Update" : "Save"}
             </Button>
             <Button variant="outline" onClick={onClose} className="w-full">
@@ -259,7 +259,7 @@ const AddItemDialog = ({ open, onClose, onAdd, editItem }: AddItemDialogProps) =
           <DialogTitle>{editItem ? "Edit coupon" : "New coupon"}</DialogTitle>
         </DialogHeader>
         
-        <ScrollArea className="max-h-[60vh] p-6">
+        <ScrollArea className="max-h-[60vh] p-6" hideScrollbar={false}>
           {renderFormContent()}
         </ScrollArea>
         
@@ -267,7 +267,9 @@ const AddItemDialog = ({ open, onClose, onAdd, editItem }: AddItemDialogProps) =
           <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="button" onClick={handleSubmit}>{editItem ? "Update" : "Save"}</Button>
+          <Button type="button" onClick={handleSubmit} className="bg-[#FF66B3] hover:bg-[#E54C9A] text-white">
+            {editItem ? "Update" : "Save"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

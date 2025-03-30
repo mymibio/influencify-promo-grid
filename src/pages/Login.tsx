@@ -99,7 +99,7 @@ const Login = () => {
             
             <Button 
               type="submit" 
-              className="w-full" 
+              className="w-full bg-[#FF66B3] hover:bg-[#E54C9A] text-white" 
               disabled={isLoading}
             >
               <LogIn className="mr-2 h-4 w-4" />
@@ -108,7 +108,7 @@ const Login = () => {
             
             <p className="text-center text-sm text-muted-foreground">
               Don't have an account yet?{" "}
-              <Link to="/signup" className="text-brand-purple hover:underline">
+              <Link to="/signup" className="text-[#FF66B3] hover:underline">
                 Sign up
               </Link>
             </p>
