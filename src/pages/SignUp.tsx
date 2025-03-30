@@ -135,24 +135,33 @@ const SignUp = () => {
       }
       
       if (data && data.user) {
-        // Insert a record in user_profiles table
-        const { error: profileError } = await supabase
-          .from('user_profiles')
-          .insert({
-            id: data.user.id,
-            username: formData.username,
-            name: formData.name,
-            email: formData.email,
-            social_links: {},
-            created_at: new Date().toISOString()
-          });
+        try {
+          // Insert a record in user_profiles table
+          const { error: profileError } = await supabase
+            .from('user_profiles')
+            .insert({
+              id: data.user.id,
+              username: formData.username,
+              name: formData.name,
+              email: formData.email,
+              social_links: {},
+              created_at: new Date().toISOString()
+            });
+            
+          if (profileError) {
+            console.error("Error creating user profile:", profileError);
+            throw profileError;
+          }
           
-        if (profileError) {
-          throw profileError;
+          toast.success("Account created successfully! Redirecting to dashboard...");
+          navigate("/dashboard");
+        } catch (profileErr: any) {
+          // If profile creation fails, attempt to clean up the auth user
+          console.error("Error during profile creation:", profileErr);
+          
+          // Don't throw here - we want to show an error but we've already created the auth record
+          setFormError(profileErr.message || "Error creating user profile. Please try again.");
         }
-        
-        toast.success("Account created successfully! Redirecting to dashboard...");
-        navigate("/dashboard");
       }
     } catch (error: any) {
       console.error("Error during sign up:", error);
@@ -165,6 +174,8 @@ const SignUp = () => {
         } else {
           setFormError(error.message || "Failed to create account. Please try again.");
         }
+      } else if (error.message.includes("User already registered")) {
+        setFormError("This email is already registered. Please log in instead.");
       } else if (error.message.includes("email address")) {
         setFormError("Email address is already in use.");
       } else {

@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
@@ -21,21 +22,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const createUserProfile = async (userId: string, email: string) => {
     try {
-      // Extract username from email (before the @)
-      const username = email.split('@')[0];
-      
-      // Create a default name from the username
-      const name = username.charAt(0).toUpperCase() + username.slice(1);
-      
-      // Check if a profile already exists for this user to avoid duplicates
+      // First check if a profile already exists for this user to avoid duplicates
       const { data: existingProfile } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('id', userId)
         .maybeSingle();
-      
+        
       // If profile exists, return it and don't create a new one
       if (existingProfile) {
+        console.log("Found existing profile, not creating a new one");
         return {
           id: existingProfile.id,
           username: existingProfile.username,
@@ -48,8 +44,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           createdAt: existingProfile.created_at,
         };
       }
+
+      // Extract username from email (before the @)
+      const username = email.split('@')[0];
       
-      // Otherwise create a new profile
+      // Create a default name from the username
+      const name = username.charAt(0).toUpperCase() + username.slice(1);
+      
+      console.log("Creating new user profile for user", userId);
+      
+      // Create a new profile
       const { data, error } = await supabase
         .from('user_profiles')
         .insert({
