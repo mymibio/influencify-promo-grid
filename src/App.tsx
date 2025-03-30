@@ -43,13 +43,13 @@ function App() {
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/login" element={<Login />} />
                 
-                {/* Protected dashboard routes with nested routes */}
+                {/* Protected dashboard routes */}
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                 <Route path="/dashboard/settings" element={<ProtectedRoute><DashboardSettings /></ProtectedRoute>} />
                 <Route path="/dashboard/analytics" element={<ProtectedRoute><DashboardAnalytics /></ProtectedRoute>} />
                 <Route path="/dashboard/theme" element={<ProtectedRoute><DashboardTheme /></ProtectedRoute>} />
                 
-                {/* User profile route - moved above 404 catch-all but after exact matches */}
+                {/* User profile route - must be before the catch-all but after dashboard routes to avoid conflicts */}
                 <Route path="/:username" element={<UserProfile />} />
                 
                 {/* Catch-all route for 404s */}
