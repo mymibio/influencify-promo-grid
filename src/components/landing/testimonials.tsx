@@ -1,101 +1,157 @@
 
-import { useState, useEffect } from "react";
-import { Star } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@/components/ui/carousel";
+import { Card, CardContent } from "@/components/ui/card";
+import { Star, Quote } from "lucide-react";
 
 const testimonials = [
   {
-    name: "Sarah Johnson",
+    name: "Alex Johnson",
     role: "Fashion Influencer",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=256&q=80",
-    content: "Influencify has completely transformed how I monetize my Instagram. My followers love the clean, organized look of my coupon page!",
-    rating: 5
+    image: "/placeholder.svg",
+    content:
+      "Influencify has completely transformed how I monetize my Instagram following. Since I started using it, my conversion rates have increased by 40%!",
+    stars: 5,
   },
   {
-    name: "Marcus Chen",
-    role: "Tech Reviewer",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=256&q=80",
-    content: "The analytics alone are worth it. I can now see which products my audience engages with most and optimize my content strategy.",
-    rating: 5
+    name: "Samantha Lee",
+    role: "Beauty Blogger",
+    image: "/placeholder.svg",
+    content:
+      "The customization options are incredible. I can match my link page perfectly with my brand aesthetic, and my followers absolutely love it.",
+    stars: 5,
   },
   {
-    name: "Priya Patel",
-    role: "Beauty Creator",
-    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=256&q=80",
-    content: "Setting up my page took less than 10 minutes, and I started earning affiliate commissions that same day. The ROI is incredible!",
-    rating: 5
-  }
+    name: "Marcus Williams",
+    role: "Fitness Coach",
+    image: "/placeholder.svg",
+    content:
+      "I was skeptical at first, but after seeing a 50% increase in affiliate conversions in the first month, I'm completely sold. Best decision I've made for my business.",
+    stars: 5,
+  },
+  {
+    name: "Emma Rodriguez",
+    role: "Travel Influencer",
+    image: "/placeholder.svg",
+    content:
+      "The analytics features help me understand exactly which products are performing best. This has helped me optimize my recommendations and increase my earnings.",
+    stars: 4,
+  },
 ];
 
 const Testimonials = () => {
-  const [visibleItems, setVisibleItems] = useState<number[]>([]);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const index = parseInt(entry.target.getAttribute("data-index") || "0");
-            setVisibleItems((prev) => [...prev, index]);
-          }
-        });
+        if (entries[0].isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
       },
       { threshold: 0.2 }
     );
 
-    const elements = document.querySelectorAll(".testimonial-item");
-    elements.forEach((el) => observer.observe(el));
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
 
     return () => observer.disconnect();
   }, []);
 
   return (
-    <section className="py-24 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
-      <div className="absolute -top-40 -left-40 w-80 h-80 bg-brand-purple opacity-5 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-brand-light-purple opacity-5 rounded-full blur-3xl"></div>
+    <section
+      ref={sectionRef}
+      className="py-24 bg-white relative overflow-hidden"
+      id="testimonials"
+    >
+      {/* Background elements */}
+      <div className="absolute -top-40 -left-40 w-80 h-80 bg-[#FFE6D9] opacity-30 rounded-full blur-3xl"></div>
+      <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-[#FFE6D9] opacity-30 rounded-full blur-3xl"></div>
 
       <div className="container px-4 md:px-6">
-        <div className="text-center mb-16">
+        <div
+          className={`text-center mb-16 transition-all duration-700 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          }`}
+        >
+          <div className="inline-flex items-center justify-center rounded-full bg-[#FFE6D9] px-3 py-1 text-sm font-medium text-[#FF7F50] mb-4">
+            <span>Our Happy Customers</span>
+          </div>
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-            Loved by <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-purple to-brand-light-purple">Creators</span>
+            What <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF7F50] to-[#FF5F35]">Influencers</span> Say About Us
           </h2>
-          <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
             Join thousands of influencers who are already growing their business with Influencify
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {testimonials.map((testimonial, index) => (
-            <div
-              key={index}
-              data-index={index}
-              className={`testimonial-item bg-white p-6 rounded-2xl shadow-lg border border-gray-100 transition-all duration-700 ${
-                visibleItems.includes(index) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
-              }`}
-              style={{ transitionDelay: `${index * 200}ms` }}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full overflow-hidden">
-                  <img 
-                    src={testimonial.avatar} 
-                    alt={testimonial.name} 
-                    className="w-full h-full object-cover" 
-                  />
-                </div>
-                <div>
-                  <div className="font-medium">{testimonial.name}</div>
-                  <div className="text-sm text-gray-500">{testimonial.role}</div>
-                </div>
-              </div>
-              
-              <div className="flex mb-4">
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
-              
-              <p className="text-gray-700">"{testimonial.content}"</p>
+        <div
+          className={`mx-auto max-w-7xl transition-all duration-1000 delay-300 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-16"
+          }`}
+        >
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {testimonials.map((testimonial, index) => (
+                <CarouselItem
+                  key={index}
+                  className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3"
+                >
+                  <div className="h-full">
+                    <Card className="rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow h-full">
+                      <CardContent className="p-6 flex flex-col h-full">
+                        <div className="flex items-center space-x-4 mb-4">
+                          <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-[#FFD6C3] to-[#FFE6D9]">
+                            <Quote className="w-8 h-8 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[#FF7F50]/70" />
+                          </div>
+                          <div>
+                            <h4 className="text-lg font-semibold">{testimonial.name}</h4>
+                            <p className="text-gray-500 text-sm">{testimonial.role}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex mb-4">
+                          {Array.from({ length: testimonial.stars }).map((_, i) => (
+                            <Star
+                              key={i}
+                              className="w-4 h-4 text-[#FFAA80] fill-[#FFAA80]"
+                            />
+                          ))}
+                        </div>
+                        
+                        <blockquote className="flex-1 text-gray-700 italic">
+                          "{testimonial.content}"
+                        </blockquote>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="flex justify-center mt-8 gap-2">
+              <CarouselPrevious 
+                className="relative left-0 right-auto mr-2 bg-white border-gray-200 hover:bg-[#FFE6D9] hover:border-[#FFD6C3] hover:text-[#FF7F50]" 
+              />
+              <CarouselNext 
+                className="relative right-0 left-auto ml-2 bg-white border-gray-200 hover:bg-[#FFE6D9] hover:border-[#FFD6C3] hover:text-[#FF7F50]" 
+              />
             </div>
-          ))}
+          </Carousel>
         </div>
       </div>
     </section>

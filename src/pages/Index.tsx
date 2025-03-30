@@ -1,12 +1,7 @@
 
+import { useEffect, useState, lazy, Suspense } from "react";
 import Navbar from "@/components/ui/navbar";
 import Hero from "@/components/landing/hero";
-import Features from "@/components/landing/features";
-import HowItWorks from "@/components/landing/how-it-works";
-import Testimonials from "@/components/landing/testimonials";
-import PricingSection from "@/components/landing/pricing";
-import Footer from "@/components/landing/footer";
-import { useEffect, lazy, Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Lazy load components that are not above the fold
@@ -18,13 +13,13 @@ const LazyFooter = lazy(() => import("@/components/landing/footer"));
 
 // Loading fallback component
 const SectionSkeleton = () => (
-  <div className="w-full py-16">
+  <div className="w-full py-8">
     <div className="max-w-6xl mx-auto px-4">
-      <Skeleton className="h-8 w-64 mb-6 mx-auto" />
-      <Skeleton className="h-4 w-full max-w-2xl mx-auto mb-10" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <Skeleton className="h-8 w-64 mb-4 mx-auto" />
+      <Skeleton className="h-4 w-full max-w-2xl mx-auto mb-6" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-64 rounded-xl" />
+          <Skeleton key={i} className="h-40 rounded-xl" />
         ))}
       </div>
     </div>
@@ -32,12 +27,19 @@ const SectionSkeleton = () => (
 );
 
 const Index = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  
   useEffect(() => {
     // Scroll to top on page load
     window.scrollTo(0, 0);
     
-    // Preload components after initial page load
+    // Mark page as loaded
     const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 300);
+    
+    // Preload components after initial page load
+    const preloadTimer = setTimeout(() => {
       const links = [
         "/components/landing/features",
         "/components/landing/how-it-works",
@@ -51,34 +53,56 @@ const Index = () => {
         preloadLink.href = link;
         document.head.appendChild(preloadLink);
       });
-    }, 1000);
+    }, 800);
     
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(preloadTimer);
+    };
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white overflow-x-hidden">
+    <div className={`min-h-screen flex flex-col bg-gradient-to-b from-[#fff9f4] to-white overflow-x-hidden transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
       <Navbar />
       <main className="flex-1">
-        {/* Critical path - render immediately */}
         <Hero />
         
-        {/* Lazily load below-the-fold content */}
-        <Suspense fallback={<SectionSkeleton />}>
-          <LazyFeatures />
-        </Suspense>
+        <div className="relative">
+          {/* Decorative elements */}
+          <div className="absolute top-20 left-10 w-64 h-64 bg-[#FFE0D0] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style={{ animationDuration: '8s' }}></div>
+          <div className="absolute bottom-40 right-10 w-80 h-80 bg-[#FFDCC3] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ animationDuration: '12s' }}></div>
+          
+          <Suspense fallback={<SectionSkeleton />}>
+            <LazyFeatures />
+          </Suspense>
+        </div>
         
-        <Suspense fallback={<SectionSkeleton />}>
-          <LazyHowItWorks />
-        </Suspense>
+        <div className="relative overflow-hidden">
+          {/* Decorative elements */}
+          <div className="absolute top-40 right-20 w-72 h-72 bg-[#FFD6C3] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ animationDuration: '10s' }}></div>
+          
+          <Suspense fallback={<SectionSkeleton />}>
+            <LazyHowItWorks />
+          </Suspense>
+        </div>
         
-        <Suspense fallback={<SectionSkeleton />}>
-          <LazyTestimonials />
-        </Suspense>
+        <div className="relative">
+          {/* Decorative elements */}
+          <div className="absolute top-20 left-20 w-80 h-80 bg-[#FDE8DC] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ animationDuration: '15s' }}></div>
+          
+          <Suspense fallback={<SectionSkeleton />}>
+            <LazyTestimonials />
+          </Suspense>
+        </div>
         
-        <Suspense fallback={<SectionSkeleton />}>
-          <LazyPricingSection />
-        </Suspense>
+        <div className="relative overflow-hidden">
+          {/* Decorative elements */}
+          <div className="absolute bottom-20 right-10 w-72 h-72 bg-[#FFF0E5] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style={{ animationDuration: '12s' }}></div>
+          
+          <Suspense fallback={<SectionSkeleton />}>
+            <LazyPricingSection />
+          </Suspense>
+        </div>
       </main>
       
       <Suspense fallback={<SectionSkeleton />}>
