@@ -17,6 +17,7 @@ import DashboardTheme from "./pages/DashboardTheme";
 import MobileNavigation from "./components/dashboard/mobile-navigation";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import { MobilePopoverProvider } from "./components/ui/popover";
 
 function App() {
   const queryClient = new QueryClient();
@@ -24,33 +25,35 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              {/* Public routes */}
-              <Route path="/" element={<Index />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/login" element={<Login />} />
+        <MobilePopoverProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                {/* Public routes */}
+                <Route path="/" element={<Index />} />
+                <Route path="/signup" element={<SignUp />} />
+                <Route path="/login" element={<Login />} />
+                
+                {/* Protected dashboard routes with nested routes */}
+                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/dashboard/settings" element={<ProtectedRoute><DashboardSettings /></ProtectedRoute>} />
+                <Route path="/dashboard/analytics" element={<ProtectedRoute><DashboardAnalytics /></ProtectedRoute>} />
+                <Route path="/dashboard/theme" element={<ProtectedRoute><DashboardTheme /></ProtectedRoute>} />
+                
+                {/* User profile route - should be below dashboard routes */}
+                <Route path="/:username" element={<UserProfile />} />
+                
+                {/* Catch-all route for 404s */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
               
-              {/* Protected dashboard routes with nested routes */}
-              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/dashboard/settings" element={<ProtectedRoute><DashboardSettings /></ProtectedRoute>} />
-              <Route path="/dashboard/analytics" element={<ProtectedRoute><DashboardAnalytics /></ProtectedRoute>} />
-              <Route path="/dashboard/theme" element={<ProtectedRoute><DashboardTheme /></ProtectedRoute>} />
-              
-              {/* User profile route - should be below dashboard routes */}
-              <Route path="/:username" element={<UserProfile />} />
-              
-              {/* Catch-all route for 404s */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            
-            {/* Mobile Navigation that will display on all pages where the URL includes "/dashboard" */}
-            <MobileNavigation />
-          </BrowserRouter>
-        </TooltipProvider>
+              {/* Mobile Navigation that will display on all pages where the URL includes "/dashboard" */}
+              <MobileNavigation />
+            </BrowserRouter>
+          </TooltipProvider>
+        </MobilePopoverProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
