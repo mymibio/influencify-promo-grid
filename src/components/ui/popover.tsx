@@ -56,7 +56,7 @@ const PopoverContent = React.forwardRef<
 
   if (isMobile) {
     return (
-      <Drawer open={!!props['data-state'] === 'open'} onOpenChange={(isOpen) => {
+      <Drawer open={props['data-state'] === 'open'} onOpenChange={(isOpen) => {
         if (!isOpen) {
           const closeEvent = new Event('popper:close');
           window.dispatchEvent(closeEvent);

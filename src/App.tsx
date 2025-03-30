@@ -20,7 +20,14 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { MobilePopoverProvider } from "./components/ui/popover";
 
 function App() {
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        refetchOnWindowFocus: false,
+      },
+    },
+  });
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -42,7 +49,7 @@ function App() {
                 <Route path="/dashboard/analytics" element={<ProtectedRoute><DashboardAnalytics /></ProtectedRoute>} />
                 <Route path="/dashboard/theme" element={<ProtectedRoute><DashboardTheme /></ProtectedRoute>} />
                 
-                {/* User profile route - should be below dashboard routes */}
+                {/* User profile route - moved above 404 catch-all but after exact matches */}
                 <Route path="/:username" element={<UserProfile />} />
                 
                 {/* Catch-all route for 404s */}
