@@ -23,24 +23,24 @@ const Navbar = () => {
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      scrolled ? "bg-white/95 shadow-sm backdrop-blur-sm" : "bg-transparent"
+      scrolled ? "bg-white/90 shadow-sm backdrop-blur-sm" : "bg-transparent"
     }`}>
-      <div className="container flex h-16 items-center justify-between px-4 md:px-6">
+      <div className="container flex h-16 md:h-20 items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-2">
           <Link to="/" className="flex items-center font-bold text-xl">
-            <span className="text-brand-purple">Influencify</span>
+            <span className="text-brand-blue font-serif">MYMI.bio</span>
           </Link>
         </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8">
-          <Link to="#features" className="text-sm font-medium hover:text-brand-purple transition-colors">
+          <Link to="#features" className="text-sm font-medium hover:text-brand-blue transition-colors">
             Features
           </Link>
-          <Link to="#how-it-works" className="text-sm font-medium hover:text-brand-purple transition-colors">
+          <Link to="#how-it-works" className="text-sm font-medium hover:text-brand-blue transition-colors">
             How It Works
           </Link>
-          <Link to="#pricing" className="text-sm font-medium hover:text-brand-purple transition-colors">
+          <Link to="#pricing" className="text-sm font-medium hover:text-brand-blue transition-colors">
             Pricing
           </Link>
           <Link to="/login">
@@ -49,8 +49,8 @@ const Navbar = () => {
             </Button>
           </Link>
           <Link to="/signup">
-            <Button className="bg-brand-purple hover:bg-brand-dark-purple">
-              Sign Up
+            <Button className="bg-brand-blue hover:bg-opacity-90 text-white rounded-full">
+              Start Creating
             </Button>
           </Link>
         </nav>
@@ -70,21 +70,21 @@ const Navbar = () => {
             <nav className="flex flex-col space-y-4">
               <Link
                 to="#features"
-                className="text-sm font-medium hover:text-brand-purple transition-colors"
+                className="text-sm font-medium hover:text-brand-blue transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Features
               </Link>
               <Link
                 to="#how-it-works"
-                className="text-sm font-medium hover:text-brand-purple transition-colors"
+                className="text-sm font-medium hover:text-brand-blue transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 How It Works
               </Link>
               <Link
                 to="#pricing"
-                className="text-sm font-medium hover:text-brand-purple transition-colors"
+                className="text-sm font-medium hover:text-brand-blue transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Pricing
@@ -95,8 +95,8 @@ const Navbar = () => {
                 </Button>
               </Link>
               <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
-                <Button className="w-full bg-brand-purple hover:bg-brand-dark-purple">
-                  Sign Up
+                <Button className="w-full bg-brand-blue hover:bg-opacity-90 text-white rounded-full">
+                  Start Creating
                 </Button>
               </Link>
             </nav>

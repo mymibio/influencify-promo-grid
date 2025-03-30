@@ -62,15 +62,15 @@ const Index = () => {
   }, []);
 
   return (
-    <div className={`min-h-screen flex flex-col bg-gradient-to-b from-[#fff9f4] to-white overflow-x-hidden transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`min-h-screen flex flex-col bg-white overflow-x-hidden transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
       <Navbar />
       <main className="flex-1">
         <Hero />
         
         <div className="relative">
           {/* Decorative elements */}
-          <div className="absolute top-20 left-10 w-64 h-64 bg-[#FFE0D0] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style={{ animationDuration: '8s' }}></div>
-          <div className="absolute bottom-40 right-10 w-80 h-80 bg-[#FFDCC3] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ animationDuration: '12s' }}></div>
+          <div className="absolute top-20 left-10 w-64 h-64 bg-brand-sky-blue rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-soft" style={{ animationDuration: '8s' }}></div>
+          <div className="absolute bottom-40 right-10 w-80 h-80 bg-brand-light-blue rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-soft" style={{ animationDuration: '12s' }}></div>
           
           <Suspense fallback={<SectionSkeleton />}>
             <LazyFeatures />
@@ -79,7 +79,7 @@ const Index = () => {
         
         <div className="relative overflow-hidden">
           {/* Decorative elements */}
-          <div className="absolute top-40 right-20 w-72 h-72 bg-[#FFD6C3] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ animationDuration: '10s' }}></div>
+          <div className="absolute top-40 right-20 w-72 h-72 bg-brand-sky-blue rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-soft" style={{ animationDuration: '10s' }}></div>
           
           <Suspense fallback={<SectionSkeleton />}>
             <LazyHowItWorks />
@@ -88,7 +88,7 @@ const Index = () => {
         
         <div className="relative">
           {/* Decorative elements */}
-          <div className="absolute top-20 left-20 w-80 h-80 bg-[#FDE8DC] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ animationDuration: '15s' }}></div>
+          <div className="absolute top-20 left-20 w-80 h-80 bg-brand-sky-blue rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-soft" style={{ animationDuration: '15s' }}></div>
           
           <Suspense fallback={<SectionSkeleton />}>
             <LazyTestimonials />
@@ -97,7 +97,7 @@ const Index = () => {
         
         <div className="relative overflow-hidden">
           {/* Decorative elements */}
-          <div className="absolute bottom-20 right-10 w-72 h-72 bg-[#FFF0E5] rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style={{ animationDuration: '12s' }}></div>
+          <div className="absolute bottom-20 right-10 w-72 h-72 bg-brand-sky-blue rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-soft" style={{ animationDuration: '12s' }}></div>
           
           <Suspense fallback={<SectionSkeleton />}>
             <LazyPricingSection />

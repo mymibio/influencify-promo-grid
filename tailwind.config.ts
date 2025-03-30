@@ -64,9 +64,10 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				brand: {
-					purple: "#8B5CF6",
-					"light-purple": "#A78BFA",
-					"dark-purple": "#7C3AED"
+					"blue": "#1A354D",
+					"light-blue": "#B6D8F2",
+					"sky-blue": "#D6E8F7",
+					"sand": "#F9F5F0"
 				}
 			},
 			borderRadius: {
@@ -106,6 +107,15 @@ export default {
 				'float': {
 					'0%, 100%': { transform: 'translateY(0)' },
 					'50%': { transform: 'translateY(-10px)' }
+				},
+				'wave': {
+					'0%, 100%': { transform: 'rotate(0deg)' },
+					'25%': { transform: 'rotate(5deg)' },
+					'75%': { transform: 'rotate(-5deg)' }
+				},
+				'slide-up': {
+					'0%': { transform: 'translateY(20px)', opacity: '0' },
+					'100%': { transform: 'translateY(0)', opacity: '1' }
 				}
 			},
 			animation: {
@@ -116,10 +126,11 @@ export default {
 				'scale-in': 'scale-in 0.2s ease-out',
 				'spin-slow': 'spin-slow 15s linear infinite',
 				'gradient-x': 'gradient-x 10s ease infinite',
-				'float': 'float 6s ease-in-out infinite'
+				'float': 'float 6s ease-in-out infinite',
+				'wave': 'wave 3s ease-in-out infinite',
+				'slide-up': 'slide-up 0.8s ease-out forwards',
 			}
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
 } satisfies Config;
-
