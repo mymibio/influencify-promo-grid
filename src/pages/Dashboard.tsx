@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { PromotionalItem } from "@/types/user";
 import { Button } from "@/components/ui/button";
@@ -174,7 +173,6 @@ const Dashboard = () => {
     setItems(reorderedItems);
     
     try {
-      // Update positions in the database
       const updates = reorderedItems.map((item, index) => ({
         id: item.id,
         position: index,
@@ -197,7 +195,6 @@ const Dashboard = () => {
     
     try {
       if (editingItem) {
-        // Update existing item
         const { error } = await supabase
           .from('promotional_items')
           .update({
@@ -224,7 +221,6 @@ const Dashboard = () => {
         );
         toast.success("Item updated successfully");
       } else {
-        // Create new item
         const newItem = {
           ...updatedItem,
           id: uuidv4(),
@@ -271,8 +267,6 @@ const Dashboard = () => {
     try {
       const imageUrl = URL.createObjectURL(file);
       
-      // In a real implementation, upload the file to storage
-      // For now, just set the URL directly
       const { error } = await supabase
         .from('user_profiles')
         .update({ profile_picture: imageUrl })
@@ -290,11 +284,7 @@ const Dashboard = () => {
     }
   };
   
-  const handleAddSocialMedia = () => {
-    setIsSocialDialogOpen(true);
-  };
-
-  const handleSaveSocialMedia = async () => {
+  const handleAddSocialMedia = async () => {
     if (!profile || !currentSocialPlatform || !socialHandle) return;
     
     try {
@@ -365,7 +355,20 @@ const Dashboard = () => {
         return <Link size={20} />;
     }
   };
-  
+
+  const socialPlatforms = [
+    { name: "Instagram", key: "instagram", icon: Instagram, color: "text-pink-500" },
+    { name: "TikTok", key: "tiktok", icon: MessageCircle, color: "text-black" },
+    { name: "YouTube", key: "youtube", icon: Youtube, color: "text-red-500" },
+    { name: "Email", key: "email", icon: Mail, color: "text-blue-500" },
+  ];
+
+  const handleSocialClick = (platform: string) => {
+    setCurrentSocialPlatform(platform);
+    setSocialHandle(profile?.socialLinks?.[platform] || "");
+    setIsSocialDialogOpen(true);
+  };
+
   if (!profile) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
@@ -472,42 +475,37 @@ const Dashboard = () => {
                         </Button>
                       </div>
                     )}
-                  </div>
-                </div>
-                
-                <div className="flex flex-wrap gap-2 justify-center pb-6">
-                  {profile.socialLinks && Object.entries(profile.socialLinks).map(([platform, handle]) => (
-                    <div 
-                      key={platform} 
-                      className="relative group"
-                    >
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-10 w-10 rounded-full"
+                    
+                    <div className="flex flex-wrap gap-3 justify-center md:justify-start mt-4">
+                      {socialPlatforms.map((platform) => (
+                        <button
+                          key={platform.key}
+                          onClick={() => handleSocialClick(platform.key)}
+                          className="relative group"
+                        >
+                          <div className={`w-10 h-10 flex items-center justify-center rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors ${
+                            profile.socialLinks?.[platform.key] ? "bg-gray-100" : ""
+                          }`}>
+                            <platform.icon size={22} className={platform.color} />
+                            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-gray-100 border border-gray-200 text-xs">
+                              {profile.socialLinks?.[platform.key] ? "✓" : "+"}
+                            </span>
+                          </div>
+                        </button>
+                      ))}
+                      
+                      <button
                         onClick={() => {
-                          setCurrentSocialPlatform(platform);
-                          setSocialHandle(handle as string);
+                          setCurrentSocialPlatform("");
+                          setSocialHandle("");
                           setIsSocialDialogOpen(true);
                         }}
+                        className="w-10 h-10 flex items-center justify-center rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors"
                       >
-                        {getSocialIcon(platform)}
-                      </Button>
+                        <Plus size={22} />
+                      </button>
                     </div>
-                  ))}
-                  
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-10 w-10 rounded-full"
-                    onClick={() => {
-                      setCurrentSocialPlatform("");
-                      setSocialHandle("");
-                      setIsSocialDialogOpen(true);
-                    }}
-                  >
-                    <Plus size={16} />
-                  </Button>
+                  </div>
                 </div>
               </div>
               
@@ -668,42 +666,63 @@ const Dashboard = () => {
       <Dialog open={isSocialDialogOpen} onOpenChange={setIsSocialDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Social Media</DialogTitle>
+            <DialogTitle>{currentSocialPlatform ? `Add ${currentSocialPlatform}` : 'Add Social Media'}</DialogTitle>
             <DialogDescription>
               Connect your social media accounts to your profile
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="platform">Platform</Label>
-              <div className="grid grid-cols-3 gap-2">
-                {['Instagram', 'Youtube', 'Twitter', 'Facebook', 'Email', 'WhatsApp'].map(platform => (
-                  <Button 
-                    key={platform}
-                    variant={currentSocialPlatform === platform.toLowerCase() ? "default" : "outline"}
-                    className="flex flex-col gap-1 h-auto py-2"
-                    onClick={() => setCurrentSocialPlatform(platform.toLowerCase())}
-                  >
-                    {getSocialIcon(platform)}
-                    <span className="text-xs">{platform}</span>
-                  </Button>
-                ))}
+            {!currentSocialPlatform ? (
+              <div className="space-y-2">
+                <Label htmlFor="platform">Platform</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {socialPlatforms.map(platform => (
+                    <Button 
+                      key={platform.key}
+                      variant="outline"
+                      className="flex flex-col gap-1 h-auto py-2"
+                      onClick={() => {
+                        setCurrentSocialPlatform(platform.key);
+                        setSocialHandle(profile.socialLinks?.[platform.key] || "");
+                      }}
+                    >
+                      <platform.icon size={20} className={platform.color} />
+                      <span className="text-xs">{platform.name}</span>
+                    </Button>
+                  ))}
+                </div>
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="handle">Username/Handle</Label>
-              <Input 
-                id="handle" 
-                value={socialHandle} 
-                onChange={(e) => setSocialHandle(e.target.value)}
-                placeholder={`Enter your ${currentSocialPlatform} handle`}
-                disabled={!currentSocialPlatform}
-              />
-            </div>
-            <div className="pt-4 flex justify-end">
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor="handle">
+                  {currentSocialPlatform === "email" ? "Email Address" : "Username/Handle"}
+                </Label>
+                <Input 
+                  id="handle" 
+                  value={socialHandle} 
+                  onChange={(e) => setSocialHandle(e.target.value)}
+                  placeholder={currentSocialPlatform === "email" ? "you@example.com" : `Enter your ${currentSocialPlatform} username`}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {currentSocialPlatform === "email" 
+                    ? "Enter your email address" 
+                    : `Enter your ${currentSocialPlatform} username without the @ symbol`}
+                </p>
+              </div>
+            )}
+            <div className="pt-4 flex justify-between">
+              {currentSocialPlatform && (
+                <Button 
+                  variant="outline"
+                  onClick={() => setCurrentSocialPlatform("")}
+                >
+                  Back
+                </Button>
+              )}
               <Button 
-                onClick={handleSaveSocialMedia}
+                onClick={handleAddSocialMedia}
                 disabled={!currentSocialPlatform || !socialHandle}
+                className="ml-auto"
               >
                 Save
               </Button>
