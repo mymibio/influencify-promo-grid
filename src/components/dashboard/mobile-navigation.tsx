@@ -83,11 +83,12 @@ const MobileNavigation = () => {
           <button 
             onClick={() => setIsAddDialogOpen(true)}
             className="absolute -top-6 rounded-full p-3 bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
+            aria-label="Add new coupon"
           >
             <Plus size={22} className="text-white" />
           </button>
           <div className="mt-6">
-            <span className="text-xs font-medium text-primary">Add</span>
+            {/* Removed the text "Add" */}
           </div>
         </div>
         

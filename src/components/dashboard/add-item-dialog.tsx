@@ -7,9 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PromotionalItem } from "@/types/user";
 import { toast } from "sonner";
-import { ImagePlus } from "lucide-react";
+import { ImagePlus, ChevronDown } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose, DrawerFooter } from "@/components/ui/drawer";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface AddItemDialogProps {
   open: boolean;
@@ -28,6 +29,7 @@ const AddItemDialog = ({ open, onClose, onAdd, editItem }: AddItemDialogProps) =
   const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState("");
   const isMobile = useIsMobile();
+  const [showScrollIndicator, setShowScrollIndicator] = useState(true);
 
   // Populate form when editing an existing item
   useEffect(() => {
@@ -98,10 +100,22 @@ const AddItemDialog = ({ open, onClose, onAdd, editItem }: AddItemDialogProps) =
     }
   }, [open]);
 
+  // Handle scroll indicator
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const bottom = Math.floor(e.currentTarget.scrollHeight - e.currentTarget.scrollTop) <= 
+      Math.ceil(e.currentTarget.clientHeight) + 20;
+    
+    if (bottom) {
+      setShowScrollIndicator(false);
+    } else {
+      setShowScrollIndicator(true);
+    }
+  };
+
   const renderFormContent = () => (
-    <form onSubmit={handleSubmit} className="grid gap-4 py-4">
+    <form onSubmit={handleSubmit} className="grid gap-4 py-2">
       {/* Image Upload Section */}
-      <div className="mb-4">
+      <div className="mb-3">
         <Label htmlFor="image-upload" className="block mb-2">
           Upload Image
         </Label>
@@ -211,19 +225,31 @@ const AddItemDialog = ({ open, onClose, onAdd, editItem }: AddItemDialogProps) =
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onClose}>
-        <DrawerContent className="max-h-[85vh]">
-          <DrawerHeader>
-            <DrawerTitle>{editItem ? "Edit coupon" : "Add new coupon"}</DrawerTitle>
+        <DrawerContent className="max-h-[90vh]">
+          <DrawerHeader className="py-3 px-4 border-b">
+            <DrawerTitle className="text-center">{editItem ? "Edit coupon" : "Add coupon"}</DrawerTitle>
             <DrawerClose />
           </DrawerHeader>
           
-          <div className="px-4">
-            {renderFormContent()}
+          <div className="relative">
+            <ScrollArea className="px-4 pb-24 max-h-[65vh]" onScroll={handleScroll}>
+              {renderFormContent()}
+            </ScrollArea>
+            
+            {/* Scroll indicator */}
+            {showScrollIndicator && (
+              <div className="absolute bottom-0 left-0 right-0 flex justify-center pb-2 pt-4 bg-gradient-to-t from-white via-white">
+                <div className="flex flex-col items-center text-xs text-gray-500">
+                  <span>Scroll for more</span>
+                  <ChevronDown className="h-4 w-4 animate-bounce" />
+                </div>
+              </div>
+            )}
           </div>
           
-          <DrawerFooter className="pt-2">
+          <DrawerFooter className="pt-2 border-t mt-0 bg-white">
             <Button onClick={handleSubmit} className="w-full">
-              {editItem ? "Update" : "Add"} Coupon
+              {editItem ? "Update" : "Save"} Coupon
             </Button>
             <Button variant="outline" onClick={onClose} className="w-full">
               Cancel
@@ -236,18 +262,32 @@ const AddItemDialog = ({ open, onClose, onAdd, editItem }: AddItemDialogProps) =
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>{editItem ? "Edit coupon" : "Add new coupon"}</DialogTitle>
+      <DialogContent className="sm:max-w-[500px] max-h-[85vh] flex flex-col">
+        <DialogHeader className="pb-2 border-b">
+          <DialogTitle>{editItem ? "Edit coupon" : "Add coupon"}</DialogTitle>
         </DialogHeader>
         
-        {renderFormContent()}
+        <div className="relative flex-grow overflow-hidden">
+          <ScrollArea className="h-full max-h-[50vh] py-3" onScroll={handleScroll}>
+            {renderFormContent()}
+          </ScrollArea>
+          
+          {/* Scroll indicator */}
+          {showScrollIndicator && (
+            <div className="absolute bottom-0 left-0 right-0 flex justify-center pb-2 pt-4 bg-gradient-to-t from-white via-white">
+              <div className="flex flex-col items-center text-xs text-gray-500">
+                <span>Scroll for more</span>
+                <ChevronDown className="h-4 w-4 animate-bounce" />
+              </div>
+            </div>
+          )}
+        </div>
         
-        <DialogFooter>
+        <DialogFooter className="pt-2 border-t">
           <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="button" onClick={handleSubmit}>{editItem ? "Update" : "Add"} Coupon</Button>
+          <Button type="button" onClick={handleSubmit}>{editItem ? "Update" : "Save"} Coupon</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
