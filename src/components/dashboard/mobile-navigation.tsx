@@ -7,11 +7,18 @@ import { cn } from "@/lib/utils";
 import AddItemDialog from "@/components/dashboard/add-item-dialog";
 import { PromotionalItem } from "@/types/user";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 const MobileNavigation = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const { profile } = useAuth();
+  
+  // Don't render navigation if not on dashboard routes
+  if (!currentPath.includes('/dashboard')) {
+    return null;
+  }
   
   const isActive = (path: string) => {
     if (path === "/dashboard" && currentPath === "/dashboard") {
@@ -30,7 +37,10 @@ const MobileNavigation = () => {
   };
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText("https://yourdomain.com/fashionista")
+    if (!profile) return;
+    
+    const shareableLink = `${window.location.origin}/${profile.username}`;
+    navigator.clipboard.writeText(shareableLink)
       .then(() => {
         toast.success("Link copied to clipboard!");
       })
