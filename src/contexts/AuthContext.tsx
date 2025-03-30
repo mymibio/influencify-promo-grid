@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
@@ -28,6 +27,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Create a default name from the username
       const name = username.charAt(0).toUpperCase() + username.slice(1);
       
+      // Check if a profile already exists for this user to avoid duplicates
+      const { data: existingProfile } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+      
+      // If profile exists, return it and don't create a new one
+      if (existingProfile) {
+        return {
+          id: existingProfile.id,
+          username: existingProfile.username,
+          email: existingProfile.email,
+          name: existingProfile.name,
+          profilePicture: existingProfile.profile_picture,
+          bio: existingProfile.bio,
+          socialLinks: existingProfile.social_links as AppUser['socialLinks'] || {},
+          categories: existingProfile.categories,
+          createdAt: existingProfile.created_at,
+        };
+      }
+      
+      // Otherwise create a new profile
       const { data, error } = await supabase
         .from('user_profiles')
         .insert({
