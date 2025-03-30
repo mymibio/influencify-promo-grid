@@ -1,6 +1,5 @@
 
-import { useState } from "react";
-import { User } from "@/types/user";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,34 +9,28 @@ import { toast } from "sonner";
 import SimpleSidebar from "@/components/dashboard/simple-sidebar";
 import { Pencil, Check, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-
-// Mock user data
-const sampleUser: User = {
-  id: "123",
-  username: "fashionista",
-  email: "ashley@example.com",
-  name: "Ashley Johnson",
-  profilePicture: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256&h=256&auto=format&fit=crop",
-  bio: "Fashion & lifestyle content creator. Sharing my favorite products and deals with you!",
-  socialLinks: {
-    instagram: "fashionista",
-    twitter: "fashionista",
-    youtube: "fashionistachannel"
-  },
-  createdAt: new Date().toISOString()
-};
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import MobileNavigation from "@/components/dashboard/mobile-navigation";
 
 const DashboardSettings = () => {
-  const [user, setUser] = useState(sampleUser);
+  const { profile, refreshProfile } = useAuth();
   const [settings, setSettings] = useState({
     notifications: true,
     publicProfile: true,
     darkMode: false
   });
   const [editingBio, setEditingBio] = useState(false);
-  const [bioText, setBioText] = useState(sampleUser.bio);
+  const [bioText, setBioText] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const isMobile = useIsMobile();
   
+  useEffect(() => {
+    if (profile) {
+      setBioText(profile.bio || "");
+    }
+  }, [profile]);
+
   const handleSettingChange = (setting: string, value: boolean) => {
     setSettings(prev => ({
       ...prev,
@@ -56,26 +49,53 @@ const DashboardSettings = () => {
     setEditingBio(true);
   };
 
-  const handleSaveBio = () => {
-    setUser(prev => ({
-      ...prev,
-      bio: bioText
-    }));
-    setEditingBio(false);
-    toast.success("Bio updated successfully!");
+  const handleSaveBio = async () => {
+    if (!profile) return;
+    
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ bio: bioText })
+        .eq('id', profile.id);
+      
+      if (error) {
+        throw error;
+      }
+      
+      await refreshProfile();
+      setEditingBio(false);
+      toast.success("Bio updated successfully!");
+    } catch (error) {
+      console.error("Error updating bio:", error);
+      toast.error("Failed to update bio");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCancelEditBio = () => {
-    setBioText(user.bio);
+    setBioText(profile?.bio || "");
     setEditingBio(false);
   };
+  
+  if (!profile) {
+    return (
+      <div className="flex min-h-screen w-full bg-gray-50 items-center justify-center">
+        <div className="text-center p-8">
+          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-primary mx-auto mb-4"></div>
+          <p>Loading your profile settings...</p>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="flex min-h-screen w-full bg-gray-50">
       <SimpleSidebar />
       
       <main className="flex-1">
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 pb-20 md:pb-8">
           <h1 className="text-3xl font-bold mb-6">Settings</h1>
           
           {/* User Bio Section */}
@@ -94,11 +114,15 @@ const DashboardSettings = () => {
                     className="min-h-[80px]"
                   />
                   <div className="flex space-x-2">
-                    <Button onClick={handleSaveBio} size="sm">
-                      <Check className="h-4 w-4 mr-2" />
+                    <Button onClick={handleSaveBio} size="sm" disabled={isLoading}>
+                      {isLoading ? (
+                        <span className="h-4 w-4 rounded-full border-2 border-current border-r-transparent animate-spin mr-2" />
+                      ) : (
+                        <Check className="h-4 w-4 mr-2" />
+                      )}
                       Save
                     </Button>
-                    <Button onClick={handleCancelEditBio} variant="outline" size="sm">
+                    <Button onClick={handleCancelEditBio} variant="outline" size="sm" disabled={isLoading}>
                       <X className="h-4 w-4 mr-2" />
                       Cancel
                     </Button>
@@ -106,7 +130,7 @@ const DashboardSettings = () => {
                 </div>
               ) : (
                 <div className="flex justify-between items-start">
-                  <p className="text-gray-600">{user.bio}</p>
+                  <p className="text-gray-600">{profile.bio || "No bio added yet. Click edit to add one."}</p>
                   <Button variant="ghost" size="sm" onClick={handleEditBio}>
                     <Pencil className="h-4 w-4" />
                   </Button>
@@ -165,6 +189,7 @@ const DashboardSettings = () => {
           </Card>
         </div>
       </main>
+      <MobileNavigation />
     </div>
   );
 };
