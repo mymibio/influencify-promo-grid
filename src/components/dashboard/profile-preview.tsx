@@ -1,7 +1,7 @@
 
 import React from "react";
-import { Monitor, Copy } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Copy } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { User, PromotionalItem } from "@/types/user";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -110,15 +110,9 @@ const ProfilePreview: React.FC<ProfilePreviewProps> = ({ user, items, selectedTh
 
   return (
     <Card className={`sticky top-8 ${hideOnMobile ? 'hidden md:block' : ''} ${className || ''}`}>
-      <CardHeader className="space-y-1">
-        <CardTitle className="flex items-center">
-          <Monitor className="mr-2 h-5 w-5" />
-          Live Preview
-        </CardTitle>
-        <CardDescription>See how your profile looks with selected theme</CardDescription>
-        
+      <CardContent className="p-4">
         {/* Link Copy UI */}
-        <div className="flex items-center gap-1 bg-gradient-to-r from-blue-50 to-indigo-50 border border-indigo-100 p-1.5 rounded-full mt-2">
+        <div className="flex items-center gap-1 bg-gradient-to-r from-blue-50 to-indigo-50 border border-indigo-100 p-1.5 rounded-full mb-4">
           <div className="flex items-center gap-2 pl-2 flex-1">
             <span className="text-sm font-medium text-gray-700 truncate">yourdomain.com/{user.username}</span>
           </div>
@@ -132,8 +126,7 @@ const ProfilePreview: React.FC<ProfilePreviewProps> = ({ user, items, selectedTh
             <span className="text-xs">Copy</span>
           </Button>
         </div>
-      </CardHeader>
-      <CardContent className="p-4">
+        
         <div className="border-8 border-gray-800 rounded-3xl p-2 bg-gray-800 shadow-xl mx-auto max-w-[280px]">
           <div className="rounded-2xl overflow-hidden h-[500px] bg-white">
             {/* Header with theme-specific background */}

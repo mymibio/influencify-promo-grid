@@ -360,12 +360,6 @@ const Dashboard = () => {
       
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">
-          {isMobile && (
-            <div className="flex items-center justify-center mb-4">
-              <h1 className="text-xl font-bold">Dashboard</h1>
-            </div>
-          )}
-          
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {!isMobile && (
               <div className="hidden lg:block">
@@ -484,13 +478,6 @@ const Dashboard = () => {
                 </div>
               </div>
               
-              <div className="mb-6 mt-8">
-                <h2 className="text-xl font-bold">Your Coupons</h2>
-                <p className="text-muted-foreground">
-                  This is how your coupons will appear to visitors. Add more coupons or edit existing ones.
-                </p>
-              </div>
-
               {isLoading ? (
                 <div className="text-center py-12">
                   <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-brand-purple mx-auto mb-4"></div>
@@ -499,16 +486,18 @@ const Dashboard = () => {
               ) : (
                 <>
                   {items.length > 0 ? (
-                    <PromotionalGrid 
-                      items={items} 
-                      onEdit={handleEditCard}
-                      onDelete={handleDeleteCard}
-                      onDrag={handleDragCard}
-                      onReorder={handleReorderCards}
-                      editable={true}
-                    />
+                    <div className="mt-8">
+                      <PromotionalGrid 
+                        items={items} 
+                        onEdit={handleEditCard}
+                        onDelete={handleDeleteCard}
+                        onDrag={handleDragCard}
+                        onReorder={handleReorderCards}
+                        editable={true}
+                      />
+                    </div>
                   ) : (
-                    <div className="text-center py-8 bg-gray-50 border border-dashed border-gray-300 rounded-lg">
+                    <div className="text-center py-8 bg-gray-50 border border-dashed border-gray-300 rounded-lg mt-8">
                       <p className="text-gray-500 mb-4">You don't have any promotional items yet.</p>
                       <Button 
                         onClick={() => {
