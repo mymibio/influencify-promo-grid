@@ -45,14 +45,64 @@ const SignUp = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    // In a real app with Supabase, we would register the user
-    // For now, let's simulate a successful registration
-    
-    setTimeout(() => {
+    try {
+      // Check if username is already taken
+      const { data: existingUsers, error: checkError } = await supabase
+        .from('user_profiles')
+        .select('username')
+        .eq('username', formData.username);
+        
+      if (checkError) {
+        throw checkError;
+      }
+      
+      if (existingUsers && existingUsers.length > 0) {
+        toast.error("Username already taken. Please choose another one.");
+        setIsLoading(false);
+        return;
+      }
+      
+      // Sign up the user with Supabase auth
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            name: formData.name,
+          }
+        }
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      if (data && data.user) {
+        // Create user profile
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .insert({
+            id: data.user.id,
+            username: formData.username,
+            name: formData.name,
+            email: formData.email,
+            social_links: {},
+            created_at: new Date().toISOString()
+          });
+          
+        if (profileError) {
+          throw profileError;
+        }
+        
+        toast.success("Account created successfully! Redirecting to dashboard...");
+        navigate("/dashboard");
+      }
+    } catch (error: any) {
+      console.error("Error during sign up:", error);
+      toast.error(error.message || "Failed to create account. Please try again.");
+    } finally {
       setIsLoading(false);
-      toast.success("Account created successfully! Redirecting to dashboard...");
-      navigate("/dashboard");
-    }, 1500);
+    }
   };
 
   return (
@@ -108,6 +158,7 @@ const SignUp = () => {
                     onChange={handleChange}
                     className="pl-32"
                     required
+                    disabled={!!new URLSearchParams(location.search).get('username')}
                   />
                 </div>
               </div>
