@@ -6,10 +6,11 @@ import ThemeSelector from "@/components/dashboard/theme-selector";
 import { Monitor } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { User, PromotionalItem } from "@/types/user";
+import { User, PromotionalItem, SocialLinks } from "@/types/user";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Json } from "@/integrations/supabase/types";
 
 const DashboardTheme = () => {
   const [selectedTheme, setSelectedTheme] = useState("default");
@@ -40,6 +41,9 @@ const DashboardTheme = () => {
         }
         
         if (userData) {
+          // Safely cast social_links to SocialLinks type
+          const socialLinks = userData.social_links as SocialLinks || {};
+          
           const userProfile: User = {
             id: userData.id,
             username: userData.username,
@@ -47,7 +51,7 @@ const DashboardTheme = () => {
             name: userData.name,
             profilePicture: userData.profile_picture,
             bio: userData.bio || "",
-            socialLinks: userData.social_links || {},
+            socialLinks,
             createdAt: userData.created_at
           };
           
@@ -456,3 +460,4 @@ const getThemeStyles = (themeId: string) => {
 };
 
 export default DashboardTheme;
+
