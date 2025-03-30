@@ -11,6 +11,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 const Hero = () => {
   const [username, setUsername] = useState("");
   const [isChecking, setIsChecking] = useState(false);
+  const [usernameError, setUsernameError] = useState("");
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
 
@@ -22,20 +23,27 @@ const Hero = () => {
     // Only allow lowercase letters, numbers, and underscore
     const sanitizedValue = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "");
     setUsername(sanitizedValue);
+    // Clear error when user starts typing again
+    if (usernameError) {
+      setUsernameError("");
+    }
   };
 
   const checkUsername = async () => {
     if (!username) {
+      setUsernameError("Please enter a username");
       toast.error("Please enter a username");
       return;
     }
 
     if (username.length < 3) {
+      setUsernameError("Username must be at least 3 characters");
       toast.error("Username must be at least 3 characters");
       return;
     }
 
     setIsChecking(true);
+    setUsernameError("");
     
     try {
       // Query Supabase to check if the username is already taken
@@ -48,13 +56,15 @@ const Hero = () => {
       if (error && error.code !== 'PGRST116') {
         // PGRST116 means no rows returned, which is good (username is available)
         console.error("Error checking username:", error);
+        setUsernameError("Error checking username availability");
         toast.error("Error checking username availability");
         setIsChecking(false);
         return;
       }
       
       if (data) {
-        // Username exists
+        // Username exists - show error message below input
+        setUsernameError("Username is already taken. Please choose another one.");
         toast.error("Username is already taken. Please choose another one.");
         setIsChecking(false);
         return;
@@ -66,6 +76,7 @@ const Hero = () => {
       
     } catch (error) {
       console.error("Error:", error);
+      setUsernameError("Error checking username availability");
       toast.error("Error checking username availability");
     } finally {
       setIsChecking(false);
@@ -133,6 +144,13 @@ const Hero = () => {
                 )}
               </Button>
             </div>
+            
+            {/* Error message display */}
+            {usernameError && (
+              <div className="text-red-500 mt-2 text-sm">
+                {usernameError}
+              </div>
+            )}
             
             <div className="text-xs text-gray-500 mt-2 text-center">
               Claim your unique link before someone else takes it!
