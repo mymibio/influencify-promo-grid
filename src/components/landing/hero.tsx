@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -6,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, CheckCircle, Sparkles, Heart, Star, ArrowDown } from "lucide-react";
+import { ArrowRight, CheckCircle, Sparkles, Heart, Star, ArrowDown, ArrowLeft } from "lucide-react";
 
 const Hero = () => {
   const [username, setUsername] = useState("");
@@ -37,10 +36,8 @@ const Hero = () => {
   }, []);
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Only allow lowercase letters, numbers, and underscore
     const sanitizedValue = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "");
     setUsername(sanitizedValue);
-    // Clear error when user starts typing again
     if (usernameError) {
       setUsernameError("");
     }
@@ -63,7 +60,6 @@ const Hero = () => {
     setUsernameError("");
     
     try {
-      // Query Supabase to check if the username is already taken
       const { data, error } = await supabase
         .from('user_profiles')
         .select('username')
@@ -71,7 +67,6 @@ const Hero = () => {
         .single();
       
       if (error && error.code !== 'PGRST116') {
-        // PGRST116 means no rows returned, which is good (username is available)
         console.error("Error checking username:", error);
         setUsernameError("Error checking username availability");
         toast.error("Error checking username availability");
@@ -80,17 +75,14 @@ const Hero = () => {
       }
       
       if (data) {
-        // Username exists - show error message below input
         setUsernameError("Username is already taken. Please choose another one.");
         toast.error("Username is already taken. Please choose another one.");
         setIsChecking(false);
         return;
       }
       
-      // Username is available
       toast.success("Username is available! Continue to sign up.");
       navigate(`/signup?username=${username}`);
-      
     } catch (error) {
       console.error("Error:", error);
       setUsernameError("Error checking username availability");
@@ -109,17 +101,14 @@ const Hero = () => {
 
   return (
     <section ref={heroRef} className="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden">
-      {/* Background elements */}
       <div className="absolute inset-0 bg-gradient-to-b from-brand-sky-blue to-white -z-10"></div>
       
-      {/* Decorative blurred circles */}
       <div className="absolute top-20 right-10 w-80 h-80 bg-brand-light-blue rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-pulse-soft" style={{ animationDuration: '15s' }}></div>
       <div className="absolute -bottom-20 left-10 w-96 h-96 bg-brand-light-blue rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-soft" style={{ animationDuration: '20s' }}></div>
       <div className="absolute left-1/4 top-1/3 w-64 h-64 bg-brand-light-blue rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse-soft" style={{ animationDuration: '18s' }}></div>
       
       <div className="container px-4 md:px-6 relative">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
-          {/* Left column with text */}
           <div className="flex flex-col items-start text-left">
             <div className={`inline-block mb-6 rounded-full bg-white px-4 py-1.5 text-sm font-medium text-brand-blue transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
               <span className="inline-flex items-center gap-1.5">
@@ -136,7 +125,6 @@ const Hero = () => {
               So you can share exclusive products with your followers and turn every click into a conversion.
             </p>
             
-            {/* Signup form */}
             <div className={`w-full max-w-md mt-12 bg-white p-4 md:p-6 rounded-3xl shadow-xl border border-gray-50 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
               <div className="flex gap-2 flex-col sm:flex-row">
                 <div className="relative flex-1">
@@ -166,7 +154,6 @@ const Hero = () => {
                 </Button>
               </div>
               
-              {/* Error message display */}
               {usernameError && (
                 <div className="text-red-500 mt-2 text-sm">
                   {usernameError}
@@ -192,14 +179,11 @@ const Hero = () => {
             </div>
           </div>
           
-          {/* Right column with phone mockup */}
           <div className={`relative mx-auto w-full max-w-[320px] transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
             <div className="phone-mockup border-[12px] border-black bg-white shadow-2xl">
               <div className="phone-notch"></div>
               
-              {/* Phone content */}
               <div className="relative w-full h-full overflow-hidden">
-                {/* Status bar */}
                 <div className="flex justify-between px-6 py-1 text-xs bg-brand-blue text-white">
                   <div>9:41</div>
                   <div className="flex space-x-1">
@@ -209,9 +193,7 @@ const Hero = () => {
                   </div>
                 </div>
                 
-                {/* App content */}
                 <div className="h-full bg-white flex flex-col">
-                  {/* App header */}
                   <div className="flex justify-between items-center p-4 border-b border-gray-100">
                     <div className="h-8 w-8 rounded-full bg-brand-light-blue flex items-center justify-center text-brand-blue">
                       <ArrowLeft size={16} />
@@ -222,23 +204,18 @@ const Hero = () => {
                     </div>
                   </div>
                   
-                  {/* Profile content */}
                   <div className="flex-1 p-4 overflow-auto">
                     <div className="flex flex-col items-center space-y-4">
-                      {/* Profile image */}
                       <div className="w-24 h-24 rounded-full bg-brand-light-blue border-4 border-white shadow-lg overflow-hidden">
                         <div className="w-full h-full bg-gradient-to-br from-brand-blue to-brand-light-blue opacity-60"></div>
                       </div>
                       
-                      {/* Profile name */}
                       <div className="text-xl font-bold text-center">@yourname</div>
                       
-                      {/* Bio */}
                       <div className="text-sm text-center text-gray-600 max-w-[200px]">
                         Turn your Instagram bio into a money-making machine with MYMI.bio
                       </div>
                       
-                      {/* Product cards */}
                       <div className="w-full grid grid-cols-1 gap-4 mt-4">
                         <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 animate-float" style={{ animationDelay: '0s' }}>
                           <div className="h-36 bg-gradient-to-r from-brand-light-blue to-brand-sky-blue"></div>
@@ -265,7 +242,6 @@ const Hero = () => {
                     </div>
                   </div>
                   
-                  {/* Bottom navigation */}
                   <div className="border-t border-gray-200 p-4 flex justify-around">
                     <div className="flex flex-col items-center text-xs text-brand-blue">
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
@@ -288,22 +264,19 @@ const Hero = () => {
                 
                 <div className="phone-nav-pill"></div>
               </div>
-            </div>
-            
-            {/* Phone reflection/shadow effect */}
-            <div className="absolute w-full h-8 bg-black/10 bottom-[-25px] blur-md rounded-full mx-auto left-0 right-0 scale-x-75"></div>
-            
-            {/* Decoration elements around phone */}
-            <div className="absolute -top-6 -right-6 w-12 h-12 animate-float" style={{ animationDelay: '0.3s' }}>
-              <Star className="text-yellow-400 w-full h-full drop-shadow-md" />
-            </div>
-            <div className="absolute -bottom-4 -left-4 w-10 h-10 animate-float" style={{ animationDelay: '0.7s' }}>
-              <Heart className="text-pink-400 w-full h-full drop-shadow-md" />
+              
+              <div className="absolute w-full h-8 bg-black/10 bottom-[-25px] blur-md rounded-full mx-auto left-0 right-0 scale-x-75"></div>
+              
+              <div className="absolute -top-6 -right-6 w-12 h-12 animate-float" style={{ animationDelay: '0.3s' }}>
+                <Star className="text-yellow-400 w-full h-full drop-shadow-md" />
+              </div>
+              <div className="absolute -bottom-4 -left-4 w-10 h-10 animate-float" style={{ animationDelay: '0.7s' }}>
+                <Heart className="text-pink-400 w-full h-full drop-shadow-md" />
+              </div>
             </div>
           </div>
         </div>
         
-        {/* Scroll indicator */}
         <button 
           onClick={scrollToNextSection}
           className="mt-16 inline-flex flex-col items-center text-gray-500 hover:text-brand-blue transition-colors animate-bounce mx-auto block"
