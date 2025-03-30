@@ -38,19 +38,36 @@ const Hero = () => {
     setIsChecking(true);
     
     try {
-      // Here we would check if the username is available
-      // For this demo, we'll simulate a check with a timeout
-      // In a real implementation, you'd query your database
+      // Query Supabase to check if the username is already taken
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('username')
+        .eq('username', username)
+        .single();
       
-      // Simulated check - replace with actual Supabase query in the future
-      setTimeout(() => {
-        toast.success("Username is available! Continue to sign up.");
-        navigate(`/signup?username=${username}`);
+      if (error && error.code !== 'PGRST116') {
+        // PGRST116 means no rows returned, which is good (username is available)
+        console.error("Error checking username:", error);
+        toast.error("Error checking username availability");
         setIsChecking(false);
-      }, 1000);
+        return;
+      }
+      
+      if (data) {
+        // Username exists
+        toast.error("Username is already taken. Please choose another one.");
+        setIsChecking(false);
+        return;
+      }
+      
+      // Username is available
+      toast.success("Username is available! Continue to sign up.");
+      navigate(`/signup?username=${username}`);
       
     } catch (error) {
-      toast.error("Error checking username");
+      console.error("Error:", error);
+      toast.error("Error checking username availability");
+    } finally {
       setIsChecking(false);
     }
   };
@@ -164,4 +181,3 @@ const Hero = () => {
 };
 
 export default Hero;
-
