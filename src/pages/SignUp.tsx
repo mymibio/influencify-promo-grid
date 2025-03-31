@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +29,7 @@ const SignUp = () => {
     const searchParams = new URLSearchParams(location.search);
     const usernameParam = searchParams.get('username');
     if (usernameParam) {
+      console.log("Found username in URL:", usernameParam);
       setUsername(usernameParam);
     }
   }, [location]);
@@ -50,7 +50,7 @@ const SignUp = () => {
         .from('user_profiles')
         .select('username')
         .eq('username', username)
-        .single();
+        .maybeSingle();
         
       if (usernameCheck) {
         toast.error("Username was claimed while you were signing up. Please choose another.");

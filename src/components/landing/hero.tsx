@@ -13,6 +13,7 @@ const Hero = () => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     setIsVisible(true);
@@ -46,25 +47,24 @@ const Hero = () => {
     if (!username) {
       setUsernameError("Please enter a username");
       toast.error("Please enter a username");
+      setIsChecking(false);
       return false;
     }
 
     if (username.length < 3) {
       setUsernameError("Username must be at least 3 characters");
       toast.error("Username must be at least 3 characters");
+      setIsChecking(false);
       return false;
     }
 
-    setIsChecking(true);
-    setUsernameError("");
-    
     try {
       console.log("Checking username:", username);
       const { data, error } = await supabase
         .from('user_profiles')
         .select('username')
         .eq('username', username)
-        .single();
+        .maybeSingle();
       
       if (error && error.code !== 'PGRST116') {
         console.error("Error checking username:", error);
@@ -83,26 +83,30 @@ const Hero = () => {
       
       toast.success("Username is available! Continue to sign up.");
       console.log("Username is available, navigating to signup");
-      navigate(`/signup?username=${username}`);
+      
+      window.location.href = `/signup?username=${username}`;
       return true;
     } catch (error) {
       console.error("Error:", error);
       setUsernameError("Error checking username availability");
       toast.error("Error checking username availability");
-      return false;
-    } finally {
       setIsChecking(false);
+      return false;
     }
   };
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await checkUsername();
+    setIsChecking(true);
+    
+    setTimeout(() => {
+      checkUsername();
+    }, 100);
   };
 
   const handleSignUpClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    navigate('/signup');
+    window.location.href = '/signup';
   };
 
   const scrollToNextSection = () => {
@@ -139,6 +143,7 @@ const Hero = () => {
             </p>
             
             <form 
+              ref={formRef}
               onSubmit={handleFormSubmit} 
               className={`w-full max-w-md mt-12 bg-white p-4 md:p-6 rounded-3xl shadow-xl border border-gray-50 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}
             >
