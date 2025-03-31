@@ -46,19 +46,20 @@ const Hero = () => {
     if (!username) {
       setUsernameError("Please enter a username");
       toast.error("Please enter a username");
-      return;
+      return false;
     }
 
     if (username.length < 3) {
       setUsernameError("Username must be at least 3 characters");
       toast.error("Username must be at least 3 characters");
-      return;
+      return false;
     }
 
     setIsChecking(true);
     setUsernameError("");
     
     try {
+      console.log("Checking username:", username);
       const { data, error } = await supabase
         .from('user_profiles')
         .select('username')
@@ -70,30 +71,38 @@ const Hero = () => {
         setUsernameError("Error checking username availability");
         toast.error("Error checking username availability");
         setIsChecking(false);
-        return;
+        return false;
       }
       
       if (data) {
         setUsernameError("Username is already taken. Please choose another one.");
         toast.error("Username is already taken. Please choose another one.");
         setIsChecking(false);
-        return;
+        return false;
       }
       
       toast.success("Username is available! Continue to sign up.");
+      console.log("Username is available, navigating to signup");
       navigate(`/signup?username=${username}`);
+      return true;
     } catch (error) {
       console.error("Error:", error);
       setUsernameError("Error checking username availability");
       toast.error("Error checking username availability");
+      return false;
     } finally {
       setIsChecking(false);
     }
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    checkUsername();
+    await checkUsername();
+  };
+
+  const handleSignUpClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    navigate('/signup');
   };
 
   const scrollToNextSection = () => {
@@ -173,11 +182,12 @@ const Hero = () => {
             </form>
             
             <div className={`flex flex-col sm:flex-row gap-4 max-w-md w-full mt-8 transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-              <Link to="/signup" className="flex-1">
-                <Button className="bg-brand-blue hover:opacity-90 text-white py-6 rounded-full text-lg w-full shadow-lg hover:shadow-brand-blue/30 transition-all hover:translate-y-[-2px]">
-                  Get Started — It's Free
-                </Button>
-              </Link>
+              <Button 
+                onClick={handleSignUpClick}
+                className="bg-brand-blue hover:opacity-90 text-white py-6 rounded-full text-lg w-full shadow-lg hover:shadow-brand-blue/30 transition-all hover:translate-y-[-2px]"
+              >
+                Get Started — It's Free
+              </Button>
               <Link to="/examples" className="flex-1">
                 <Button variant="outline" className="py-6 text-lg w-full hover:bg-gray-50 transition-all hover:translate-y-[-2px] border-gray-200 rounded-full text-gray-700">
                   See Examples
