@@ -13,7 +13,6 @@ const Hero = () => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     setIsVisible(true);
@@ -43,19 +42,19 @@ const Hero = () => {
     }
   };
 
-  const checkUsername = async () => {
+  const checkUsernameAndNavigate = async () => {
     if (!username) {
       setUsernameError("Please enter a username");
       toast.error("Please enter a username");
       setIsChecking(false);
-      return false;
+      return;
     }
 
     if (username.length < 3) {
       setUsernameError("Username must be at least 3 characters");
       toast.error("Username must be at least 3 characters");
       setIsChecking(false);
-      return false;
+      return;
     }
 
     try {
@@ -66,47 +65,37 @@ const Hero = () => {
         .eq('username', username)
         .maybeSingle();
       
-      if (error && error.code !== 'PGRST116') {
-        console.error("Error checking username:", error);
-        setUsernameError("Error checking username availability");
-        toast.error("Error checking username availability");
-        setIsChecking(false);
-        return false;
+      if (error) {
+        throw error;
       }
       
       if (data) {
         setUsernameError("Username is already taken. Please choose another one.");
         toast.error("Username is already taken. Please choose another one.");
         setIsChecking(false);
-        return false;
+        return;
       }
       
-      toast.success("Username is available! Continue to sign up.");
+      toast.success("Username is available! Redirecting to sign up...");
       console.log("Username is available, navigating to signup");
       
-      window.location.href = `/signup?username=${username}`;
-      return true;
+      navigate(`/signup?username=${username}`);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error checking username:", error);
       setUsernameError("Error checking username availability");
       toast.error("Error checking username availability");
       setIsChecking(false);
-      return false;
     }
   };
 
-  const handleFormSubmit = async (e: React.FormEvent) => {
+  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsChecking(true);
-    
-    setTimeout(() => {
-      checkUsername();
-    }, 100);
+    checkUsernameAndNavigate();
   };
 
-  const handleSignUpClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    window.location.href = '/signup';
+  const handleSignUpClick = () => {
+    navigate('/signup');
   };
 
   const scrollToNextSection = () => {
@@ -143,7 +132,6 @@ const Hero = () => {
             </p>
             
             <form 
-              ref={formRef}
               onSubmit={handleFormSubmit} 
               className={`w-full max-w-md mt-12 bg-white p-4 md:p-6 rounded-3xl shadow-xl border border-gray-50 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}
             >
@@ -274,7 +262,7 @@ const Hero = () => {
                       <span>Profile</span>
                     </div>
                     <div className="flex flex-col items-center text-xs text-gray-400">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5v14"></path><path d="M12 8v14"></path></svg>
                       <span>Links</span>
                     </div>
                     <div className="flex flex-col items-center text-xs text-gray-400">
