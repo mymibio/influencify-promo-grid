@@ -1,6 +1,7 @@
 
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { Json } from '@/integrations/supabase/types';
 
 // Create a context with authentication and profile data
 interface AuthContextType {
@@ -78,6 +79,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       if (data) {
+        // Handle the conversion from Json type to Record<string, string>
+        const socialLinksObj = data.social_links as Json;
+        
+        // Convert socialLinks from Json to Record<string, string>
+        let typedSocialLinks: Record<string, string> = {};
+        
+        // Only process if it's an object and not a string, array, or null
+        if (socialLinksObj && typeof socialLinksObj === 'object' && !Array.isArray(socialLinksObj)) {
+          Object.entries(socialLinksObj).forEach(([key, value]) => {
+            if (typeof value === 'string') {
+              typedSocialLinks[key] = value;
+            }
+          });
+        }
+        
         setProfile({
           id: data.id,
           username: data.username,
@@ -85,7 +101,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           email: data.email,
           bio: data.bio,
           profilePicture: data.profile_picture,
-          socialLinks: data.social_links
+          socialLinks: typedSocialLinks
         });
       }
     } catch (error) {
