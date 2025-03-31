@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
@@ -92,6 +91,11 @@ const Hero = () => {
     }
   };
 
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    checkUsername();
+  };
+
   const scrollToNextSection = () => {
     const featuresSection = document.getElementById("features");
     if (featuresSection) {
@@ -125,7 +129,10 @@ const Hero = () => {
               So you can share exclusive products with your followers and turn every click into a conversion.
             </p>
             
-            <div className={`w-full max-w-md mt-12 bg-white p-4 md:p-6 rounded-3xl shadow-xl border border-gray-50 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+            <form 
+              onSubmit={handleFormSubmit} 
+              className={`w-full max-w-md mt-12 bg-white p-4 md:p-6 rounded-3xl shadow-xl border border-gray-50 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}
+            >
               <div className="flex gap-2 flex-col sm:flex-row">
                 <div className="relative flex-1">
                   <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
@@ -141,8 +148,8 @@ const Hero = () => {
                 </div>
                 
                 <Button 
+                  type="submit"
                   className="bg-brand-blue hover:opacity-90 text-white whitespace-nowrap group rounded-xl"
-                  onClick={checkUsername}
                   disabled={isChecking}
                 >
                   {isChecking ? "Checking..." : (
@@ -163,7 +170,7 @@ const Hero = () => {
               <div className="text-xs text-gray-500 mt-2 text-center">
                 Claim your unique link before someone else takes it!
               </div>
-            </div>
+            </form>
             
             <div className={`flex flex-col sm:flex-row gap-4 max-w-md w-full mt-8 transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
               <Link to="/signup" className="flex-1">

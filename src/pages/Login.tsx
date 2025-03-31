@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "@/components/ui/navbar";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,10 +10,14 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { profile } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Get the pathname to redirect to after login
+  const from = location.state?.from || "/dashboard";
 
   // If already logged in, redirect to dashboard
   useEffect(() => {
@@ -41,7 +45,7 @@ const Login = () => {
       if (error) throw error;
       
       toast.success("Logged in successfully!");
-      navigate("/dashboard");
+      navigate(from);
     } catch (error: any) {
       console.error("Error during login:", error);
       toast.error(error.message || "Failed to log in");
