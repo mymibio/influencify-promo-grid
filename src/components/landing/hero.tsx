@@ -1,10 +1,10 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 import { ArrowRight, CheckCircle, Sparkles, Heart, Star, ArrowDown, ArrowLeft } from "lucide-react";
 
 const Hero = () => {

@@ -17,6 +17,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { MobilePopoverProvider } from "./components/ui/popover";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 // Add Google Fonts (injected in head)
 const fontLink = document.createElement("link");
@@ -64,12 +65,32 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<SignUp />} />
                 
-                {/* Dashboard routes */}
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/dashboard/settings" element={<DashboardSettings />} />
-                <Route path="/dashboard/analytics" element={<DashboardAnalytics />} />
-                <Route path="/dashboard/theme" element={<DashboardTheme />} />
-                <Route path="/dashboard/links" element={<Dashboard />} />
+                {/* Dashboard routes - protected */}
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/dashboard/settings" element={
+                  <ProtectedRoute>
+                    <DashboardSettings />
+                  </ProtectedRoute>
+                } />
+                <Route path="/dashboard/analytics" element={
+                  <ProtectedRoute>
+                    <DashboardAnalytics />
+                  </ProtectedRoute>
+                } />
+                <Route path="/dashboard/theme" element={
+                  <ProtectedRoute>
+                    <DashboardTheme />
+                  </ProtectedRoute>
+                } />
+                <Route path="/dashboard/links" element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } />
                 
                 {/* User profile route */}
                 <Route path="/:username" element={<UserProfile />} />

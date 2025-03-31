@@ -19,10 +19,11 @@ const SignUp = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // If already logged in, redirect to dashboard
-  if (profile) {
-    navigate("/dashboard");
-    return null;
-  }
+  useEffect(() => {
+    if (profile) {
+      navigate("/dashboard");
+    }
+  }, [profile, navigate]);
 
   // Get username from URL if available
   useEffect(() => {
@@ -44,6 +45,19 @@ const SignUp = () => {
     setIsSubmitting(true);
     
     try {
+      // Check username availability once more before signup
+      const { data: usernameCheck, error: usernameError } = await supabase
+        .from('user_profiles')
+        .select('username')
+        .eq('username', username)
+        .single();
+        
+      if (usernameCheck) {
+        toast.error("Username was claimed while you were signing up. Please choose another.");
+        setIsSubmitting(false);
+        return;
+      }
+      
       // First sign up the user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,

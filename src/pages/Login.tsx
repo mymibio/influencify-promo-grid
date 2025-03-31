@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link, useNavigate } from "react-router-dom";
@@ -16,10 +16,11 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // If already logged in, redirect to dashboard
-  if (profile) {
-    navigate("/dashboard");
-    return null;
-  }
+  useEffect(() => {
+    if (profile) {
+      navigate("/dashboard");
+    }
+  }, [profile, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +40,7 @@ const Login = () => {
       
       if (error) throw error;
       
-      toast.success("Logged in successfully! Redirecting to dashboard...");
+      toast.success("Logged in successfully!");
       navigate("/dashboard");
     } catch (error: any) {
       console.error("Error during login:", error);
@@ -57,42 +58,49 @@ const Login = () => {
           <div className="text-center">
             <h1 className="text-2xl font-bold">Welcome Back</h1>
             <p className="text-muted-foreground mt-2">
-              Sign in to access your MYMI.bio account
+              Sign in to your MYMI.bio account
             </p>
           </div>
           
           <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="w-full"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full"
-              />
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="w-full"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  Password
+                </label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full"
+                />
+                <div className="flex justify-end">
+                  <Link to="/forgot-password" className="text-sm text-[#5271FF] hover:underline mt-1">
+                    Forgot password?
+                  </Link>
+                </div>
+              </div>
             </div>
             
             <Button 
               type="submit"
-              className="w-full bg-[#FF66B3] hover:bg-[#E54C9A] text-white"
+              className="w-full bg-[#5271FF] hover:bg-[#4262EA] text-white"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Signing In..." : "Sign In"}
@@ -100,7 +108,7 @@ const Login = () => {
             
             <p className="text-center text-sm text-muted-foreground">
               Don't have an account?{" "}
-              <Link to="/signup" className="text-[#FF66B3] hover:underline">
+              <Link to="/signup" className="text-[#5271FF] hover:underline">
                 Sign Up
               </Link>
             </p>
