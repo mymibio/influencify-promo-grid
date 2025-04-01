@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -83,8 +84,8 @@ const Hero = () => {
       toast.success("Username is available! Redirecting to sign up...");
       console.log("Username is available, redirecting to signup");
       
-      // Use window.location.href for a full page reload and navigation
-      window.location.href = `/signup?username=${encodeURIComponent(username)}`;
+      // Navigate to signup page with username parameter
+      navigate(`/signup?username=${encodeURIComponent(username)}`);
     } catch (error) {
       console.error("Error checking username:", error);
       setUsernameError("Error checking username availability");
@@ -100,8 +101,7 @@ const Hero = () => {
   };
 
   const handleSignUpClick = () => {
-    // Use window.location for direct navigation
-    window.location.href = '/signup';
+    navigate('/signup');
   };
 
   const scrollToNextSection = () => {
@@ -159,15 +159,17 @@ const Hero = () => {
           
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <span className="text-gray-500 text-sm">mymi.bio/</span>
+              <div className="flex items-center">
+                <div className="px-3 py-2 bg-gray-100 border border-r-0 rounded-l-lg text-gray-500 text-sm">
+                  yourbio.link/
+                </div>
+                <Input 
+                  value={username}
+                  onChange={handleUsernameChange}
+                  className="rounded-l-none border-l-0"
+                  placeholder="yourname" 
+                />
               </div>
-              <Input 
-                value={username}
-                onChange={handleUsernameChange}
-                className="pl-[85px] pr-3 py-2 border rounded-l-lg focus:ring-blue-500 focus:border-blue-500"
-                placeholder="yourname" 
-              />
               {usernameError && (
                 <p className="absolute text-xs text-red-500 mt-1">{usernameError}</p>
               )}
@@ -218,7 +220,7 @@ const Hero = () => {
               {/* Phone Header */}
               <div className="bg-gray-50 h-10 flex items-center justify-center border-b">
                 <span className="text-sm text-gray-500">
-                  mymi.bio/{username || "yourname"}
+                  yourbio.link/{username || "yourname"}
                 </span>
               </div>
               

@@ -123,7 +123,7 @@ const SignUp = () => {
           <div className="text-center">
             <h1 className="text-2xl font-bold">Create Your Account</h1>
             <p className="text-muted-foreground mt-2">
-              Sign up to start using MYMI.bio
+              Sign up to start using your bio link
             </p>
           </div>
           
@@ -133,16 +133,21 @@ const SignUp = () => {
                 <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
                   Username
                 </label>
-                <Input
-                  id="username"
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
-                  placeholder="yourname"
-                  className="w-full"
-                  disabled={!!location.search.includes('username=')}
-                />
-                <p className="text-xs text-gray-500 mt-1">This will be your unique link: mymi.bio/{username}</p>
+                <div className="flex rounded-md shadow-sm">
+                  <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
+                    yourbio.link/
+                  </span>
+                  <Input
+                    id="username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
+                    placeholder="yourname"
+                    className="rounded-none rounded-r-md"
+                    disabled={!!location.search.includes('username=')}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">This will be your unique link: yourbio.link/{username}</p>
               </div>
               
               <div>
