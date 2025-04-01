@@ -1,114 +1,62 @@
 
-import { useState, useEffect, useRef } from "react";
-import { Check, BarChart, Palette, Link as LinkIcon, Users, Zap, Globe, Award, Shield } from "lucide-react";
+import { Check } from "lucide-react";
 
 const features = [
   {
-    title: "Beautiful Link Pages",
-    description: "Showcase your promotions in a visually stunning, responsive layout that captures attention.",
-    icon: <Palette className="h-6 w-6 text-[#FF7F50]" />
+    title: "Beautiful Pinterest-Style Grid",
+    description: "Showcase your promotions in a visually stunning, responsive layout that captures attention."
   },
   {
     title: "Multiple Card Formats",
-    description: "Choose between square or vertical cards to best showcase your products and promotions.",
-    icon: <Award className="h-6 w-6 text-[#FF7F50]" />
+    description: "Choose between 1:1 square cards or 9:16 vertical cards to best showcase your products."
   },
   {
     title: "Easy Coupon Sharing",
-    description: "Provide exclusive discount codes to your followers with one-click copy functionality.",
-    icon: <LinkIcon className="h-6 w-6 text-[#FF7F50]" />
+    description: "Provide exclusive discount codes to your followers with one-click copy functionality."
   },
   {
     title: "Custom Branding",
-    description: "Match your page to your personal brand with customizable colors, fonts, and layout options.",
-    icon: <Globe className="h-6 w-6 text-[#FF7F50]" />
+    description: "Match your page to your personal brand with customizable colors, fonts, and layout options."
   },
   {
     title: "Performance Analytics",
-    description: "Track clicks, conversions, and engagement to optimize your promotional strategy.",
-    icon: <BarChart className="h-6 w-6 text-[#FF7F50]" />
+    description: "Track clicks, conversions, and engagement to optimize your promotional strategy."
   },
   {
     title: "Direct Product Links",
-    description: "Send followers directly to product pages with trackable affiliate links.",
-    icon: <Zap className="h-6 w-6 text-[#FF7F50]" />
+    description: "Send followers directly to product pages with trackable affiliate links."
   }
 ];
 
-const Features = () => {
-  const [visibleItems, setVisibleItems] = useState<number[]>([]);
-  const featuresRef = useRef<HTMLDivElement>(null);
-  
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          const timeout = setTimeout(() => {
-            const elements = document.querySelectorAll(".feature-card");
-            elements.forEach((el, i) => {
-              setTimeout(() => {
-                setVisibleItems((prev) => [...prev, i]);
-              }, i * 100);
-            });
-          }, 200);
-          return () => clearTimeout(timeout);
-        }
-      },
-      { threshold: 0.1 }
-    );
+const FeatureCard = ({ title, description }: { title: string; description: string }) => (
+  <div className="bg-white rounded-lg shadow-sm border p-6 transition-all hover:shadow-md">
+    <div className="flex items-start gap-4">
+      <div className="mt-1 bg-brand-purple/10 rounded-full p-1">
+        <Check className="h-5 w-5 text-brand-purple" />
+      </div>
+      <div>
+        <h3 className="text-lg font-medium">{title}</h3>
+        <p className="text-muted-foreground mt-2">{description}</p>
+      </div>
+    </div>
+  </div>
+);
 
-    if (featuresRef.current) {
-      observer.observe(featuresRef.current);
-    }
-    
-    return () => observer.disconnect();
-  }, []);
-  
+const Features = () => {
   return (
-    <section className="py-24 bg-white relative overflow-hidden" id="features">
-      {/* Background elements */}
-      <div className="absolute -top-40 -left-40 w-80 h-80 bg-[#FFE6D9] opacity-40 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-[#FFE6D9] opacity-40 rounded-full blur-3xl"></div>
-      
+    <section className="py-16 bg-gray-50" id="features">
       <div className="container px-4 md:px-6">
-        <div className="text-center mb-16 animate-on-scroll">
-          <div className="inline-flex items-center justify-center rounded-full bg-[#FFE6D9] px-3 py-1 text-sm font-medium text-[#FF7F50] mb-4">
-            <span>Powerful Features</span>
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-            Everything You Need to <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF7F50] to-[#FF5F35]">Monetize Your Following</span>
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold tracking-tight">
+            Everything You Need to <span className="text-brand-purple">Monetize Your Following</span>
           </h2>
-          <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="mt-4 text-xl text-muted-foreground max-w-3xl mx-auto">
             Our platform is designed specifically for influencers looking to maximize their promotional opportunities.
           </p>
         </div>
-        
-        <div ref={featuresRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, index) => (
-            <div 
-              key={index}
-              className={`feature-card bg-white rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-700 ${
-                visibleItems.includes(index) ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-              } hover:-translate-y-2`}
-              style={{ transitionDelay: `${index * 100}ms` }}
-            >
-              <div className="p-6">
-                <div className="bg-[#FFE6D9] rounded-full p-3 inline-block mb-4">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
-                
-                <ul className="mt-6 space-y-2">
-                  {[1, 2, 3].map((point) => (
-                    <li key={point} className="flex items-center gap-2 text-sm text-gray-600">
-                      <Check className="h-4 w-4 text-[#FF7F50]" />
-                      <span>Feature subpoint {point}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+            <FeatureCard key={index} title={feature.title} description={feature.description} />
           ))}
         </div>
       </div>

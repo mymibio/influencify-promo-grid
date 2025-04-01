@@ -1,57 +1,39 @@
 
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/ui/navbar";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-  const { profile } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Get the pathname to redirect to after login
-  const from = location.state?.from || "/dashboard";
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
-  // If already logged in, redirect to dashboard
-  useEffect(() => {
-    if (profile) {
-      navigate("/dashboard");
-    }
-  }, [profile, navigate]);
-
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
-    if (!email || !password) {
-      toast.error("Please enter both email and password");
-      return;
-    }
-
-    setIsSubmitting(true);
+    // In a real app, we would send this data to an API
+    // For now, let's simulate a successful login
     
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (error) throw error;
-      
-      toast.success("Logged in successfully!");
-      navigate(from);
-    } catch (error: any) {
-      console.error("Error during login:", error);
-      toast.error(error.message || "Failed to log in");
-    } finally {
-      setIsSubmitting(false);
-    }
+    setTimeout(() => {
+      setIsLoading(false);
+      toast.success("Logged in successfully! Redirecting to dashboard...");
+      navigate("/dashboard");
+    }, 1500);
   };
 
   return (
@@ -62,40 +44,38 @@ const Login = () => {
           <div className="text-center">
             <h1 className="text-2xl font-bold">Welcome Back</h1>
             <p className="text-muted-foreground mt-2">
-              Sign in to your MYMI.bio account
+              Log in to manage your influencer page
             </p>
           </div>
           
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
+                <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
                 />
               </div>
               
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
-                </label>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
+                  name="password"
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full"
+                  placeholder="Your password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
                 />
-                <div className="flex justify-end">
-                  <Link to="/forgot-password" className="text-sm text-[#5271FF] hover:underline mt-1">
+                <div className="text-right mt-1">
+                  <Link to="/forgot-password" className="text-sm text-brand-purple hover:underline">
                     Forgot password?
                   </Link>
                 </div>
@@ -103,17 +83,17 @@ const Login = () => {
             </div>
             
             <Button 
-              type="submit"
-              className="w-full bg-[#5271FF] hover:bg-[#4262EA] text-white"
-              disabled={isSubmitting}
+              type="submit" 
+              className="w-full bg-brand-purple hover:bg-brand-dark-purple" 
+              disabled={isLoading}
             >
-              {isSubmitting ? "Signing In..." : "Sign In"}
+              {isLoading ? "Logging in..." : "Log In"}
             </Button>
             
             <p className="text-center text-sm text-muted-foreground">
-              Don't have an account?{" "}
-              <Link to="/signup" className="text-[#5271FF] hover:underline">
-                Sign Up
+              Don't have an account yet?{" "}
+              <Link to="/signup" className="text-brand-purple hover:underline">
+                Sign up
               </Link>
             </p>
           </form>

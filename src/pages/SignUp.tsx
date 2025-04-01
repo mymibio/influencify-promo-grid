@@ -1,118 +1,41 @@
 
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/ui/navbar";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
 
 const SignUp = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    username: "",
+    password: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-  const { profile } = useAuth();
-  const [username, setUsername] = useState("");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // If already logged in, redirect to dashboard
-  useEffect(() => {
-    if (profile) {
-      navigate("/dashboard");
-    }
-  }, [profile, navigate]);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
-  // Get username from URL if available
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const usernameParam = searchParams.get('username');
-    if (usernameParam) {
-      console.log("Found username in URL:", usernameParam);
-      setUsername(usernameParam);
-    }
-  }, [location]);
-
-  const handleSignUp = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Handling signup submission");
+    setIsLoading(true);
     
-    if (!username || !name || !email || !password) {
-      toast.error("Please fill in all fields");
-      return;
-    }
-
-    setIsSubmitting(true);
+    // In a real app, we would send this data to an API
+    // For now, let's simulate a successful registration
     
-    try {
-      console.log("Checking if username is still available...");
-      // Check username availability once more before signup
-      const { data: usernameCheck, error: usernameError } = await supabase
-        .from('user_profiles')
-        .select('username')
-        .eq('username', username)
-        .maybeSingle();
-        
-      if (usernameCheck) {
-        toast.error("Username was claimed while you were signing up. Please choose another.");
-        setIsSubmitting(false);
-        return;
-      }
-      
-      console.log("Username is available, proceeding with signup");
-      // First sign up the user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            username,
-            name,
-          }
-        }
-      });
-      
-      if (authError) {
-        console.error("Auth error during signup:", authError);
-        throw authError;
-      }
-      
-      if (!authData.user) {
-        console.error("No user returned from signUp");
-        throw new Error("Failed to create user");
-      }
-
-      console.log("User created successfully, creating profile");
-      // Create the user profile
-      const { error: profileError } = await supabase
-        .from('user_profiles')
-        .insert({
-          id: authData.user.id,
-          username,
-          name,
-          email,
-          bio: '',
-          social_links: {}
-        });
-      
-      if (profileError) {
-        console.error("Profile creation error:", profileError);
-        throw profileError;
-      }
-      
-      console.log("User profile created successfully");
-      toast.success("Account created! Redirecting to dashboard...");
-      
-      // Use navigate for redirection
+    setTimeout(() => {
+      setIsLoading(false);
+      toast.success("Account created successfully! Redirecting to dashboard...");
       navigate("/dashboard");
-    } catch (error: any) {
-      console.error("Error during signup:", error);
-      toast.error(error.message || "Failed to create account");
-    } finally {
-      setIsSubmitting(false);
-    }
+    }, 1500);
   };
 
   return (
@@ -123,89 +46,75 @@ const SignUp = () => {
           <div className="text-center">
             <h1 className="text-2xl font-bold">Create Your Account</h1>
             <p className="text-muted-foreground mt-2">
-              Sign up to start using your bio link
+              Start sharing your favorite products today
             </p>
           </div>
           
-          <form onSubmit={handleSignUp} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <div>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                  Username
-                </label>
-                <div className="flex rounded-md shadow-sm">
-                  <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
-                    yourbio.link/
-                  </span>
-                  <Input
-                    id="username"
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
-                    placeholder="yourname"
-                    className="rounded-none rounded-r-md"
-                    disabled={!!location.search.includes('username=')}
-                  />
-                </div>
-                <p className="text-xs text-gray-500 mt-1">This will be your unique link: yourbio.link/{username}</p>
-              </div>
-              
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Full Name
-                </label>
+                <Label htmlFor="name">Full Name</Label>
                 <Input
                   id="name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your Name"
-                  className="w-full"
+                  name="name"
+                  placeholder="Your name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
                 />
               </div>
               
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
+                <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
                 />
               </div>
               
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
-                </label>
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  name="username"
+                  placeholder="Choose a username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
+                  name="password"
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full"
+                  placeholder="Create a password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
                 />
-                <p className="text-xs text-gray-500 mt-1">Password must be at least 6 characters</p>
               </div>
             </div>
             
             <Button 
-              type="submit"
-              className="w-full bg-[#5271FF] hover:bg-[#4262EA] text-white"
-              disabled={isSubmitting}
+              type="submit" 
+              className="w-full bg-brand-purple hover:bg-brand-dark-purple" 
+              disabled={isLoading}
             >
-              {isSubmitting ? "Creating Account..." : "Create Account"}
+              {isLoading ? "Creating Account..." : "Create Account"}
             </Button>
             
             <p className="text-center text-sm text-muted-foreground">
               Already have an account?{" "}
-              <Link to="/login" className="text-[#5271FF] hover:underline">
-                Sign In
+              <Link to="/login" className="text-brand-purple hover:underline">
+                Log in
               </Link>
             </p>
           </form>
