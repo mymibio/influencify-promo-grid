@@ -37,6 +37,7 @@ const SignUp = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Handling signup submission");
     
     if (!username || !name || !email || !password) {
       toast.error("Please fill in all fields");
@@ -46,6 +47,7 @@ const SignUp = () => {
     setIsSubmitting(true);
     
     try {
+      console.log("Checking if username is still available...");
       // Check username availability once more before signup
       const { data: usernameCheck, error: usernameError } = await supabase
         .from('user_profiles')
@@ -59,6 +61,7 @@ const SignUp = () => {
         return;
       }
       
+      console.log("Username is available, proceeding with signup");
       // First sign up the user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
@@ -71,12 +74,17 @@ const SignUp = () => {
         }
       });
       
-      if (authError) throw authError;
+      if (authError) {
+        console.error("Auth error during signup:", authError);
+        throw authError;
+      }
       
       if (!authData.user) {
+        console.error("No user returned from signUp");
         throw new Error("Failed to create user");
       }
 
+      console.log("User created successfully, creating profile");
       // Create the user profile
       const { error: profileError } = await supabase
         .from('user_profiles')
@@ -89,9 +97,15 @@ const SignUp = () => {
           social_links: {}
         });
       
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error("Profile creation error:", profileError);
+        throw profileError;
+      }
       
+      console.log("User profile created successfully");
       toast.success("Account created! Redirecting to dashboard...");
+      
+      // Use navigate for redirection
       navigate("/dashboard");
     } catch (error: any) {
       console.error("Error during signup:", error);
