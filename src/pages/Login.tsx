@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/ui/navbar";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -26,14 +27,27 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    // In a real app, we would send this data to an API
-    // For now, let's simulate a successful login
-    
-    setTimeout(() => {
+    try {
+      // Sign in with Supabase auth
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      if (data && data.user) {
+        toast.success("Logged in successfully! Redirecting to dashboard...");
+        navigate("/dashboard");
+      }
+    } catch (error: any) {
+      console.error("Error during login:", error);
+      toast.error(error.message || "Failed to login. Please check your credentials and try again.");
+    } finally {
       setIsLoading(false);
-      toast.success("Logged in successfully! Redirecting to dashboard...");
-      navigate("/dashboard");
-    }, 1500);
+    }
   };
 
   return (
